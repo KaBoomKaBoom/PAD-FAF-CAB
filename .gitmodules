@@ -1,0 +1,6 @@
+[submodule "PAD-L-F-Service"]
+	path = PAD-L-F-Service
+	url = https://github.com/KaBoomKaBoom/PAD-L-F-Service.git
+[submodule "PAD-Budgeting-Service"]
+	path = PAD-Budgeting-Service
+	url = https://github.com/KaBoomKaBoom/PAD-Budgeting-Service.git
