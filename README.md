@@ -134,3 +134,145 @@ Each service has a **clear boundary** and encapsulates specific functionality to
 ## 🔗 Architecture Diagram
 
 ![Architecture Diagram](docs/architecture_diagram.jpg)
+
+---
+
+## ⚙️ Technologies and Communication Patterns
+
+Each microservice is implemented with a different technology stack to ensure diversity, flexibility, and to reflect real-world scenarios where teams may use different languages/frameworks based on their strengths and service requirements.  
+
+### 1. User Management Service
+- **Technology**: Python, FastAPI, FastAPI-Users
+- **Database**: PostgreSQL
+- **Communication**: REST APIs (synchronous), publishes identity-related events via Message Broker.
+- **Motivation**:  
+  FastAPI provides high performance for REST APIs with minimal overhead.  
+  The **FastAPI-Users** library accelerates user authentication and role management (students, teachers, admins).  
+  Python’s flexibility and ease of integration with external services (like **Discord**) makes it a strong fit.  
+  Trade-off: Not as performant as compiled languages, but speed of development and community support outweigh this for user management tasks.
+
+---
+
+### 2. Notification Service
+- **Technology**: Python, FastAPI
+- **Database**: PostgreSQL, Redis (for fast, temporary storage of notifications/queues)
+- **Communication**:  
+  - Consumes events asynchronously from the Message Broker.  
+  - Sends REST responses (e.g., confirmation of notification status).  
+- **Motivation**:  
+  Notifications must be delivered quickly and reliably. Python with FastAPI allows quick prototyping and integration with async event systems.  
+  Redis is ideal for short-lived, high-frequency messages.  
+  Trade-off: Requires careful scaling to handle spikes in traffic.
+
+---
+
+### 3. Tea Management Service
+- **Technology**: .NET 8 (ASP.NET Core Web API)
+- **Database**: PostgreSQL
+- **Communication**: REST APIs (for querying consumables), publishes events (low stock, overuse) to the Message Broker.
+- **Motivation**:  
+  .NET provides strong enterprise support and excellent integration with SQL Server.  
+  Since this service tracks inventory with structured data, relational DB is a natural fit.  
+  Trade-off: More rigid than NoSQL, but consistency and relational queries matter here.
+
+---
+
+### 4. Communication Service
+- **Technology**: .NET 8 (SignalR for real-time communication)
+- **Database**: PostgreSQL
+- **Communication**:  
+  - Real-time via WebSockets/SignalR.  
+  - Publishes infractions to Notification Service via Message Broker.  
+- **Motivation**:  
+  Real-time chat requires stable, scalable WebSocket support. SignalR abstracts much of this complexity.  
+  MongoDB handles unstructured chat data well (flexible schema).  
+  Trade-off: Eventual consistency with NoSQL, but acceptable for chat data.
+
+---
+
+### 5. Cab Booking Service
+- **Technology**: Java, Spring Boot
+- **Database**: PostgreSQL
+- **Communication**: REST APIs for booking, event publishing for reminders and conflicts.
+- **Motivation**:  
+  Spring Boot provides mature support for enterprise apps and integrates well with external services (e.g., Google Calendar).  
+  PostgreSQL ensures consistency for scheduling and avoiding double-bookings.  
+  Trade-off: Slightly steeper learning curve, but reliability justifies it.
+
+---
+
+### 6. Check-in Service
+- **Technology**: Java, Spring Boot
+- **Database**: PostgreSQL
+- **Communication**:  
+  - REST APIs to register check-in/check-out events.  
+  - Publishes entry/exit logs asynchronously (events to Notification Service).  
+- **Motivation**:  
+  Java provides good support for scalability and performance under high load (simulating CCTV input).  
+  PostgreSQL fits well with structured logs of entry/exit events.  
+  Trade-off: More verbose than Python/.NET, but ideal for stable backend tracking.
+
+---
+
+### 7. Lost & Found Service
+- **Technology**: .NET 8 (ASP.NET Core Web API)
+- **Database**: PostgreSQL
+- **Communication**: REST APIs (create posts, comment threads), publishes events (post created/resolved) to Notification Service.
+- **Motivation**:  
+  Flexible structure of posts and comments makes MongoDB a natural choice.  
+  .NET ensures good performance and developer productivity.  
+  Trade-off: Requires extra moderation logic, but performance is not a bottleneck here.
+
+---
+
+### 8. Budgeting Service
+- **Technology**: .NET 8 (ASP.NET Core Web API)
+- **Database**: PostgreSQL
+- **Communication**:  
+  - REST APIs for reports and financial logs.  
+  - Consumes events from Tea Management, Sharing, and Fund Raising Services.  
+- **Motivation**:  
+  Requires ACID compliance to handle treasury logs, debts, and donations.  
+  SQL Server provides strong consistency guarantees.  
+  Trade-off: Higher maintenance cost vs NoSQL, but correctness is crucial.
+
+---
+
+### 9. Fund Raising Service
+- **Technology**: .NET 8 (ASP.NET Core Web API)
+- **Database**: PostgreSQL
+- **Communication**:  
+  - REST APIs for campaign management.  
+  - Publishes completion events to Budgeting, Tea Management, or Sharing Services.  
+- **Motivation**:  
+  PostgreSQL provides good relational modeling for campaigns, goals, and donations.  
+  .NET allows strong integration with other services and event-driven workflows.  
+  Trade-off: Campaign data is semi-structured, but consistency of donations outweighs flexibility.
+
+---
+
+### 10. Sharing Service
+- **Technology**: .NET 8 (ASP.NET Core Web API)
+- **Database**: PostgreSQL
+- **Communication**:  
+  - REST APIs for object rentals/returns.  
+  - Publishes events to Notification Service (object broken, overdue).  
+  - Updates Budgeting Service via events when debt must be tracked.  
+- **Motivation**:  
+  MongoDB’s flexible schema is useful for varied object states (games, cords, cups).  
+  Event-driven approach ensures smooth integration with debt tracking.  
+  Trade-off: Less strict consistency, but acceptable for sharing object states.
+
+---
+
+## 📡 Communication Patterns
+- **Synchronous**:  
+  - REST APIs (FastAPI, ASP.NET Core, Spring Boot) used for direct queries (user lookup, booking availability, lost & found posts).  
+- **Asynchronous**:  
+  - Message Broker (RabbitMQ) used for events:  
+    - Notifications (infractions, booking reminders, consumables low).  
+    - Budget updates (fundraising completion, consumables overuse).  
+    - Resource state changes (object broken, sharing updates).  
+- **Real-time**:  
+  - WebSockets (SignalR) for chat and live user communication.  
+ 
