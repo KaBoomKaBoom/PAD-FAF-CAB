@@ -128,3 +128,9 @@ Each service has a **clear boundary** and encapsulates specific functionality to
 - **Boundaries**:
   - Owns sharing inventory.
   - Publishes events to **Notification Service** and **Budgeting Service**.
+  
+  ---
+
+## 🔗 Architecture Diagram
+
+![Architecture Diagram](docs/architecture_diagram.jpg)
