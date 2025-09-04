@@ -4,3 +4,9 @@
 [submodule "PAD-Budgeting-Service"]
 	path = PAD-Budgeting-Service
 	url = https://github.com/KaBoomKaBoom/PAD-Budgeting-Service.git
+[submodule "PAD_User_Management_Service"]
+	path = PAD_User_Management_Service
+	url = git@github.com:simiion12/PAD_User_Management_Service.git
+[submodule "PAD_Notification_Service"]
+	path = PAD_Notification_Service
+	url = git@github.com:simiion12/PAD_Notification_Service.git
