@@ -263,6 +263,8 @@ Each microservice is implemented with a different technology stack to ensure div
   Event-driven approach ensures smooth integration with debt tracking.  
   Trade-off: Less strict consistency, but acceptable for sharing object states.
 
+ 
+
 ---
 
 ## 📡 Communication Patterns
@@ -276,3 +278,60 @@ Each microservice is implemented with a different technology stack to ensure div
 - **Real-time**:  
   - WebSockets (SignalR) for chat and live user communication.  
  
+---
+
+## 📑 Communication Contract and Data Management
+
+### 🔗 Communication Contract
+To ensure **loose coupling** and **scalability**, services will communicate using a hybrid model of synchronous APIs and asynchronous events:
+
+1. **Synchronous Communication (APIs)**  
+   - Services expose **REST APIs** (FastAPI, ASP.NET Core, Spring Boot) for direct queries and updates.  
+   - Examples:  
+     - User Management Service provides user role/nickname lookup APIs.  
+     - Cab Booking Service provides booking availability queries.  
+     - Lost & Found Service provides APIs for creating posts and comments.  
+
+2. **Asynchronous Communication (Events via Message Broker)**  
+   - Services publish **domain events** (e.g., *ConsumablesLow*, *BookingCreated*, *ObjectBroken*) to a **Message Broker** (Kafka/RabbitMQ).  
+   - Other services subscribe to events and react accordingly.  
+   - Examples:  
+     - Tea Management Service publishes *ConsumablesLow*, consumed by Notification Service.  
+     - Sharing Service publishes *ObjectBroken*, consumed by Budgeting Service.  
+     - Fund Raising Service publishes *CampaignCompleted*, consumed by Tea Management/Sharing Service + Budgeting Service.  
+
+3. **Real-Time Communication**  
+   - Communication Service uses **SignalR (WebSockets)** for live chat between users.  
+   - Infractions are sent as async events to Notification Service.  
+
+---
+
+### 🗄️ Data Management Strategy
+
+- **Database per Service**  
+  Each microservice owns its own database. No other service is allowed to access it directly.  
+
+- **Data Sharing via APIs**  
+  Services requiring another service’s data must call its **public API** rather than accessing its database.  
+  Example:  
+  - Communication Service requests user nicknames from User Management API.  
+  - Check-in Service validates user IDs against User Management API.  
+
+- **Event-Driven Data Propagation**  
+  For cross-service workflows, events are propagated via the Message Broker.  
+  - Services maintain **local copies** of necessary external data (if needed), updated by events.  
+  - Example: Budgeting Service stores debt entries when it receives events from Tea Management or Sharing Services.  
+
+- **Consistency Model**  
+  - **Strong consistency** within a service’s own database.  
+  - **Eventual consistency** across services via asynchronous events.  
+  - Trade-off: Eventual consistency allows decoupling and resilience at the cost of short delays in data propagation, which is acceptable for the FAFCab use case (e.g., budget updates, consumable logs).  
+
+---
+
+### 📡 Example Communication Flow
+- A user consumes too much tea:  
+  1. **Tea Management Service** records consumption in its SQL Server DB.  
+  2. It publishes a `ConsumableOveruse` event to the **Message Broker**.  
+  3. **Notification Service** consumes the event → notifies the admin.  
+  4. **Budgeting Service** consumes the event → adds an entry to the debt book in SQL Server.  
