@@ -335,3 +335,250 @@ To ensure **loose coupling** and **scalability**, services will communicate usin
   2. It publishes a `ConsumableOveruse` event to the **Message Broker**.  
   3. **Notification Service** consumes the event → notifies the admin.  
   4. **Budgeting Service** consumes the event → adds an entry to the debt book in SQL Server.  
+
+  ---
+
+  # 📚 API Endpoints
+
+This section defines the **Communication Contract** (endpoints, request/response formats, and data types).
+All services expose REST APIs and exchange data in **JSON format** (`Content-Type: application/json`).
+
+---
+
+## 🔎 Lost & Found Service
+
+**Base URL:** `/api/lost-found`  
+**Database:** MongoDB  
+**Technology Stack:** .NET  
+
+### 1. Create a Post
+
+- **POST** `/posts`
+- **Description:** Create a new lost or found item post.
+
+**Request:**
+```json
+{
+  "title": "Lost USB Stick",
+  "description": "Black Kingston USB stick, lost in FAFCab kitchen",
+  "type": "lost", 
+  "authorId": "u123"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "postId": "p001",
+  "title": "Lost USB Stick",
+  "description": "Black Kingston USB stick, lost in FAFCab kitchen",
+  "type": "lost",
+  "authorId": "u123",
+  "status": "open",
+  "createdAt": "2025-09-02T10:30:00Z"
+}
+```
+
+### 2. Get All Posts
+
+- **GET** `/posts`
+- **Description:** Retrieve all lost & found posts.
+
+**Response (200 OK):**
+```json
+[
+  {
+    "postId": "p001",
+    "title": "Lost USB Stick",
+    "type": "lost",
+    "status": "open"
+  },
+  {
+    "postId": "p002",
+    "title": "Found Jacket",
+    "type": "found",
+    "status": "resolved"
+  }
+]
+```
+
+### 3. Get a Single Post
+
+- **GET** `/posts/{postId}`
+- **Description:** Retrieve details of a specific post.
+
+**Response (200 OK):**
+```json
+{
+  "postId": "p001",
+  "title": "Lost USB Stick",
+  "description": "Black Kingston USB stick, lost in FAFCab kitchen",
+  "type": "lost",
+  "authorId": "u123",
+  "status": "open",
+  "createdAt": "2025-09-02T10:30:00Z",
+  "comments": [
+    {
+      "commentId": "c001",
+      "authorId": "u555",
+      "text": "I saw one in the main room yesterday",
+      "createdAt": "2025-09-02T11:00:00Z"
+    }
+  ]
+}
+```
+
+### 4. Add Comment to Post
+
+- **POST** `/posts/{postId}/comments`
+
+**Request:**
+```json
+{
+  "authorId": "u555",
+  "text": "I saw one in the main room yesterday"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "commentId": "c001",
+  "authorId": "u555",
+  "text": "I saw one in the main room yesterday",
+  "createdAt": "2025-09-02T11:00:00Z"
+}
+```
+
+### 5. Resolve Post
+
+- **PATCH** `/posts/{postId}/resolve`
+- **Description:** Mark a post as resolved by its creator.
+
+**Response (200 OK):**
+```json
+{
+  "postId": "p001",
+  "status": "resolved",
+  "resolvedAt": "2025-09-02T12:00:00Z"
+}
+```
+
+---
+
+## 💰 Budgeting Service
+
+**Base URL:** `/api/budget`  
+**Database:** SQL Server  
+**Technology Stack:** .NET
+
+### 1. Get Current Balance
+
+- **GET** `/balance`
+- **Description:** Returns the current treasury balance.
+
+**Response (200 OK):**
+```json
+{
+  "balance": 1520.75,
+  "currency": "EUR",
+  "lastUpdated": "2025-09-02T09:00:00Z"
+}
+```
+
+### 2. Get All Transactions
+
+- **GET** `/transactions`
+- **Description:** Retrieve a list of all treasury transactions.
+
+**Response (200 OK):**
+```json
+[
+  {
+    "transactionId": "t001",
+    "type": "donation",
+    "amount": 200.00,
+    "currency": "EUR",
+    "source": "Partner NGO",
+    "createdAt": "2025-08-20T14:30:00Z"
+  },
+  {
+    "transactionId": "t002",
+    "type": "expense",
+    "amount": 50.00,
+    "currency": "EUR",
+    "source": "Tea Supplies",
+    "createdAt": "2025-08-21T09:15:00Z"
+  }
+]
+```
+
+### 3. Add a Transaction
+
+- **POST** `/transactions`
+
+**Request:**
+```json
+{
+  "type": "expense",
+  "amount": 75.00,
+  "currency": "EUR",
+  "source": "New Board Markers",
+  "authorId": "u123"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "transactionId": "t003",
+  "type": "expense",
+  "amount": 75.00,
+  "currency": "EUR",
+  "source": "New Board Markers",
+  "authorId": "u123",
+  "createdAt": "2025-09-02T10:00:00Z"
+}
+```
+
+### 4. Get Debt Book
+
+- **GET** `/debts`
+- **Description:** Retrieve a list of users who owe money for overuse or damages.
+
+**Response (200 OK):**
+```json
+[
+  {
+    "debtId": "d001",
+    "userId": "u321",
+    "reason": "Broke kettle",
+    "amount": 30.00,
+    "currency": "EUR",
+    "status": "unpaid"
+  },
+  {
+    "debtId": "d002",
+    "userId": "u789",
+    "reason": "Overused tea",
+    "amount": 15.00,
+    "currency": "EUR",
+    "status": "paid"
+  }
+]
+```
+
+### 5. Export Transactions as CSV
+
+- **GET** `/transactions/export`
+- **Description:** Allows admins to export transactions as CSV.
+
+**Response (200 OK):**
+```
+Content-Type: text/csv
+
+transactionId,type,amount,currency,source,createdAt
+t001,donation,200.00,EUR,Partner NGO,2025-08-20T14:30:00Z
+t002,expense,50.00,EUR,Tea Supplies,2025-08-21T09:15:00Z
+t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
+```
