@@ -22,3 +22,9 @@
 [submodule "PAD-Communication-Service"]
 	path = PAD-Communication-Service
 	url = https://github.com/Pascal-Adrian/PAD-Communication-Service.git
+[submodule "PAD-Fund-Raising-Service"]
+	path = PAD-Fund-Raising-Service
+	url = https://github.com/Chiuliana/PAD-Fund-Raising-Service.git
+[submodule "PAD-Sharing-Service"]
+	path = PAD-Sharing-Service
+	url = https://github.com/Chiuliana/PAD-Sharing-Service.git

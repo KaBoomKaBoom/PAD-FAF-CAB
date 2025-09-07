@@ -1052,3 +1052,420 @@ _No body_
   }
 ]
 ```
+
+## 🤝 Sharing Service
+**Base URL:** `/api/sharing`
+**Database:** PostgreSQL
+**Technology Stack:** .NET 
+### 1. Get All Shareable Items
+- **GET** `/items`
+- **Description:** Retrieve a list of all shareable items and their current status.
+**Response (200 OK):**
+```json
+[
+  {
+    "uuid": "00000000-0000-0000-0000-000000000000",
+    "owner_name": "string",
+    "owner_surname": "string",
+    "owner_uuid": "00000000-0000-0000-0000-000000000000",
+    "category": "GAMES",
+    "name": "string",
+    "image_link": "string",
+    "is_available": true,
+    "is_usable": true,
+    "state": "string",
+  }
+]
+```
+### 2. Get Shareable Items by UUID
+- **GET** `/{item_uuid}`
+- **Description:** Retrieve details of a specific shareable item by its UUID.
+**Response (200 OK):**
+```json
+{
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "owner_name": "string",
+  "owner_surname": "string",
+  "owner_uuid": "00000000-0000-0000-0000-000000000000",
+  "category": "GAMES",
+  "name": "string",
+  "image_link": "string",
+  "is_available": true,
+  "is_usable": true,
+  "state": "string",
+}
+```
+### 3. Add a New Shareable Item
+- **POST** `/items`
+- **Description:** Add a new shareable item to the inventory.
+**Request:**
+```json
+{
+  "owner_uuid": "00000000-0000-0000-0000-000000000000",
+  "category": "GAMES",
+  "name": "string",
+  "image": "blob",
+  "state": "string"
+}
+```
+**Response (201 Created):**
+```json
+{
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "owner_name": "string",
+  "owner_surname": "string",
+  "owner_uuid": "00000000-0000-0000-0000-000000000000",
+  "category": "GAMES",
+  "name": "string",
+  "image_link": "string",
+  "is_available": true,
+  "is_usable": true,
+  "state": "string",
+}
+```
+### 4. Update Shareable Item Details
+- **PATCH** `/{item_uuid}`
+- **Description:** Update details of a specific shareable item (name, image, state).
+**Request:**
+```json
+{
+  "name": "string",
+  "image": "blob",
+  "state": "string"
+}
+```
+**Response (200 OK):**
+```json
+{
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "owner_name": "string",
+  "owner_surname": "string",
+  "owner_uuid": "00000000-0000-0000-0000-000000000000",
+  "category": "GAMES",
+  "name": "string",
+  "image_link": "string",
+  "is_available": true,
+  "is_usable": true,
+  "state": "string",
+}
+```
+### 5. Delete a Shareable Item
+- **DELETE** `/{item_uuid}`
+- **Description:** Remove a shareable item from the inventory.
+**Response (204 No Content):**
+_No body_
+### 6. Rent a Shareable Item
+- **POST** `/rent`
+- **Description:** Rent a shareable item to a user.
+**Request:**
+```json
+{
+  "user_uuid": "00000000-0000-0000-0000-000000000000",
+  "item_uuid": "00000000-0000-0000-0000-000000000000",
+  "borrowed_at": "2025-09-02T10:30:00"
+}
+```
+**Response (201 Created):**
+```json
+{ 
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "user_name": "string",
+  "user_surname": "string",
+  "user_uuid": "00000000-0000-0000-0000-000000000000",
+  "item_name": "string", 
+  "item_uuid": "00000000-0000-0000-0000-000000000000",
+  "borrowed_at": "2025-09-02T10:30:00",
+  "to_be_returned_at": "2025-09-09T10:30:00",
+}
+```
+### 7. Return a Shareable Item
+- **POST** `/return`
+- **Description:** Return a rented shareable item.
+**Request:**
+```json
+{
+  "rental_uuid": "00000000-0000-0000-0000-000000000000",
+  "is_usable": true,
+  "state": "string"
+}
+```
+**Response (200 OK):**
+```json
+{
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "user_name": "string",
+  "user_surname": "string",
+  "user_uuid": "00000000-0000-0000-0000-000000000000",
+  "item_name": "string", 
+  "item_uuid": "00000000-0000-0000-0000-000000000000",
+  "borrowed_at": "2025-09-02T10:30:00",
+  "to_be_returned_at": "2025-09-09T10:30:00",
+  "returned_at": "2025-09-05T10:30:00",
+  "is_usable": true,
+  "return_state_borrower": "string"
+}
+```   
+### 8. Confirm Return
+- **POST** `/confirm-return`
+- **Description:** Confirm the return of a rented shareable item by the owner.
+**Request:**
+```json
+{
+  "rental_uuid": "00000000-0000-0000-0000-000000000000",
+  "is_usable": true,
+  "state": "string"
+}
+```
+**Response (200 OK):**
+```json
+{
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "user_name": "string",
+  "user_surname": "string",
+  "user_uuid": "00000000-0000-0000-0000-000000000000",
+  "item_name": "string", 
+  "item_uuid": "00000000-0000-0000-0000-000000000000",
+  "borrowed_at": "2025-09-02T10:30:00",
+  "to_be_returned_at": "2025-09-09T10:30:00",
+  "returned_at": "2025-09-05T10:30:00",
+  "is_usable": true,
+  "return_state_borrower": "string",
+  "return_state_owner": "string"
+}
+``` 
+## 💸 Fund Raising Service
+**Base URL:** `/api/fundraising`
+**Database:** PostgreSQL
+**Technology Stack:** .NET
+### 1. Get All Fundraising Campaigns
+- **GET** `/`
+- **Description:** Retrieve a list of all fundraising campaigns.
+**Response (200 OK):**
+```json
+[
+  {
+    "uuid": "00000000-0000-0000-0000-000000000000",
+    "author_name": "string",
+    "author_surname": "string",
+    "author_uuid": "00000000-0000-0000-0000-000000000000",
+    "good_name": "string",
+    "good_amount": 0.0,
+    "good_type": "MONEY",
+    "good_uuid": "00000000-0000-0000-0000-000000000000",
+    "title": "string",
+    "description": "string",
+    "amount": 0.0,
+    "target": 0.0,
+    "created_at": "2025-09-02T10:30:00Z",
+    "expires_at": "2025-09-02T10:30:00Z",
+    "is_active": true
+  }
+]
+```
+### 2. Get Fundraising Campaign by UUID
+- **GET** `/{fundraiser_uuid}`
+- **Description:** Update details of a specific fundraising campaign (title, description, target, expires_at).  
+**Request:**
+```json
+{
+  "title": "string",
+  "description": "string",
+  "target": 0.0,
+  "expires_at": "2025-09-02T10:30:00Z"
+}
+``` 
+**Response (200 OK):**
+```json
+{
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "author_name": "string",
+  "author_surname": "string",
+  "author_uuid": "00000000-0000-0000-0000-000000000000",
+  "good_name": "string",
+  "good_amount": 0.0,
+  "good_type": "MONEY",
+  "good_uuid": "00000000-0000-0000-0000-000000000000",
+  "title": "string",
+  "description": "string",
+  "amount": 0.0,
+  "target": 0.0,
+  "created_at": "2025-09-02T10:30:00Z",
+  "expires_at": "2025-09-02T10:30:00Z",
+  "is_active": true
+}
+```   
+### 5. Delete a Fundraising Campaign 
+- **DELETE** `/{fundraiser_uuid}`
+- **Description:** Delete a specific fundraising campaign by its UUID.
+**Response (204 No Content):**
+_No body_
+### 6. Create a Donation
+- **POST** `/donations`
+- **Description:** Create a new donation towards a fundraising campaign.
+**Request:**
+```json
+{
+  "fundraiser_uuid": "00000000-0000-0000-0000-000000000000",
+  "user_uuid": "00000000-0000-0000-0000-000000000000",
+  "amount": 0.0,
+  "currency": "EUR",
+  "payment_method": "CREDIT_CARD",
+  "reason": "string"
+}
+```
+- **Description:** Retrieve details of a specific fundraising campaign by its UUID.
+**Response (200 OK):**
+```json
+{
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "author_name": "string",
+  "author_surname": "string",
+  "author_uuid": "00000000-0000-0000-0000-000000000000",
+  "good_name": "string",
+  "good_amount": 0.0,
+  "good_type": "MONEY",
+  "good_uuid": "00000000-0000-0000-0000-000000000000",
+  "title": "string",
+  "description": "string",
+  "amount": 0.0,
+  "target": 0.0,
+  "created_at": "2025-09-02T10:30:00Z",
+  "expires_at": "2025-09-02T10:30:00Z",
+  "is_active": true
+}
+```
+### 3. Create a New Fundraising Campaign
+- **POST** `/`
+- **Description:** Create a new fundraising campaign.
+**Request:**
+```json
+{
+  "author_uuid": "00000000-0000-0000-0000-000000000000",
+  "good_uuid": "00000000-0000-0000-000000000000",
+  "title": "string",
+  "description": "string",
+  "target": 0.0,
+  "expires_at": "2025-09-02T10:30:00Z"
+}
+```
+**Response (201 Created):**
+```json
+{
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "author_name": "string",
+  "author_surname": "string",
+  "author_uuid": "00000000-0000-0000-0000-000000000000",
+  "good_name": "string",
+  "good_amount": 0.0,
+  "good_type": "MONEY",
+  "good_uuid": "00000000-0000-0000-0000-000000000000",
+  "title": "string",
+  "description": "string",
+  "amount": 0.0,
+  "target": 0.0,
+  "created_at": "2025-09-02T10:30:00Z",
+  "expires_at": "2025-09-02T10:30:00Z",
+  "is_active": true
+}
+```
+### 4. Update Fundraising Campaign Details
+- **PATCH** `/{fundraiser_uuid}`
+- **Description:** Update details of a specific fundraising campaign (title, description, target, expires_at).  
+**Request:**
+```json
+{
+  "title": "string",
+  "description": "string",
+  "target": 0.0,
+  "expires_at": "2025-09-02T10:30:00Z"
+}
+``` 
+**Response (200 OK):**
+```json
+{
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "author_name": "string",
+  "author_surname": "string",
+  "author_uuid": "00000000-0000-0000-0000-000000000000",
+  "good_name": "string",
+  "good_amount": 0.0,
+  "good_type": "MONEY",
+  "good_uuid": "00000000-0000-0000-0000-000000000000",
+  "title": "string",
+  "description": "string",
+  "amount": 0.0,
+  "target": 0.0,
+  "created_at": "2025-09-02T10:30:00Z",
+  "expires_at": "2025-09-02T10:30:00Z",
+  "is_active": true
+}
+```   
+### 5. Delete a Fundraising Campaign 
+- **DELETE** `/{fundraiser_uuid}`
+- **Description:** Delete a specific fundraising campaign by its UUID.
+**Response (204 No Content):**
+_No body_
+### 6. Create a Donation
+- **POST** `/donations`
+- **Description:** Create a new donation towards a fundraising campaign.
+**Request:**
+```json
+{
+  "fundraiser_uuid": "00000000-0000-0000-0000-000000000000",
+  "user_uuid": "00000000-0000-0000-0000-000000000000",
+  "amount": 0.0
+}
+```
+**Response (201 Created):**
+```json
+{
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "fundraiser_title": "string",
+  "fundraiser_uuid": "00000000-0000-0000-0000-000000000000",
+  "good_name": "string",
+  "good_uuid": "00000000-0000-0000-0000-000000000000",
+  "user_name": "string",
+  "user_surname": "string",
+  "user_uuid": "00000000-0000-0000-0000-000000000000",
+  "amount": 0.0,
+  "created_at": "2025-09-02T10:30:00Z"
+}
+```
+### 7. Get Donations by Fundraiser UUID
+- **GET** `/donations/{fundraiser_uuid}`
+- **Description:** Retrieve all donations made towards a specific fundraising campaign.
+**Response (200 OK):**
+```json
+[
+  {
+    "uuid": "00000000-0000-0000-0000-000000000000",
+    "fundraiser_title": "string",
+    "fundraiser_uuid": "00000000-0000-0000-0000-000000000000",
+    "good_name": "string",
+    "good_uuid": "00000000-0000-0000-0000-000000000000",
+    "user_name": "string",
+    "user_surname": "string",
+    "user_uuid": "00000000-0000-0000-0000-000000000000",
+    "amount": 0.0,
+    "created_at": "2025-09-02T10:30:00Z"
+  }
+]
+```
+### 8. Get Donations by User UUID
+- **GET** `/donations/user/{user_uuid}`
+- **Description:** Retrieve all donations made by a specific user.
+**Response (200 OK):**
+```json
+[
+  { 
+    "uuid": "00000000-0000-0000-0000-000000000000",
+    "fundraiser_title": "string",
+    "fundraiser_uuid": "00000000-0000-0000-0000-000000000000",
+    "good_name": "string",
+    "good_uuid": "00000000-0000-0000-0000-000000000000",
+    "amount": 0.0,
+    "created_at": "2025-09-02T10:30:00Z"
+  }
+]
+```
+
