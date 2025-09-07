@@ -582,3 +582,259 @@ t001,donation,200.00,EUR,Partner NGO,2025-08-20T14:30:00Z
 t002,expense,50.00,EUR,Tea Supplies,2025-08-21T09:15:00Z
 t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
 ```
+
+---
+
+## Cab Booking Service
+**Base url:** `/api/bookings`
+
+**Database:** PostgreSQL
+
+**Technology stack:** Java & Spring boot
+
+### 1. Create a booking
+- **POST**
+- **Description:** Create a booking of any of the rooms in Google Calendar
+  **Request:**
+``` json
+{
+    "user_email": "username@gmail.com",
+    "room": "KITCHEN",
+    "startIso": "2025-09-06T09:00:00+03:00",
+    "endIso": "2025-09-06T09:00:00+03:00",
+    "attendees": [
+        {
+            "user_email": "username@gmail.com",
+            "role": "STUDENT"
+        },
+        {
+            "user_email": "username@gmail.com",
+            "role": "STUDENT"
+        }
+    ]
+}
+```
+**Response:**
+``` json
+{
+  "id": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+  "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+  "room": "KITCHEN"
+  "user_email": "username@gmail.com"
+  "startIso": "2025-09-06T09:00:00+03:00",
+  "endIso": "2025-09-06T09:00:00+03:00",
+  "googleEventId": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+  "created_at": "2025-09-06T09:00:00+03:00"
+}
+```
+
+### 2. Get all bookings
+- **GET**
+- **Description:** Get all registered bookings
+  **Response:**
+``` json
+{
+    {
+        "id": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+        "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+        "room": "KITCHEN"
+        "user_email": "username@gmail.com"
+        "startIso": "2025-09-06T09:00:00+03:00",
+        "endIso": "2025-09-06T09:00:00+03:00",
+        "googleEventId": "c75f7c66-e858-47d6-bb82-7ea5547c800c"
+    },
+    {
+        "id": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+        "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+        "room": "KITCHEN"
+        "user_email": "username@gmail.com"
+        "startIso": "2025-09-06T09:00:00+03:00",
+        "endIso": "2025-09-06T09:00:00+03:00",
+        "googleEventId": "c75f7c66-e858-47d6-bb82-7ea5547c800c"
+    }
+}
+```
+### 3. Get booking by uuid
+- **GET** `/{booking_uuid}`
+- **Description:** Get booking by it's uuid
+  **Response:**
+``` json
+{
+  "id": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+  "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+  "room": "KITCHEN"
+  "user_email": "username@gmail.com"
+  "startIso": "2025-09-06T09:00:00+03:00",
+  "endIso": "2025-09-06T09:00:00+03:00",
+  "googleEventId": "c75f7c66-e858-47d6-bb82-7ea5547c800c"
+}
+```
+### 4. Cancel a booking
+- **DELETE** `/{booking_uuid}`
+- **Description:** Cancel a booking by it's uuid
+  **Response:**
+``` json
+{
+  "status": "canceled"
+  "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+}
+```
+### 5. Add/Remove attendees
+- **PATCH** `/{booking_uuid}/attendees`
+- **Description:** Add or remove attendees from a google calendar booking
+  **Request:**
+``` json
+{
+  "add": [
+    {
+      "user_email": "username@gmail.com"
+      "role": "STUDENT"
+    }
+  ],
+  "remove": [
+    {
+      "user_email": "username@gmail.com"
+      "role": "STUDENT"
+    }
+  ]
+}
+```
+**Response:**
+``` json
+{
+  "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+  "attendees": [
+    {
+      "user_email": "username@gmail.com"
+      "status": "added"
+    },
+    {
+      "user_email": "username@gmail.com"
+      "status": "removed"
+    }
+  ],
+  "updatedAt": "2025-09-06T09:00:00+03:00",
+}
+```
+### 6. Get attendees of a booking
+- **GET** /{booking_uuid}/attendees`
+- **Description:** Get all attendees of a booking
+  **Response:**
+``` json
+{
+    {
+        "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+        "user_email: "username@gmail.com"
+    },
+    {
+        "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+        "user_email: "username@gmail.com"
+    }
+}
+```
+### 7. Google calendare response
+``` json
+{
+  "kind": "calendar#event",
+  "id": "97nt9h22gfb7ojk7hm2k3ajob0",
+  "status": "confirmed",
+  "htmlLink": "https://www.google.com/calendar/event?eid=...",
+  "summary": "Room booked by Alice",
+  "start": { "dateTime": "2025-09-06T09:00:00+03:00" },
+  "end":   { "dateTime": "2025-09-06T10:00:00+03:00" },
+  "attendees": [
+    { 
+        "email": "username@gmail.com", 
+        "responseStatus": "needsAction" 
+    }
+  ]
+}
+```
+
+---
+
+# Check-in Service
+**Base url:** `/api/check_in`
+
+**Database:** PostgreSQL
+
+**Technology stack:** Java & Spring boot
+
+### 1. Create an entry
+- **POST**
+- **Database:** PostgreSQL
+- **Technology stack:** Java & Spring boot
+  **Request:**
+``` json
+{
+    "id": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+    "registered_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c", (OPTIONAL)    
+    "unregistered_uuid": "guest_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c", (OPTIONAL)
+    "entry_time": "2025-09-06T09:00:00+03:00"
+}
+```
+**Response:**
+``` json
+{
+    "entry_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+    "registered_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c", (OPTIONAL)
+    "unregistered_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c", (OPTIONAL)
+    "authorized": True (False if no user/guest uuid provided)
+    "entry_time": "2025-09-06T09:00:00+03:00",
+    "exit_time": "2025-09-06T09:00:00+03:00",
+}
+```
+
+### 2. Get an entry
+- **GET** `/{entry_uuid}`
+- **Description:** Get an entry via its uuid
+  **Response:**
+``` json
+{
+    "entry_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+    "registered_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c", (OPTIONAL)
+    "unregistered_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c", (OPTIONAL)
+    "authorized": True (False if no user/guest uuid provided)
+    "entry_time": "2025-09-06T09:00:00+03:00",
+    "exit_time": "2025-09-06T09:00:00+03:00",
+}
+```
+
+### 3. Create a guest
+- **POST** `/create_guest`
+- **Description:** Create a guest
+  **Request:**
+``` json
+{
+    "user_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+    "guest_name": "JohnDoe"
+    "room": "KITCHEN"
+}
+```
+**Response:**
+``` json
+{
+    "guest_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+    "registered_by": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+    "room": "KITCHEN"
+}
+```
+
+### 4. Get all guests
+- **GET**
+- **Description:** Get all guests that were registered
+  **Response:**
+``` json
+{
+    {
+        "guest_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+        "registered_by": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+        "room": "KITCHEN"
+    },
+    {
+        "guest_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+        "registered_by": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+        "room": "KITCHEN"
+    }
+}
+```
