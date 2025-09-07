@@ -10,3 +10,9 @@
 [submodule "PAD_Notification_Service"]
 	path = PAD_Notification_Service
 	url = git@github.com:simiion12/PAD_Notification_Service.git
+[submodule "PAD_Check-in_Service"]
+	path = PAD_Check-in_Service
+	url = https://github.com/Kipitokisk/PAD_Check-in_Service.git
+[submodule "PAD_Cab_Booking_Service"]
+	path = PAD_Cab_Booking_Service
+	url = https://github.com/Kipitokisk/PAD_Cab_Booking_Service.git
