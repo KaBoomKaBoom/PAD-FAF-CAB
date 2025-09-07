@@ -599,17 +599,17 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
 ``` json
 {
     "user_email": "username@gmail.com",
-    "room": "KITCHEN",
+    "room_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
     "startIso": "2025-09-06T09:00:00+03:00",
     "endIso": "2025-09-06T09:00:00+03:00",
     "attendees": [
         {
             "user_email": "username@gmail.com",
-            "role": "STUDENT"
+            "role_name": "STUDENT"
         },
         {
             "user_email": "username@gmail.com",
-            "role": "STUDENT"
+            "role_name": "STUDENT"
         }
     ]
 }
@@ -619,7 +619,7 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
 {
   "id": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
   "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
-  "room": "KITCHEN"
+  "room_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
   "user_email": "username@gmail.com"
   "startIso": "2025-09-06T09:00:00+03:00",
   "endIso": "2025-09-06T09:00:00+03:00",
@@ -637,7 +637,7 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
     {
         "id": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
         "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
-        "room": "KITCHEN"
+        "room_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
         "user_email": "username@gmail.com"
         "startIso": "2025-09-06T09:00:00+03:00",
         "endIso": "2025-09-06T09:00:00+03:00",
@@ -646,7 +646,7 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
     {
         "id": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
         "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
-        "room": "KITCHEN"
+        "room_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
         "user_email": "username@gmail.com"
         "startIso": "2025-09-06T09:00:00+03:00",
         "endIso": "2025-09-06T09:00:00+03:00",
@@ -662,7 +662,7 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
 {
   "id": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
   "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
-  "room": "KITCHEN"
+  "room_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
   "user_email": "username@gmail.com"
   "startIso": "2025-09-06T09:00:00+03:00",
   "endIso": "2025-09-06T09:00:00+03:00",
@@ -676,7 +676,7 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
 ``` json
 {
   "status": "canceled"
-  "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
+  "booking_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c"
 }
 ```
 ### 5. Add/Remove attendees
@@ -688,13 +688,13 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
   "add": [
     {
       "user_email": "username@gmail.com"
-      "role": "STUDENT"
+      "role_name": "STUDENT"
     }
   ],
   "remove": [
     {
       "user_email": "username@gmail.com"
-      "role": "STUDENT"
+      "role_name": "STUDENT"
     }
   ]
 }
@@ -713,7 +713,7 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
       "status": "removed"
     }
   ],
-  "updatedAt": "2025-09-06T09:00:00+03:00",
+  "updatedAt": "2025-09-06T09:00:00+03:00"
 }
 ```
 ### 6. Get attendees of a booking
@@ -781,7 +781,7 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
     "unregistered_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c", (OPTIONAL)
     "authorized": True (False if no user/guest uuid provided)
     "entry_time": "2025-09-06T09:00:00+03:00",
-    "exit_time": "2025-09-06T09:00:00+03:00",
+    "exit_time": "2025-09-06T09:00:00+03:00"
 }
 ```
 
@@ -796,7 +796,7 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
     "unregistered_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c", (OPTIONAL)
     "authorized": True (False if no user/guest uuid provided)
     "entry_time": "2025-09-06T09:00:00+03:00",
-    "exit_time": "2025-09-06T09:00:00+03:00",
+    "exit_time": "2025-09-06T09:00:00+03:00"
 }
 ```
 
@@ -808,7 +808,7 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
 {
     "user_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
     "guest_name": "JohnDoe"
-    "room": "KITCHEN"
+    "room_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c"
 }
 ```
 **Response:**
@@ -816,7 +816,7 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
 {
     "guest_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
     "registered_by": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
-    "room": "KITCHEN"
+    "room_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c"
 }
 ```
 
@@ -829,12 +829,12 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
     {
         "guest_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
         "registered_by": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
-        "room": "KITCHEN"
+        "room_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c"
     },
     {
         "guest_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
         "registered_by": "c75f7c66-e858-47d6-bb82-7ea5547c800c",
-        "room": "KITCHEN"
+        "room_uuid": "c75f7c66-e858-47d6-bb82-7ea5547c800c"
     }
 }
 ```
