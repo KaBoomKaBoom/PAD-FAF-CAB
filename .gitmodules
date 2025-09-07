@@ -16,3 +16,9 @@
 [submodule "PAD_Cab_Booking_Service"]
 	path = PAD_Cab_Booking_Service
 	url = https://github.com/Kipitokisk/PAD_Cab_Booking_Service.git
+[submodule "PAD-Tea-Management-Service"]
+	path = PAD-Tea-Management-Service
+	url = https://github.com/Pascal-Adrian/PAD-Tea-Management-Service.git
+[submodule "PAD-Communication-Service"]
+	path = PAD-Communication-Service
+	url = https://github.com/Pascal-Adrian/PAD-Communication-Service.git

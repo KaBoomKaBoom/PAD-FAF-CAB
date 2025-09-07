@@ -838,3 +838,217 @@ t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
     }
 }
 ```
+
+## ☕️ Tea Management Service
+
+**Base URL:** `/api/consumables`  
+**Database:** PostgreSQL  
+**Technology Stack:** .NET
+
+### 1. Get All Consumables
+- **GET** `/`
+- **Description:** Retrieve a list of all consumables and their current stock levels.
+**Response (200 OK):**
+```json
+[
+  {
+    "uuid": "00000000-0000-0000-0000-000000000000",
+    "name": "string",
+    "image_link": "string",
+    "amount": 0.0,
+    "amount_type": "GRAMS",
+    "threshold": 0.0,
+    "edited_at": "2025-09-02T10:30:00Z"
+  }
+]
+```
+### 2. Get Consumable by UUID
+- **GET** `/{consumable_uuid}`
+- **Description:** Retrieve details of a specific consumable by its UUID.
+**Response (200 OK):**
+```json
+{
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "name": "string",
+  "image_link": "string",
+  "amount": 0.0,
+  "amount_type": "GRAMS",
+  "threshold": 0.0,
+  "edited_at": "2025-09-02T10:30:00Z"
+}
+```
+### 3. Add a New Consumable
+- **POST** `/`
+- **Description:** Add a new consumable to the inventory.
+**Request:**
+```json
+{
+  "name": "string",
+  "image": "blob",
+  "amount": 0.0,
+  "amount_type": "GRAMS",
+  "threshold": 0.0
+}
+```
+**Response (201 Created):**
+```json
+{
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "name": "string",
+  "image_link": "string",
+  "amount": 0.0,
+  "amount_type": "GRAMS",
+  "threshold": 0.0,
+  "edited_at": "2025-09-02T10:30:00Z"
+}
+```
+### 4. Update Consumable Details
+- **PATCH** `/{consumable_uuid}`
+- **Description:** Update details of a specific consumable (name, image, threshold).
+**Request:**
+```json
+{
+  "name": "string",
+  "image": "blob",
+  "threshold": 0.0
+}
+```
+**Response (200 OK):**
+```json
+{
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "name": "string",
+  "image_link": "string",
+  "amount": 0.0,
+  "amount_type": "GRAMS",
+  "threshold": 0.0,
+  "edited_at": "2025-09-02T10:30:00Z"
+}
+```
+### 5. Delete a Consumable
+- **DELETE** `/{consumable_uuid}`
+- **Description:** Remove a consumable from the inventory.
+**Response (204 No Content):**
+_No body_
+### 6. Get Consumption Logs
+- **GET** `/logs`
+- **Description:** Retrieve a list of all consumption logs.
+**Response (200 OK):**
+```json
+[
+  {
+    "user_name": "string",
+    "user_surname": "string",
+    "user_uuid": "00000000-0000-0000-0000-000000000000",
+    "name": "string",
+    "image_link": "string",
+    "consumable_uuid": "00000000-0000-0000-0000-000000000000",
+    "amount": 0.0,
+    "amount_type": "GRAMS",
+    "created_at": "2025-09-02T10:30:00Z"
+  }
+]
+```
+### 7. Log Consumable Usage
+- **POST** `/logs/use`
+- **Description:** Log the usage of a consumable by a user.
+**Request:**
+```json
+{
+  "user_uuid": "00000000-0000-0000-0000-000000000000",
+  "consumable_uuid": "00000000-0000-0000-0000-000000000000",
+  "amount": 0.0
+}
+```
+**Response (201 Created):**
+```json
+{
+  "user_name": "string",
+  "user_surname": "string",
+  "user_uuid": "00000000-0000-0000-0000-000000000000",
+  "name": "string",
+  "image_link": "string",
+  "consumable_uuid": "00000000-0000-0000-0000-000000000000",
+  "amount": 0.0,
+  "amount_type": "GRAMS",
+  "created_at": "2025-09-02T10:30:00Z"
+}
+```
+### 8. Log Consumable Restock
+- **POST** `/logs/restock`
+- **Description:** Log the restock of a consumable by an admin.
+**Request:**
+```json
+{
+  "user_uuid": "00000000-0000-0000-0000-000000000000",
+  "consumable_uuid": "00000000-0000-0000-0000-000000000000",
+  "amount": 0.0
+}
+```
+**Response (201 Created):**
+```json
+{
+  "user_name": "string",
+  "user_surname": "string",
+  "user_uuid": "00000000-0000-0000-0000-000000000000",
+  "name": "string",
+  "image_link": "string",
+  "consumable_uuid": "00000000-0000-0000-0000-000000000000",
+  "amount": 0.0,
+  "amount_type": "GRAMS",
+  "created_at": "2025-09-02T10:30:00Z"
+}
+```
+---
+
+## 💬 Communication Service
+**Base URL:** `/api/chat`
+**Database:** MongoDB, PostgreSQL
+**Technology Stack:** .NET (SignalR for real-time communication)
+### 1. Connect to Chat Hub
+- **Endpoint:** `/chatHub`
+- **Description:** Establish a WebSocket connection to the chat hub using SignalR.
+- **Request:**
+  - Use SignalR client to connect to the hub.
+- **Response:**
+  - WebSocket connection established.
+### 2. Send Message to Chat
+- **Method:** `SendMessage`
+- **Description:** Send a message to a private chat.
+- **Request:**
+```json
+{
+  "user_id": "string",
+  "message": "string"
+}
+```
+- **Response:**
+  - Message sent confirmation.
+### 3. Send Message to Channel
+- **Method:** `SendChannelMessage`
+- **Description:** Send a message to a specific channel.
+- **Request:**
+```json
+{
+  "channel_id": "string",
+  "message": "string"
+}
+```
+- **Response:**
+  - Message sent confirmation.
+### 4. Receive Messages
+- **Method:** `ReceiveMessage`
+- **Description:** Receive messages from the chat hub.
+- **Response:**
+```json
+[
+  {
+    "message_id": "string",
+    "sender_id": "string",
+    "channel_id": "string",
+    "content": "string",
+    "sent_at": "2025-09-02T10:30:00Z",
+    "read": false
+  }
+]
+```
