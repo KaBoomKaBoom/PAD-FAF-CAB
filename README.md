@@ -1491,6 +1491,7 @@ _No body_
   - `feat: add comment endpoint to Lost & Found service`
   - `fix: correct balance calculation in Budgeting service`
   - `doc: update contribution guidelines`
+- PRs on main are closed after end-to-end testing and 3 approvals
 
 ---
 
