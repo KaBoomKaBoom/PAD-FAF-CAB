@@ -1468,4 +1468,49 @@ _No body_
   }
 ]
 ```
+---
+
+## 🤝 Contribution Guidelines
+
+### 🔀 Branching Strategy
+- **Main Branches:**
+  - `main` → Stable production-ready code
+  - `development` → Active development branch where features are merged before release
+- **Naming Branches:**  
+  - Naming convention: `<ticket-number>/<short-description>` 
+
+---
+
+### 🔧 Merging Strategy
+- All changes must be introduced via **Pull Requests (PRs)**.
+- PRs into `main` and `development` require:
+  - **At least 2 approvals** from team members.
+  - All checks/tests to pass successfully.
+- Use **Squash and Merge** strategy to keep history clean.
+- Commit messages should be descriptive and follow [Conventional Commits](https://www.conventionalcommits.org/) style:
+  - `feat: add comment endpoint to Lost & Found service`
+  - `fix: correct balance calculation in Budgeting service`
+  - `doc: update contribution guidelines`
+
+---
+
+### 📋 Pull Request Template
+Each PR should include:
+1. **Summary** – Short description of the change.
+2. **Related Issue** – Reference to issue number (if applicable).
+3. **Changes Made** – List of modifications.
+4. **Testing Done** – How was this tested (manual/automated).
+5. **Checklist**:
+   - [ ] Code follows project coding style
+   - [ ] Tests added/updated
+   - [ ] Documentation updated (if required)
+
+---
+
+### 🗂 Example Workflow
+1. Create a new branch from `development`:  
+   ```bash
+   git checkout development
+   git pull origin development
+   git checkout -b feature/communication-censorship
 
