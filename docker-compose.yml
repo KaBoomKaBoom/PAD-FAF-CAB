@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+  budgeting_service.api:
+    image: andreiberco/pad-budgeting-service:1.1
+    container_name: pad-budgeting-service
+    ports:
+      - "8087:8087"
+    depends_on:
+      - budgeting_postgres
+    env_file:
+      - ./.env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${BUDGETING_POSTGRES_DB};Username=${BUDGETING_POSTGRES_USER};Password=${BUDGETING_POSTGRES_PASSWORD}
+
+  budgeting_postgres:
+    image: postgres:16
+    container_name: pad-budgeting-service.db
+    environment:
+      - POSTGRES_DB=${BUDGETING_POSTGRES_DB}
+      - POSTGRES_USER=${BUDGETING_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${BUDGETING_POSTGRES_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - budgeting_postgres_data:/var/lib/postgresql/data
+
+  lost_found_service.api:
+    image: andreiberco/pad-l-f-service:1.1
+    container_name: pad-l-f-service
+    ports:
+      - "8086:8086"
+    depends_on:
+      - lf_postgres
+    env_file:
+      - ./.env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${LF_POSTGRES_DB};Username=${LF_POSTGRES_USER};Password=${LF_POSTGRES_PASSWORD}
+
+  lf_postgres:
+    image: postgres:16
+    container_name: pad-l-f-service.db
+    environment:
+      - POSTGRES_DB=${LF_POSTGRES_DB}
+      - POSTGRES_USER=${LF_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${LF_POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - lf_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  budgeting_postgres_data:
+  lf_postgres_data:
+
+#Same goes the next microservices and data bases
