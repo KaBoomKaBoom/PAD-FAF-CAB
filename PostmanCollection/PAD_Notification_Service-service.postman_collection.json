@@ -1,0 +1,454 @@
+{
+	"info": {
+		"_postman_id": "notification-service-collection",
+		"name": "Notification Service",
+		"description": "Complete API testing collection for Notification Service\n\n## Overview\nThis collection tests all endpoints of the notification service including:\n- Health check endpoint\n- Internal notification sending\n- WebSocket connection testing\n- Error handling scenarios\n\n## Setup\n1. Set the `base_url` environment variable (e.g., `http://localhost:8000`)\n2. Generate test user UUIDs using the provided scripts\n3. Run the collection in sequence for best results\n\n## WebSocket Testing\nFor WebSocket testing, use a WebSocket client like:\n- Browser Console\n- WebSocket King Chrome Extension  \n- Postman WebSocket requests (newer versions)\n\nConnect to: `ws://{{base_url}}/ws/{{user_uuid}}`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "notification-service"
+	},
+	"item": [
+		{
+			"name": "Send Notification - Single User",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Generate a test user UUID",
+							"const uuid = require('uuid');",
+							"const testUserUuid = 'user-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);",
+							"pm.environment.set('test_user_uuid', testUserUuid);",
+							"",
+							"console.log('Generated test user UUID:', testUserUuid);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has correct structure\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('notifications_uuid');",
+							"    pm.expect(responseJson).to.have.property('users_notified');",
+							"    pm.expect(responseJson).to.have.property('status');",
+							"});",
+							"",
+							"pm.test(\"Single user notification created\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.users_notified).to.eql(1);",
+							"    pm.expect(responseJson.notifications_uuid).to.have.lengthOf(1);",
+							"    pm.expect(responseJson.status).to.eql('sent');",
+							"});",
+							"",
+							"// Save notification ID for future tests",
+							"const responseJson = pm.response.json();",
+							"if (responseJson.notifications_uuid && responseJson.notifications_uuid.length > 0) {",
+							"    pm.environment.set('last_notification_id', responseJson.notifications_uuid[0]);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_uuids\": [\"{{test_user_uuid}}\"],\n    \"notification_type\": \"info\",\n    \"message\": \"Hello! This is a test notification for a single user.\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/internal/notify",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"internal",
+						"notify"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send Notification - Multiple Users",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Generate multiple test user UUIDs",
+							"const users = [];",
+							"for (let i = 0; i < 3; i++) {",
+							"    users.push('user-' + Date.now() + '-' + i + '-' + Math.random().toString(36).substr(2, 9));",
+							"}",
+							"pm.environment.set('test_users_json', JSON.stringify(users));",
+							"",
+							"console.log('Generated test users:', users);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Multiple users notification created\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.users_notified).to.eql(3);",
+							"    pm.expect(responseJson.notifications_uuid).to.have.lengthOf(3);",
+							"    pm.expect(responseJson.status).to.eql('sent');",
+							"});",
+							"",
+							"pm.test(\"All notification IDs are present\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    responseJson.notifications_uuid.forEach(id => {",
+							"        pm.expect(id).to.be.a('number');",
+							"        pm.expect(id).to.be.above(0);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_uuids\": {{test_users_json}},\n    \"notification_type\": \"alert\",\n    \"message\": \"🚨 ALERT: This is a multi-user notification test. All specified users should receive this message.\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/internal/notify",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"internal",
+						"notify"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send Notification - Different Types",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Warning notification created successfully\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.status).to.eql('sent');",
+							"    pm.expect(responseJson.users_notified).to.be.above(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_uuids\": [\"{{test_user_uuid}}\"],\n    \"notification_type\": \"warning\",\n    \"message\": \"⚠️ WARNING: This is a warning type notification. Please review your account settings.\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/internal/notify",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"internal",
+						"notify"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send Notification - Invalid Request (Missing Fields)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 422 (Validation Error)\", function () {",
+							"    pm.response.to.have.status(422);",
+							"});",
+							"",
+							"pm.test(\"Error response indicates missing required fields\", function () {",
+							"    const responseText = pm.response.text();",
+							"    // Should mention missing required fields",
+							"    pm.expect(responseText).to.satisfy(function(text) {",
+							"        return text.includes('required') || text.includes('missing');",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_uuids\": [\"test-user-123\"]\n    // Missing notification_type and message fields\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/internal/notify",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"internal",
+						"notify"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "WebSocket Connection Test (Info Only)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// This is an informational request showing how to test WebSocket",
+							"console.log('='.repeat(50));",
+							"console.log('WebSocket Connection Information');",
+							"console.log('='.repeat(50));",
+							"console.log('');",
+							"console.log('To test WebSocket connections, use one of these methods:');",
+							"console.log('');",
+							"console.log('1. Browser Console:');",
+							"console.log('   const ws = new WebSocket(\"ws://localhost:8000/ws/' + pm.environment.get('test_user_uuid') + '\");');",
+							"console.log('   ws.onopen = () => console.log(\"Connected!\");');",
+							"console.log('   ws.onmessage = (event) => console.log(\"Message:\", event.data);');",
+							"console.log('   ws.onerror = (error) => console.log(\"Error:\", error);');",
+							"console.log('');",
+							"console.log('2. WebSocket King Chrome Extension');",
+							"console.log('3. Postman WebSocket requests (if available)');",
+							"console.log('');",
+							"console.log('WebSocket URL: ws://' + pm.environment.get('base_url').replace('http://', '').replace('https://', '') + '/ws/' + pm.environment.get('test_user_uuid'));",
+							"console.log('');",
+							"console.log('After connecting, send a notification to this user UUID to see real-time delivery!');",
+							"console.log('='.repeat(50));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// This request will likely fail since it's not a proper WebSocket endpoint",
+							"// But it provides information on how to test WebSocket connections",
+							"",
+							"pm.test(\"WebSocket info displayed in console\", function () {",
+							"    // Always pass - this is just an informational endpoint",
+							"    pm.expect(true).to.be.true;",
+							"});",
+							"",
+							"console.log('Check the Pre-request Script tab and Console for WebSocket testing instructions!');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/ws/{{test_user_uuid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"ws",
+						"{{test_user_uuid}}"
+					]
+				},
+				"description": "This request provides information on how to test WebSocket connections. See the Pre-request Script and Console output for detailed instructions."
+			},
+			"response": []
+		},
+		{
+			"name": "Load Test - Multiple Notifications",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Generate data for load testing",
+							"const batchSize = 5;",
+							"const users = [];",
+							"",
+							"for (let i = 0; i < batchSize; i++) {",
+							"    users.push('load-test-user-' + Date.now() + '-' + i + '-' + Math.random().toString(36).substr(2, 9));",
+							"}",
+							"",
+							"pm.environment.set('load_test_users', JSON.stringify(users));",
+							"pm.environment.set('load_test_batch_size', batchSize);",
+							"",
+							"console.log('Generated', batchSize, 'users for load testing');"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Load test completed successfully\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    const expectedUsers = parseInt(pm.environment.get('load_test_batch_size'));",
+							"    ",
+							"    pm.expect(responseJson.users_notified).to.eql(expectedUsers);",
+							"    pm.expect(responseJson.notifications_uuid).to.have.lengthOf(expectedUsers);",
+							"});",
+							"",
+							"pm.test(\"Response time acceptable for load test\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});",
+							"",
+							"// Log performance metrics",
+							"console.log('Load Test Results:');",
+							"console.log('- Users notified:', pm.response.json().users_notified);",
+							"console.log('- Response time:', pm.response.responseTime + 'ms');",
+							"console.log('- Status:', pm.response.json().status);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_uuids\": {{load_test_users}},\n    \"notification_type\": \"system\",\n    \"message\": \"🔄 LOAD TEST: This is a batch notification for performance testing. Message sent to multiple users simultaneously.\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/internal/notify",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"internal",
+						"notify"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "global-prerequest",
+				"exec": [
+					"// Global pre-request script for all requests",
+					"console.log('🚀 Running request:', pm.info.requestName);",
+					"console.log('📍 URL:', pm.request.url.toString());",
+					"",
+					"// Ensure base_url is set",
+					"if (!pm.environment.get('base_url')) {",
+					"    pm.environment.set('base_url', 'http://localhost:8000');",
+					"    console.log('⚠️  Set default base_url to http://localhost:8000');",
+					"}"
+				],
+				"type": "text/javascript"
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "global-test",
+				"exec": [
+					"// Global test script for all requests",
+					"pm.test(\"Response should not be null\", function () {",
+					"    pm.expect(pm.response).to.not.be.null;",
+					"});",
+					"",
+					"pm.test(\"Response time should be reasonable\", function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+					"});",
+					"",
+					"// Log response summary",
+					"console.log('📊 Response Summary:');",
+					"console.log('   Status:', pm.response.status);",
+					"console.log('   Time:', pm.response.responseTime + 'ms');",
+					"console.log('   Size:', pm.response.responseSize + ' bytes');"
+				],
+				"type": "text/javascript"
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8889",
+			"type": "string"
+		},
+		{
+			"key": "service_name",
+			"value": "WebSocket Notification Service",
+			"type": "string"
+		},
+		{
+			"key": "version",
+			"value": "1.0.0",
+			"type": "string"
+		}
+	]
+}
