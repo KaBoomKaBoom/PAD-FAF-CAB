@@ -1,0 +1,215 @@
+{
+	"info": {
+		"_postman_id": "70114d5d-55c5-4b13-b9ac-054d6729a1c5",
+		"name": "PAD_Check-in_Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40049840"
+	},
+	"item": [
+		{
+			"name": "Guest",
+			"item": [
+				{
+					"name": "Create guest",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"JohnDoe\",\r\n    \"registeredByUserId\": \"911cded6-9de9-4b94-8f86-c17cd5b2ea9a\",\r\n    \"roomId\": \"ea3c648c-7924-45b0-9393-1341e8a45250\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8085/guests",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"guests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all guests",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8085/guests",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"guests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get guest by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8085/guests/548bed98-47ab-406a-bd97-5ce69fd0dad5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"guests",
+								"548bed98-47ab-406a-bd97-5ce69fd0dad5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete guest by id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8085/guests/548bed98-47ab-406a-bd97-5ce69fd0dad5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"guests",
+								"548bed98-47ab-406a-bd97-5ce69fd0dad5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Entry",
+			"item": [
+				{
+					"name": "Create entry",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"guestId\": \"eb90b304-70b1-4376-90f5-ed6d5022f99f\",\r\n    \"roomId\": \"f1163c56-261f-40d7-9753-0cdec5292501\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8085/entries",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"entries"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update entry with exit",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8085/entries/61a0165a-2eb0-45a8-a82b-404641781dfe/exit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"entries",
+								"61a0165a-2eb0-45a8-a82b-404641781dfe",
+								"exit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all entries",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8085/entries",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"entries"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get entry by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8085/entries/ed29dd14-952b-4a13-97ed-67ed6e7059fd",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"entries",
+								"ed29dd14-952b-4a13-97ed-67ed6e7059fd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete entry by id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8085/entries/61a0165a-2eb0-45a8-a82b-404641781dfe",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"entries",
+								"61a0165a-2eb0-45a8-a82b-404641781dfe"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
