@@ -227,6 +227,65 @@ services:
       timeout: 5s
       retries: 5
 
+  tea-management-db: 
+    image: postgres
+    environment:
+      POSTGRES_USER: ${TM_DB_USER}
+      POSTGRES_PASSWORD: ${TM_DB_PASSWORD}
+      POSTGRES_DB: ${TM_DB_NAME}
+    volumes:
+      - tea-management-db_data:/var/lib/postgresql/data
+
+  tea-management-service:
+    image: "theboogheyman/pad-tea-management-service:1.0.1"
+    env_file:
+      - ./.env
+    environment:
+      - HTTP_PORTS=${TM_HTTP_PORTS}
+      - ASPNETCORE_ENVIRONMENT=${TM_ASPNETCORE_ENVIRONMENT}
+    ports:
+      - "${TM_HTTP_PORTS}:${TM_HTTP_PORTS}"
+    depends_on:
+      - tea-management-db
+
+  communication-db:
+    image: postgres
+    environment:
+      POSTGRES_USER: ${C_DB_USER}
+      POSTGRES_PASSWORD: ${C_DB_PASSWORD}
+      POSTGRES_DB: ${C_DB_NAME}
+    ports:
+      - "${C_LOCAL_DB_PORT}:5432"
+    volumes:
+      - communication-db_data:/var/lib/postgresql/data
+  
+  communication-mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${C_MONGO_DB_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${C_MONGO_DB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${C_MONGO_DB_NAME}
+    ports:
+      - "${C_MONGO_DB_PORT}:27017"
+    volumes:
+      - communication-mongo_data:/data/db
+
+  communication-service:
+    image: "theboogheyman/pad-communication-service:1.0.1"
+    build:
+      context: .
+      dockerfile: WebAPI/Dockerfile
+    env_file:
+      - ./.env
+    environment: 
+      - HTTP_PORTS=${C_HTTP_PORTS}
+      - ASPNETCORE_ENVIRONMENT=${C_ASPNETCORE_ENVIRONMENT}
+    ports:
+      - "${C_HTTP_PORTS}:${C_HTTP_PORTS}"
+    depends_on:
+      - communication-db
+      - communication-mongo
+
 volumes:
   budgeting_postgres_data:
   lf_postgres_data:
@@ -234,6 +293,9 @@ volumes:
   ci_postgres_data:
   um_postgres_data:
   ns_postgres_data:
+  tea-management-db_data:
+  communication-db_data:
+  communication-mongo_data:
 
 networks:
   user_management_network:
