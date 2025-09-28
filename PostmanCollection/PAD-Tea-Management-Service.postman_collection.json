@@ -1,0 +1,530 @@
+{
+	"info": {
+		"_postman_id": "e5c40934-84c0-4977-9e0b-d946f195f23d",
+		"name": "PAD-Tea-Management-Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "34239828"
+	},
+	"item": [
+		{
+			"name": "api",
+			"item": [
+				{
+					"name": "changes",
+					"item": [
+						{
+							"name": "use",
+							"item": [
+								{
+									"name": "/api/changes/use",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"user_uuid\": \"urn:uuid:ef029dad-009a-266f-6b9e-60de1ced7847\",\n  \"consumable_uuid\": \"32e0bd00-66b4-e52f-d231-4ea81f176d42\",\n  \"amount\": -25559895.042734742\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{baseUrl}}/api/changes/use"
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"user_uuid\": \"urn:uuid:ef029dad-009a-266f-6b9e-60de1ced7847\",\n  \"consumable_uuid\": \"32e0bd00-66b4-e52f-d231-4ea81f176d42\",\n  \"amount\": -25559895.042734742\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": "{{baseUrl}}/api/changes/use"
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "restock",
+							"item": [
+								{
+									"name": "/api/changes/restock",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"user_uuid\": \"urn:uuid:ef029dad-009a-266f-6b9e-60de1ced7847\",\n  \"consumable_uuid\": \"32e0bd00-66b4-e52f-d231-4ea81f176d42\",\n  \"amount\": -25559895.042734742\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{baseUrl}}/api/changes/restock"
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"user_uuid\": \"urn:uuid:ef029dad-009a-266f-6b9e-60de1ced7847\",\n  \"consumable_uuid\": \"32e0bd00-66b4-e52f-d231-4ea81f176d42\",\n  \"amount\": -25559895.042734742\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": "{{baseUrl}}/api/changes/restock"
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "/api/changes",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/changes?skip=-90160187&take=-90160187",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"changes"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "-90160187"
+										},
+										{
+											"key": "take",
+											"value": "-90160187"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/changes?skip=-90160187&take=-90160187",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"changes"
+											],
+											"query": [
+												{
+													"key": "skip",
+													"value": "-90160187"
+												},
+												{
+													"key": "take",
+													"value": "-90160187"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "consumables",
+					"item": [
+						{
+							"name": "{uuid}",
+							"item": [
+								{
+									"name": "/api/consumables/:uuid",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/consumables/:uuid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"consumables",
+												":uuid"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "urn:uuid:9ee6868a-2e8d-3e33-7535-96d442b86ce2",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/consumables/:uuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"consumables",
+														":uuid"
+													],
+													"variable": [
+														{
+															"key": "uuid"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "/api/consumables/:uuid",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"minim eiusmod in fugiat\",\n  \"threshold\": -45373043.79473293,\n  \"amountType\": \"dolore est\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/consumables/:uuid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"consumables",
+												":uuid"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "urn:uuid:9ee6868a-2e8d-3e33-7535-96d442b86ce2",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"name\": \"minim eiusmod in fugiat\",\n  \"threshold\": -45373043.79473293,\n  \"amountType\": \"dolore est\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/consumables/:uuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"consumables",
+														":uuid"
+													],
+													"variable": [
+														{
+															"key": "uuid"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "/api/consumables/:uuid",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/consumables/:uuid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"consumables",
+												":uuid"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "urn:uuid:9ee6868a-2e8d-3e33-7535-96d442b86ce2",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/consumables/:uuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"consumables",
+														":uuid"
+													],
+													"variable": [
+														{
+															"key": "uuid"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "/api/consumables",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/consumables?skip=-90160187&take=-90160187",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"consumables"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "-90160187"
+										},
+										{
+											"key": "take",
+											"value": "-90160187"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/consumables?skip=-90160187&take=-90160187",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"consumables"
+											],
+											"query": [
+												{
+													"key": "skip",
+													"value": "-90160187"
+												},
+												{
+													"key": "take",
+													"value": "-90160187"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "/api/consumables",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"sint\",\n  \"amount\": 87354975.56427956,\n  \"amount_type\": \"es\",\n  \"threshold\": 92538977.07750922,\n  \"added_by\": \"urn:uuid:9b2b8d62-9768-8a8c-c1cf-0c83b30ef171\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/api/consumables"
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"sint\",\n  \"amount\": 87354975.56427956,\n  \"amount_type\": \"es\",\n  \"threshold\": 92538977.07750922,\n  \"added_by\": \"urn:uuid:9b2b8d62-9768-8a8c-c1cf-0c83b30ef171\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{baseUrl}}/api/consumables"
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8082/"
+		}
+	]
+}

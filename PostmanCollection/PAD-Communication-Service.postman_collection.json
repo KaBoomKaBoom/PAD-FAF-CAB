@@ -1,0 +1,1114 @@
+{
+	"info": {
+		"_postman_id": "556cf01d-d573-48e7-8fbd-ff25a776c619",
+		"name": "PAD-Communication-Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "34239828"
+	},
+	"item": [
+		{
+			"name": "{channelUuid}",
+			"item": [
+				{
+					"name": "users",
+					"item": [
+						{
+							"name": "{userUuid}",
+							"item": [
+								{
+									"name": "/:channelUuid/users/:userUuid",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/:channelUuid/users/:userUuid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												":channelUuid",
+												"users",
+												":userUuid"
+											],
+											"variable": [
+												{
+													"key": "channelUuid",
+													"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+													"description": "(Required) "
+												},
+												{
+													"key": "userUuid",
+													"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/:channelUuid/users/:userUuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														":channelUuid",
+														"users",
+														":userUuid"
+													],
+													"variable": [
+														{
+															"key": "channelUuid"
+														},
+														{
+															"key": "userUuid"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "/:channelUuid/users/:userUuid",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/:channelUuid/users/:userUuid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												":channelUuid",
+												"users",
+												":userUuid"
+											],
+											"variable": [
+												{
+													"key": "channelUuid",
+													"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+													"description": "(Required) "
+												},
+												{
+													"key": "userUuid",
+													"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/:channelUuid/users/:userUuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														":channelUuid",
+														"users",
+														":userUuid"
+													],
+													"variable": [
+														{
+															"key": "channelUuid"
+														},
+														{
+															"key": "userUuid"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "messages",
+					"item": [
+						{
+							"name": "/:channelUuid/messages",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/:channelUuid/messages?skip=60707254&take=60707254",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":channelUuid",
+										"messages"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "60707254"
+										},
+										{
+											"key": "take",
+											"value": "60707254"
+										}
+									],
+									"variable": [
+										{
+											"key": "channelUuid",
+											"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+											"description": "(Required) "
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/:channelUuid/messages?skip=60707254&take=60707254",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												":channelUuid",
+												"messages"
+											],
+											"query": [
+												{
+													"key": "skip",
+													"value": "60707254"
+												},
+												{
+													"key": "take",
+													"value": "60707254"
+												}
+											],
+											"variable": [
+												{
+													"key": "channelUuid"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "/:channelUuid/messages",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"channel_uuid\": \"urn:uuid:7e647e86-8983-79a2-8769-6a41af4f635d\",\n  \"sender_uuid\": \"urn:uuid:346a366b-0ecd-4fae-fb30-c92558010011\",\n  \"text\": \"exercitation nisi enim nostrud\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/:channelUuid/messages",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":channelUuid",
+										"messages"
+									],
+									"variable": [
+										{
+											"key": "channelUuid",
+											"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+											"description": "(Required) "
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"channel_uuid\": \"urn:uuid:7e647e86-8983-79a2-8769-6a41af4f635d\",\n  \"sender_uuid\": \"urn:uuid:346a366b-0ecd-4fae-fb30-c92558010011\",\n  \"text\": \"exercitation nisi enim nostrud\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/:channelUuid/messages",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												":channelUuid",
+												"messages"
+											],
+											"variable": [
+												{
+													"key": "channelUuid"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "/:channelUuid",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/:channelUuid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								":channelUuid"
+							],
+							"variable": [
+								{
+									"key": "channelUuid",
+									"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/:channelUuid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":channelUuid"
+									],
+									"variable": [
+										{
+											"key": "channelUuid"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/:channelUuid",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"non enim ea\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/:channelUuid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								":channelUuid"
+							],
+							"variable": [
+								{
+									"key": "channelUuid",
+									"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"non enim ea\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/:channelUuid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":channelUuid"
+									],
+									"variable": [
+										{
+											"key": "channelUuid"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/:channelUuid",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/:channelUuid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								":channelUuid"
+							],
+							"variable": [
+								{
+									"key": "channelUuid",
+									"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/:channelUuid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":channelUuid"
+									],
+									"variable": [
+										{
+											"key": "channelUuid"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "{userUuid}",
+					"item": [
+						{
+							"name": "channels",
+							"item": [
+								{
+									"name": "/user/:userUuid/channels",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/user/:userUuid/channels?skip=60707254&take=60707254",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"user",
+												":userUuid",
+												"channels"
+											],
+											"query": [
+												{
+													"key": "skip",
+													"value": "60707254"
+												},
+												{
+													"key": "take",
+													"value": "60707254"
+												}
+											],
+											"variable": [
+												{
+													"key": "userUuid",
+													"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/user/:userUuid/channels?skip=60707254&take=60707254",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"user",
+														":userUuid",
+														"channels"
+													],
+													"query": [
+														{
+															"key": "skip",
+															"value": "60707254"
+														},
+														{
+															"key": "take",
+															"value": "60707254"
+														}
+													],
+													"variable": [
+														{
+															"key": "userUuid"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "api",
+			"item": [
+				{
+					"name": "channels",
+					"item": [
+						{
+							"name": "/api/channels",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"et ex dolor ut magna\",\n  \"owner_uuid\": \"12d68ffa-44f3-cffe-defd-17aaf772f8cd\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/api/channels"
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"et ex dolor ut magna\",\n  \"owner_uuid\": \"12d68ffa-44f3-cffe-defd-17aaf772f8cd\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{baseUrl}}/api/channels"
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "chats",
+					"item": [
+						{
+							"name": "{uuid}",
+							"item": [
+								{
+									"name": "/api/chats/:uuid",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/chats/:uuid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"chats",
+												":uuid"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/chats/:uuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"chats",
+														":uuid"
+													],
+													"variable": [
+														{
+															"key": "uuid"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "/api/chats/:uuid",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/chats/:uuid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"chats",
+												":uuid"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/chats/:uuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"chats",
+														":uuid"
+													],
+													"variable": [
+														{
+															"key": "uuid"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "{chatUuid}",
+							"item": [
+								{
+									"name": "messages",
+									"item": [
+										{
+											"name": "/api/chats/:chatUuid/messages",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/chats/:chatUuid/messages?skip=60707254&take=60707254",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"chats",
+														":chatUuid",
+														"messages"
+													],
+													"query": [
+														{
+															"key": "skip",
+															"value": "60707254"
+														},
+														{
+															"key": "take",
+															"value": "60707254"
+														}
+													],
+													"variable": [
+														{
+															"key": "chatUuid",
+															"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+															"description": "(Required) "
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}/api/chats/:chatUuid/messages?skip=60707254&take=60707254",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"chats",
+																":chatUuid",
+																"messages"
+															],
+															"query": [
+																{
+																	"key": "skip",
+																	"value": "60707254"
+																},
+																{
+																	"key": "take",
+																	"value": "60707254"
+																}
+															],
+															"variable": [
+																{
+																	"key": "chatUuid"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										},
+										{
+											"name": "/api/chats/:chatUuid/messages",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"sender_uuid\": \"urn:uuid:1be34f4f-6fbc-5936-3fe9-9743dfe8f670\",\n  \"text\": \"sint occaecat\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/chats/:chatUuid/messages",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"chats",
+														":chatUuid",
+														"messages"
+													],
+													"variable": [
+														{
+															"key": "chatUuid",
+															"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+															"description": "(Required) "
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"sender_uuid\": \"urn:uuid:1be34f4f-6fbc-5936-3fe9-9743dfe8f670\",\n  \"text\": \"sint occaecat\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/chats/:chatUuid/messages",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"chats",
+																":chatUuid",
+																"messages"
+															],
+															"variable": [
+																{
+																	"key": "chatUuid"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "/api/chats",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"user1Uuid\": \"urn:uuid:d55b493a-028c-bf53-b007-11d5175d36f7\",\n  \"user2Uuid\": \"e47b8b59-ee25-7134-9ead-da852f5f75b6\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/api/chats"
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"user1Uuid\": \"urn:uuid:d55b493a-028c-bf53-b007-11d5175d36f7\",\n  \"user2Uuid\": \"e47b8b59-ee25-7134-9ead-da852f5f75b6\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{baseUrl}}/api/chats"
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "{uuid}",
+					"item": [
+						{
+							"name": "chats",
+							"item": [
+								{
+									"name": "/users/:uuid/chats",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/users/:uuid/chats?skip=60707254&take=60707254",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"users",
+												":uuid",
+												"chats"
+											],
+											"query": [
+												{
+													"key": "skip",
+													"value": "60707254"
+												},
+												{
+													"key": "take",
+													"value": "60707254"
+												}
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "urn:uuid:c44e77ce-0cda-549d-6e61-f726afae342a",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/users/:uuid/chats?skip=60707254&take=60707254",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"users",
+														":uuid",
+														"chats"
+													],
+													"query": [
+														{
+															"key": "skip",
+															"value": "60707254"
+														},
+														{
+															"key": "take",
+															"value": "60707254"
+														}
+													],
+													"variable": [
+														{
+															"key": "uuid"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8083/"
+		}
+	]
+}
