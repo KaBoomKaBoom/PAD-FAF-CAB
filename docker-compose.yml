@@ -1,8 +1,7 @@
-version: '3.9'
-
 services:
   budgeting_service.api:
     image: andreiberco/pad-budgeting-service:1.1
+    platform: linux/amd64
     container_name: pad-budgeting-service
     ports:
       - "8087:8087"
@@ -16,6 +15,7 @@ services:
 
   budgeting_postgres:
     image: postgres:16
+    platform: linux/amd64
     container_name: pad-budgeting-service.db
     environment:
       - POSTGRES_DB=${BUDGETING_POSTGRES_DB}
@@ -28,6 +28,7 @@ services:
 
   lost_found_service.api:
     image: andreiberco/pad-l-f-service:1.1
+    platform: linux/amd64
     container_name: pad-l-f-service
     ports:
       - "8086:8086"
@@ -41,6 +42,7 @@ services:
 
   lf_postgres:
     image: postgres:16
+    platform: linux/amd64
     container_name: pad-l-f-service.db
     environment:
       - POSTGRES_DB=${LF_POSTGRES_DB}
@@ -50,6 +52,108 @@ services:
       - "5436:5432"
     volumes:
       - lf_postgres_data:/var/lib/postgresql/data
+
+  um_postgres:
+    image: postgres:15-alpine
+    platform: linux/arm64
+    ports:
+      - "5434:5432"
+    container_name: user_management_db
+    environment:
+      POSTGRES_DB: ${UM_POSTGRES_DB}
+      POSTGRES_USER: ${UM_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${UM_POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    volumes:
+      - um_postgres_data:/var/lib/postgresql/data
+    networks:
+      - user_management_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${UM_POSTGRES_USER} -d ${UM_POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  user-management:
+    image: "russian17/pad-user-management-service:latest"
+    platform: linux/arm64
+    container_name: user_management_service
+    environment:
+      UM_DATABASE_URL: ${UM_DATABASE_URL}
+      UM_SYNC_DATABASE_URL: ${UM_SYNC_DATABASE_URL}
+      UM_JWT_SECRET_KEY: ${UM_JWT_SECRET_KEY}
+      UM_JWT_ALGORITHM: ${UM_JWT_ALGORITHM}
+      UM_JWT_EXPIRE_MINUTES: ${UM_JWT_EXPIRE_MINUTES}
+      UM_JWT_REFRESH_EXPIRE_DAYS: ${UM_JWT_REFRESH_EXPIRE_DAYS}
+      UM_SECURE_COOKIES: ${UM_SECURE_COOKIES}
+      UM_COOKIE_DOMAIN: $UM_{COOKIE_DOMAIN}
+      UM_CORS_ORIGINS: ${UM_CORS_ORIGINS}
+      UM_ENVIRONMENT: ${UM_ENVIRONMENT:-development}
+      UM_DB_ECHO: ${UM_DB_ECHO:-false}
+      UM_APP_PORT: ${UM_APP_PORT}
+    ports:
+      - "${UM_APP_PORT}:${UM_APP_PORT}"
+    networks:
+      - user_management_network
+    depends_on:
+      um_postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import requests; requests.get('http://localhost:${UM_APP_PORT}/docs', timeout=10)\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  ns_postgres:
+    image: postgres:15-alpine
+    platform: linux/amd64
+    ports:
+      - "5435:5432"
+    container_name: notification_service_db
+    environment:
+      POSTGRES_DB: ${NS_POSTGRES_DB}
+      POSTGRES_USER: ${NS_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${NS_POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    volumes:
+      - ns_postgres_data:/var/lib/postgresql/data
+    networks:
+      - notification_service_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${NS_POSTGRES_USER} -d ${NS_POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  notification-service:
+    image: "russian17/pad-notification_service:latest"
+    platform: linux/amd64
+    container_name: notification_service
+    environment:
+      NS_DATABASE_URL: ${NS_DATABASE_URL}
+      NS_SYNC_DATABASE_URL: ${NS_SYNC_DATABASE_URL}
+      NS_CORS_ORIGINS: ${NS_CORS_ORIGINS}
+      NS_APP_PORT: ${NS_APP_PORT}
+    ports:
+      - "${NS_APP_PORT}:${NS_APP_PORT}"
+    networks:
+      - notification_service_network
+    depends_on:
+      ns_postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import requests; requests.get('http://localhost:${NS_APP_PORT}/docs', timeout=10)\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
 
   cab_booking_service.api:
     container_name: cab_booking_backend
@@ -68,7 +172,7 @@ services:
       - ./.env
     ports:
       - "8084:8084"
-  
+
   cb_postgres:
     container_name: cab_booking_db
     image: 'postgres:16-alpine'
@@ -128,5 +232,11 @@ volumes:
   lf_postgres_data:
   cb_postgres_data:
   ci_postgres_data:
+  um_postgres_data:
+  ns_postgres_data:
+
+networks:
+  user_management_network:
+  notification_service_network:
 
 #Same goes the next microservices and data bases
