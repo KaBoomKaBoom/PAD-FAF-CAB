@@ -28,22 +28,14 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status is 201', function () {",
-                  "    pm.response.to.have.status(201);",
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
                   "});",
                   "",
-                  "pm.test('Response has user and token', function () {",
+                  "pm.test('Response has error detail', function () {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('user');",
-                  "    pm.expect(jsonData).to.have.property('access_token');",
-                  "    pm.expect(jsonData).to.have.property('token_type');",
-                  "});",
-                  "",
-                  "// Save access token for other requests",
-                  "if (pm.response.code === 201) {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.collectionVariables.set('access_token', jsonData.access_token);",
-                  "}"
+                  "    pm.expect(jsonData).to.have.property('detail');",
+                  "});"
                 ]
               }
             }
@@ -58,7 +50,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"john.doeee@faf.utm.md\",\n  \"password\": \"securepass123\",\n  \"name_surname\": \"John Doe\",\n  \"username\": \"john_doeee\",\n  \"role\": \"STUDENT\"\n}"
+              "raw": "{\n  \"email\": \"student@faf.md\",\n  \"password\": \"password123\",\n  \"name_surname\": \"Student User\",\n  \"username\": \"student_user\",\n  \"role\": \"STUDENT\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/auth/register",
@@ -80,12 +72,15 @@
                   "",
                   "pm.test('Response has access token', function () {",
                   "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('uuid');",
+                  "    pm.expect(jsonData).to.have.property('username');",
+                  "    pm.expect(jsonData).to.have.property('email');",
+                  "    pm.expect(jsonData).to.have.property('role');",
                   "    pm.expect(jsonData).to.have.property('access_token');",
                   "    pm.expect(jsonData).to.have.property('token_type', 'bearer');",
                   "    pm.expect(jsonData).to.have.property('expires_in');",
                   "});",
                   "",
-                  "// Save access token for other requests",
                   "if (pm.response.code === 200) {",
                   "    var jsonData = pm.response.json();",
                   "    pm.collectionVariables.set('access_token', jsonData.access_token);",
@@ -104,7 +99,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"john_doe\",\n  \"password\": \"securepass123\"\n}"
+              "raw": "{\n  \"username\": \"student_user\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/auth/login",
@@ -128,6 +123,7 @@
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData).to.have.property('access_token');",
                   "    pm.expect(jsonData).to.have.property('token_type', 'bearer');",
+                  "    pm.expect(jsonData).to.have.property('expires_in');",
                   "});"
                 ]
               }
@@ -169,6 +165,216 @@
               "raw": "{{base_url}}/auth/logout",
               "host": ["{{base_url}}"],
               "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Internal",
+      "item": [
+        {
+          "name": "Verify Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has valid token verification', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('valid', true);",
+                  "    pm.expect(jsonData).to.have.property('user');",
+                  "});",
+                  "",
+                  "pm.test('User object has required fields', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user).to.have.property('id');",
+                  "    pm.expect(jsonData.user).to.have.property('uuid');",
+                  "    pm.expect(jsonData.user).to.have.property('email');",
+                  "    pm.expect(jsonData.user).to.have.property('username');",
+                  "    pm.expect(jsonData.user).to.have.property('role');",
+                  "    pm.expect(jsonData.user).to.have.property('name_surname');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/internal/verify",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "verify"]
+            }
+          }
+        },
+        {
+          "name": "Verify Token - Unauthorized",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 401', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Response has error detail', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('detail');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/internal/verify",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "verify"]
+            }
+          }
+        },
+        {
+          "name": "Get User by UUID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has user data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('uuid', '11111111-1111-1111-1111-111111111111');",
+                  "    pm.expect(jsonData).to.have.property('email');",
+                  "    pm.expect(jsonData).to.have.property('username');",
+                  "    pm.expect(jsonData).to.have.property('role');",
+                  "    pm.expect(jsonData).to.have.property('name_surname');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/internal/users/11111111-1111-1111-1111-111111111111",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "users", "11111111-1111-1111-1111-111111111111"]
+            }
+          }
+        },
+        {
+          "name": "Get User by UUID - Invalid Format",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response has error detail', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('detail', 'Invalid UUID format');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/internal/users/invalid-uuid-format",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "users", "invalid-uuid-format"]
+            }
+          }
+        },
+        {
+          "name": "Get Users by Role - ADMIN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has users array and count', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('users');",
+                  "    pm.expect(jsonData).to.have.property('count');",
+                  "    pm.expect(jsonData.users).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('All returned users have ADMIN role', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    jsonData.users.forEach(function(user) {",
+                  "        pm.expect(user.role).to.equal('ADMIN');",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/internal/users/by-role/ADMIN",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "users", "by-role", "ADMIN"]
+            }
+          }
+        },
+        {
+          "name": "Get Users by Role - Invalid Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});",
+                  "",
+                  "pm.test('Response has validation error', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('detail');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/internal/users/by-role/INVALID_ROLE",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "users", "by-role", "INVALID_ROLE"]
             }
           }
         }
