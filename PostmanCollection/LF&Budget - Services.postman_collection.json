@@ -15,12 +15,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8086/api/post",
-							"protocol": "http",
+							"raw": "{{lostFound}}/api/post",
 							"host": [
-								"localhost"
+								"{{lostFound}}"
 							],
-							"port": "8086",
 							"path": [
 								"api",
 								"post"
@@ -35,12 +33,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8086/api/post/26a813a8-675a-4517-9d1f-14510b7df560",
-							"protocol": "http",
+							"raw": "{{lostFound}}/api/post/26a813a8-675a-4517-9d1f-14510b7df560",
 							"host": [
-								"localhost"
+								"{{lostFound}}"
 							],
-							"port": "8086",
 							"path": [
 								"api",
 								"post",
@@ -53,11 +49,21 @@
 				{
 					"name": "add_post",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMjcxZmE5ZjctYzM3OS00ZmU4LWE4OWMtYmQ0YmMzZTFkOGQwIiwidXNlcm5hbWUiOiJqb2huX2RvZSIsImVtYWlsIjoiam9obi5kb2VAZmFmLnV0bS5tZCIsInJvbGUiOiJTVFVERU5UIiwiaXNzIjoicGFkLWZhZi1nYXRld2F5Iiwic3ViIjoidXNlcl8yNzFmYTlmNy1jMzc5LTRmZTgtYTg5Yy1iZDRiYzNlMWQ4ZDAiLCJleHAiOjE3NjAwMTMzNTEsIm5iZiI6MTc1OTkyNjk1MSwiaWF0IjoxNzU5OTI2OTUxfQ.WAyx1cdtRuYFQEGuQ6DmJz6fPpt4p5uDscVlJZ9T5GI",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"title\": \"Test title\",\r\n  \"description\": \"Test description\",\r\n  \"type\": \"found\",\r\n  \"authorId\": \"e8fba5cd-dc2d-424d-81c5-401d312137d8\"\r\n}",
+							"raw": "{\r\n  \"title\": \"3. Test title with notification\",\r\n  \"description\": \"3. Test description with notification\",\r\n  \"type\": \"lost\",\r\n  \"authorId\": \"271fa9f7-c379-4fe8-a89c-bd4bc3e1d8d0\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -65,12 +71,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8086/api/post",
-							"protocol": "http",
+							"raw": "{{lostFound}}/api/post",
 							"host": [
-								"localhost"
+								"{{lostFound}}"
 							],
-							"port": "8086",
 							"path": [
 								"api",
 								"post"
@@ -82,23 +86,31 @@
 				{
 					"name": "update_post",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMjcxZmE5ZjctYzM3OS00ZmU4LWE4OWMtYmQ0YmMzZTFkOGQwIiwidXNlcm5hbWUiOiJqb2huX2RvZSIsImVtYWlsIjoiam9obi5kb2VAZmFmLnV0bS5tZCIsInJvbGUiOiJTVFVERU5UIiwiaXNzIjoicGFkLWZhZi1nYXRld2F5Iiwic3ViIjoidXNlcl8yNzFmYTlmNy1jMzc5LTRmZTgtYTg5Yy1iZDRiYzNlMWQ4ZDAiLCJleHAiOjE3NjAwMTMzNTEsIm5iZiI6MTc1OTkyNjk1MSwiaWF0IjoxNzU5OTI2OTUxfQ.WAyx1cdtRuYFQEGuQ6DmJz6fPpt4p5uDscVlJZ9T5GI",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"title\": \"Updated title\",\r\n  \"description\": \"Updated description\",\r\n  \"type\": \"lost\",\r\n  \"authorId\": \"e8fba5cd-dc2d-424d-81c5-401d312137d8\"\r\n}"
+							"raw": "{\r\n  \"title\": \"3. Updated title\",\r\n  \"description\": \"3. Updated description\",\r\n  \"type\": \"lost\",\r\n  \"authorId\": \"271fa9f7-c379-4fe8-a89c-bd4bc3e1d8d0\"\r\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8086/api/post/01998074-0879-78d2-9bd9-314c2a426ce1",
-							"protocol": "http",
+							"raw": "{{lostFound}}/api/post/0199c3e5-1f62-756f-9024-b8dc8ccc58c2",
 							"host": [
-								"localhost"
+								"{{lostFound}}"
 							],
-							"port": "8086",
 							"path": [
 								"api",
 								"post",
-								"01998074-0879-78d2-9bd9-314c2a426ce1"
+								"0199c3e5-1f62-756f-9024-b8dc8ccc58c2"
 							]
 						}
 					},
@@ -110,12 +122,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8086/api/post/01998074-0879-78d2-9bd9-314c2a426ce1",
-							"protocol": "http",
+							"raw": "{{lostFound}}/api/post/01998074-0879-78d2-9bd9-314c2a426ce1",
 							"host": [
-								"localhost"
+								"{{lostFound}}"
 							],
-							"port": "8086",
 							"path": [
 								"api",
 								"post",
@@ -135,16 +145,14 @@
 							"raw": "{\r\n  \"title\": \"Test title\",\r\n  \"description\": \"Test description\",\r\n  \"type\": \"found\",\r\n  \"authorId\": \"e8fba5cd-dc2d-424d-81c5-401d312137d8\"\r\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8086/api/post/26a813a8-675a-4517-9d1f-14510b7df560/resolve",
-							"protocol": "http",
+							"raw": "{{lostFound}}/api/post/0199c3e5-1f62-756f-9024-b8dc8ccc58c2/resolve",
 							"host": [
-								"localhost"
+								"{{lostFound}}"
 							],
-							"port": "8086",
 							"path": [
 								"api",
 								"post",
-								"26a813a8-675a-4517-9d1f-14510b7df560",
+								"0199c3e5-1f62-756f-9024-b8dc8ccc58c2",
 								"resolve"
 							]
 						}
@@ -164,12 +172,10 @@
 							"raw": "{\r\n  \"title\": \"Test title\",\r\n  \"description\": \"Test description\",\r\n  \"type\": \"found\",\r\n  \"authorId\": \"e8fba5cd-dc2d-424d-81c5-401d312137d8\"\r\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8086/api/post",
-							"protocol": "http",
+							"raw": "{{lostFound}}/api/post",
 							"host": [
-								"localhost"
+								"{{lostFound}}"
 							],
-							"port": "8086",
 							"path": [
 								"api",
 								"post"
@@ -191,12 +197,10 @@
 							"raw": "{\r\n  \"title\": \"Test title\",\r\n  \"description\": \"Test description\",\r\n  \"type\": \"found\",\r\n  \"authorId\": \"e8fba5cd-dc2d-424d-81c5-401d312137d8\"\r\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8086/api/comment/1a536d09-1b69-449c-8a49-6f8c9e977ad6",
-							"protocol": "http",
+							"raw": "{{lostFound}}/api/comment/1a536d09-1b69-449c-8a49-6f8c9e977ad6",
 							"host": [
-								"localhost"
+								"{{lostFound}}"
 							],
-							"port": "8086",
 							"path": [
 								"api",
 								"comment",
@@ -209,11 +213,21 @@
 				{
 					"name": "add_comment",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"postId\": \"26a813a8-675a-4517-9d1f-14510b7df560\",\r\n  \"content\": \"Test comment\",\r\n  \"authorId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"\r\n}",
+							"raw": "{\r\n  \"postId\": \"c2b649e7-bf62-4207-b102-7e45b4ae373a\",\r\n  \"content\": \"Test comment\",\r\n  \"authorId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -221,12 +235,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8086/api/comment",
-							"protocol": "http",
+							"raw": "{{lostFound}}/api/comment",
 							"host": [
-								"localhost"
+								"{{lostFound}}"
 							],
-							"port": "8086",
 							"path": [
 								"api",
 								"comment"
@@ -245,12 +257,10 @@
 							"raw": "{\r\n  \"postId\": \"26a813a8-675a-4517-9d1f-14510b7df560\",\r\n  \"content\": \"Updated comment\",\r\n  \"authorId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"\r\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8086/api/comment/0199807d-73eb-7640-a545-2522cd736c6d",
-							"protocol": "http",
+							"raw": "{{lostFound}}/api/comment/0199807d-73eb-7640-a545-2522cd736c6d",
 							"host": [
-								"localhost"
+								"{{lostFound}}"
 							],
-							"port": "8086",
 							"path": [
 								"api",
 								"comment",
@@ -270,12 +280,10 @@
 							"raw": "{\r\n  \"postId\": \"26a813a8-675a-4517-9d1f-14510b7df560\",\r\n  \"content\": \"Test comment\",\r\n  \"authorId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"\r\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8086/api/comment/0199807d-73eb-7640-a545-2522cd736c6d",
-							"protocol": "http",
+							"raw": "{{lostFound}}/api/comment/0199807d-73eb-7640-a545-2522cd736c6d",
 							"host": [
-								"localhost"
+								"{{lostFound}}"
 							],
-							"port": "8086",
 							"path": [
 								"api",
 								"comment",
@@ -303,15 +311,13 @@
 							"raw": "{\r\n  \"postId\": \"26a813a8-675a-4517-9d1f-14510b7df560\",\r\n  \"content\": \"Test comment\",\r\n  \"authorId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"\r\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8081/api/comment",
-							"protocol": "http",
+							"raw": "{{budgeting}}/api/balance",
 							"host": [
-								"localhost"
+								"{{budgeting}}"
 							],
-							"port": "8081",
 							"path": [
 								"api",
-								"comment"
+								"balance"
 							]
 						}
 					},
@@ -330,15 +336,14 @@
 							"raw": "{\r\n  \"postId\": \"26a813a8-675a-4517-9d1f-14510b7df560\",\r\n  \"content\": \"Test comment\",\r\n  \"authorId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"\r\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8081/api/comment",
-							"protocol": "http",
+							"raw": "{{budgeting}}/api/balance/4b7d9383-f207-4024-9a0f-8de74b9c734c",
 							"host": [
-								"localhost"
+								"{{budgeting}}"
 							],
-							"port": "8081",
 							"path": [
 								"api",
-								"comment"
+								"balance",
+								"4b7d9383-f207-4024-9a0f-8de74b9c734c"
 							]
 						}
 					},
@@ -359,12 +364,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8087/api/balance",
-							"protocol": "http",
+							"raw": "{{budgeting}}/api/balance",
 							"host": [
-								"localhost"
+								"{{budgeting}}"
 							],
-							"port": "8087",
 							"path": [
 								"api",
 								"balance"
@@ -379,12 +382,10 @@
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8087/api/balance/4b7d9383-f207-4024-9a0f-8de74b9c734c/500",
-							"protocol": "http",
+							"raw": "{{budgeting}}/api/balance/4b7d9383-f207-4024-9a0f-8de74b9c734c/500",
 							"host": [
-								"localhost"
+								"{{budgeting}}"
 							],
-							"port": "8087",
 							"path": [
 								"api",
 								"balance",
@@ -401,12 +402,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8087/api/balance/4b7d9383-f207-4024-9a0f-8de74b9c734c",
-							"protocol": "http",
+							"raw": "{{budgeting}}/api/balance/4b7d9383-f207-4024-9a0f-8de74b9c734c",
 							"host": [
-								"localhost"
+								"{{budgeting}}"
 							],
-							"port": "8087",
 							"path": [
 								"api",
 								"balance",
@@ -419,8 +418,35 @@
 				{
 					"name": "get_all_transactions",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [
+							{
+								"key": "X-Internal-Authorization",
+								"value": "Bearer ",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{budgeting}}/api/balance",
+							"host": [
+								"{{budgeting}}"
+							],
+							"path": [
+								"api",
+								"balance"
+							]
+						}
 					},
 					"response": []
 				},
@@ -430,16 +456,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8087/api/transactions/",
-							"protocol": "http",
+							"raw": "{{budgeting}}/api/transactions/043d3817-c8c0-43d9-8961-fb1f34b0450e",
 							"host": [
-								"localhost"
+								"{{budgeting}}"
 							],
-							"port": "8087",
 							"path": [
 								"api",
 								"transactions",
-								""
+								"043d3817-c8c0-43d9-8961-fb1f34b0450e"
 							]
 						}
 					},
@@ -448,11 +472,21 @@
 				{
 					"name": "add_transaction",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMjcxZmE5ZjctYzM3OS00ZmU4LWE4OWMtYmQ0YmMzZTFkOGQwIiwidXNlcm5hbWUiOiJqb2huX2RvZSIsImVtYWlsIjoiam9obi5kb2VAZmFmLnV0bS5tZCIsInJvbGUiOiJTVFVERU5UIiwiaXNzIjoicGFkLWZhZi1nYXRld2F5Iiwic3ViIjoidXNlcl8yNzFmYTlmNy1jMzc5LTRmZTgtYTg5Yy1iZDRiYzNlMWQ4ZDAiLCJleHAiOjE3NjAxNzc1MDgsIm5iZiI6MTc2MDA5MTEwOCwiaWF0IjoxNzYwMDkxMTA4fQ.VF90eYXQv1AEYxHrr3rbWiKFC5PjMynnsSivCmC4XUg",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"balanceId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\r\n  \"type\": \"income\",\r\n  \"amount\": 100,\r\n  \"currency\": \"MDL\",\r\n  \"source\": \"test\",\r\n  \"userId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"\r\n}",
+							"raw": "{\r\n  \"balanceId\": \"331c23e4-1aee-477f-a96e-c0e746cb1319\",\r\n  \"type\": \"income\",\r\n  \"amount\": 100,\r\n  \"currency\": \"USD\",\r\n  \"source\": \"test\",\r\n  \"userId\": \"271fa9f7-c379-4fe8-a89c-bd4bc3e1d8d0\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -460,12 +494,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8087/api/transactions",
-							"protocol": "http",
+							"raw": "{{budgeting}}/api/transactions",
 							"host": [
-								"localhost"
+								"{{budgeting}}"
 							],
-							"port": "8087",
 							"path": [
 								"api",
 								"transactions"
@@ -480,12 +512,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8087/api/transactions/043d3817-c8c0-43d9-8961-fb1f34b0450e",
-							"protocol": "http",
+							"raw": "{{budgeting}}/api/transactions/043d3817-c8c0-43d9-8961-fb1f34b0450e",
 							"host": [
-								"localhost"
+								"{{budgeting}}"
 							],
-							"port": "8087",
 							"path": [
 								"api",
 								"transactions",
@@ -501,12 +531,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8087/api/transactions/export/csv",
-							"protocol": "http",
+							"raw": "{{budgeting}}/api/transactions/export/csv",
 							"host": [
-								"localhost"
+								"{{budgeting}}"
 							],
-							"port": "8087",
 							"path": [
 								"api",
 								"transactions",
@@ -521,7 +549,17 @@
 					"name": "get_all_debts",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{budgeting}}/api/debts",
+							"host": [
+								"{{budgeting}}"
+							],
+							"path": [
+								"api",
+								"debts"
+							]
+						}
 					},
 					"response": []
 				},
@@ -531,12 +569,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8087/api/debts/94f0c45d-ba53-4074-b15f-0b09853a6135",
-							"protocol": "http",
+							"raw": "{{budgeting}}/api/debts/94f0c45d-ba53-4074-b15f-0b09853a6135",
 							"host": [
-								"localhost"
+								"{{budgeting}}"
 							],
-							"port": "8087",
 							"path": [
 								"api",
 								"debts",
@@ -561,12 +597,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8087/api/debts",
-							"protocol": "http",
+							"raw": "{{budgeting}}/api/debts",
 							"host": [
-								"localhost"
+								"{{budgeting}}"
 							],
-							"port": "8087",
 							"path": [
 								"api",
 								"debts"
@@ -590,12 +624,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8087/api/debts/94f0c45d-ba53-4074-b15f-0b09853a6135",
-							"protocol": "http",
+							"raw": "{{budgeting}}/api/debts/94f0c45d-ba53-4074-b15f-0b09853a6135",
 							"host": [
-								"localhost"
+								"{{budgeting}}"
 							],
-							"port": "8087",
 							"path": [
 								"api",
 								"debts",
@@ -604,8 +636,117 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "test-timeout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8001/internal/budgeting/api/test-timeout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8001",
+							"path": [
+								"internal",
+								"budgeting",
+								"api",
+								"test-timeout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test-concurrency-batch",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8001/internal/budgeting/api/test-concurrency-batch",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8001",
+							"path": [
+								"internal",
+								"budgeting",
+								"api",
+								"test-concurrency-batch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test-concurrency",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8001/internal/budgeting/api/test-concurrency-batch",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8001",
+							"path": [
+								"internal",
+								"budgeting",
+								"api",
+								"test-concurrency-batch"
+							]
+						}
+					},
+					"response": []
 				}
 			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "lostFound",
+			"value": ""
+		},
+		{
+			"key": "budgeting",
+			"value": "",
+			"type": "default"
 		}
 	]
 }

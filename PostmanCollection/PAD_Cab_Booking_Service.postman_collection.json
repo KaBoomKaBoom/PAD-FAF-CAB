@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "93da6f8b-65b0-42d6-b12d-1ed69d7bcda4",
+		"_postman_id": "470f0440-eb1b-4a6d-b264-296cd49eb0a3",
 		"name": "PAD_Cab_Booking_Service",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "40049840"
+		"_exporter_id": "37053972"
 	},
 	"item": [
 		{
@@ -24,12 +24,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8084/rooms",
-							"protocol": "http",
+							"raw": "{{booking}}/rooms",
 							"host": [
-								"localhost"
+								"{{booking}}"
 							],
-							"port": "8084",
 							"path": [
 								"rooms"
 							]
@@ -43,12 +41,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8084/rooms",
-							"protocol": "http",
+							"raw": "{{booking}}/rooms",
 							"host": [
-								"localhost"
+								"{{booking}}"
 							],
-							"port": "8084",
 							"path": [
 								"rooms"
 							]
@@ -62,12 +58,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8084/rooms/911cded6-9de9-4b94-8f86-c17cd5b2ea9a",
-							"protocol": "http",
+							"raw": "{{booking}}/rooms/911cded6-9de9-4b94-8f86-c17cd5b2ea9a",
 							"host": [
-								"localhost"
+								"{{booking}}"
 							],
-							"port": "8084",
 							"path": [
 								"rooms",
 								"911cded6-9de9-4b94-8f86-c17cd5b2ea9a"
@@ -82,12 +76,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8084/rooms/911cded6-9de9-4b94-8f86-c17cd5b2ea9a",
-							"protocol": "http",
+							"raw": "{{booking}}/rooms/911cded6-9de9-4b94-8f86-c17cd5b2ea9a",
 							"host": [
-								"localhost"
+								"{{booking}}"
 							],
-							"port": "8084",
 							"path": [
 								"rooms",
 								"911cded6-9de9-4b94-8f86-c17cd5b2ea9a"
@@ -116,12 +108,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8084/bookings",
-							"protocol": "http",
+							"raw": "{{booking}}/bookings",
 							"host": [
-								"localhost"
+								"{{booking}}"
 							],
-							"port": "8084",
 							"path": [
 								"bookings"
 							]
@@ -135,12 +125,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8084/bookings",
-							"protocol": "http",
+							"raw": "{{booking}}/bookings",
 							"host": [
-								"localhost"
+								"{{booking}}"
 							],
-							"port": "8084",
 							"path": [
 								"bookings"
 							]
@@ -154,12 +142,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8084/bookings/04c64e58-bb4d-4ead-9675-9aeaa66cd079",
-							"protocol": "http",
+							"raw": "{{booking}}/bookings/04c64e58-bb4d-4ead-9675-9aeaa66cd079",
 							"host": [
-								"localhost"
+								"{{booking}}"
 							],
-							"port": "8084",
 							"path": [
 								"bookings",
 								"04c64e58-bb4d-4ead-9675-9aeaa66cd079"
@@ -174,12 +160,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8084/bookings",
-							"protocol": "http",
+							"raw": "{{booking}}/bookings",
 							"host": [
-								"localhost"
+								"{{booking}}"
 							],
-							"port": "8084",
 							"path": [
 								"bookings"
 							]
@@ -188,6 +172,37 @@
 					"response": []
 				}
 			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "booking",
+			"value": "",
+			"type": "default"
 		}
 	]
 }

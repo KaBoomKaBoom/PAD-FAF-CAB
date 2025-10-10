@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "notification-service-collection",
+		"_postman_id": "7a538546-13d5-49cb-80ec-ed5c1f7220b3",
 		"name": "Notification Service",
 		"description": "Complete API testing collection for Notification Service\n\n## Overview\nThis collection tests all endpoints of the notification service including:\n- Health check endpoint\n- Internal notification sending\n- WebSocket connection testing\n- Error handling scenarios\n\n## Setup\n1. Set the `base_url` environment variable (e.g., `http://localhost:8000`)\n2. Generate test user UUIDs using the provided scripts\n3. Run the collection in sequence for best results\n\n## WebSocket Testing\nFor WebSocket testing, use a WebSocket client like:\n- Browser Console\n- WebSocket King Chrome Extension  \n- Postman WebSocket requests (newer versions)\n\nConnect to: `ws://{{base_url}}/ws/{{user_uuid}}`",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "notification-service"
+		"_exporter_id": "37053972"
 	},
 	"item": [
 		{
@@ -21,7 +21,9 @@
 							"",
 							"console.log('Generated test user UUID:', testUserUuid);"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
 					}
 				},
 				{
@@ -52,7 +54,9 @@
 							"    pm.environment.set('last_notification_id', responseJson.notifications_uuid[0]);",
 							"}"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
 					}
 				}
 			],
@@ -69,9 +73,9 @@
 					"raw": "{\n    \"user_uuids\": [\"{{test_user_uuid}}\"],\n    \"notification_type\": \"info\",\n    \"message\": \"Hello! This is a test notification for a single user.\"\n}"
 				},
 				"url": {
-					"raw": "{{base_url}}/internal/notify",
+					"raw": "{{notification}}/internal/notify",
 					"host": [
-						"{{base_url}}"
+						"{{notification}}"
 					],
 					"path": [
 						"internal",
@@ -97,7 +101,9 @@
 							"",
 							"console.log('Generated test users:', users);"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
 					}
 				},
 				{
@@ -123,11 +129,23 @@
 							"    });",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
 					}
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1dWlkIjoiMjcxZmE5ZjctYzM3OS00ZmU4LWE4OWMtYmQ0YmMzZTFkOGQwIiwiZW1haWwiOiJqb2huLmRvZUBmYWYudXRtLm1kIiwidXNlcm5hbWUiOiJqb2huX2RvZSIsInJvbGUiOiJTVFVERU5UIiwiZXhwIjoxNzU5NTg5MTY5LCJpYXQiOjE3NTk1ODU1NjksInR5cGUiOiJhY2Nlc3MifQ.O1vvWDs1T_a8S7tfgAw-fPojkgw_YQOlWrtt7IqN6C4",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -140,9 +158,9 @@
 					"raw": "{\n    \"user_uuids\": {{test_users_json}},\n    \"notification_type\": \"alert\",\n    \"message\": \"🚨 ALERT: This is a multi-user notification test. All specified users should receive this message.\"\n}"
 				},
 				"url": {
-					"raw": "{{base_url}}/internal/notify",
+					"raw": "{{notification}}/internal/notify",
 					"host": [
-						"{{base_url}}"
+						"{{notification}}"
 					],
 					"path": [
 						"internal",
@@ -169,7 +187,9 @@
 							"    pm.expect(responseJson.users_notified).to.be.above(0);",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
 					}
 				}
 			],
@@ -186,9 +206,9 @@
 					"raw": "{\n    \"user_uuids\": [\"{{test_user_uuid}}\"],\n    \"notification_type\": \"warning\",\n    \"message\": \"⚠️ WARNING: This is a warning type notification. Please review your account settings.\"\n}"
 				},
 				"url": {
-					"raw": "{{base_url}}/internal/notify",
+					"raw": "{{notification}}/internal/notify",
 					"host": [
-						"{{base_url}}"
+						"{{notification}}"
 					],
 					"path": [
 						"internal",
@@ -217,7 +237,9 @@
 							"    });",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
 					}
 				}
 			],
@@ -234,9 +256,9 @@
 					"raw": "{\n    \"user_uuids\": [\"test-user-123\"]\n    // Missing notification_type and message fields\n}"
 				},
 				"url": {
-					"raw": "{{base_url}}/internal/notify",
+					"raw": "{{notification}}/internal/notify",
 					"host": [
-						"{{base_url}}"
+						"{{notification}}"
 					],
 					"path": [
 						"internal",
@@ -274,7 +296,9 @@
 							"console.log('After connecting, send a notification to this user UUID to see real-time delivery!');",
 							"console.log('='.repeat(50));"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
 					}
 				},
 				{
@@ -291,7 +315,9 @@
 							"",
 							"console.log('Check the Pre-request Script tab and Console for WebSocket testing instructions!');"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
 					}
 				}
 			],
@@ -299,9 +325,9 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/ws/{{test_user_uuid}}",
+					"raw": "{{notification}}/ws/{{test_user_uuid}}",
 					"host": [
-						"{{base_url}}"
+						"{{notification}}"
 					],
 					"path": [
 						"ws",
@@ -332,7 +358,9 @@
 							"",
 							"console.log('Generated', batchSize, 'users for load testing');"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
 					}
 				},
 				{
@@ -361,7 +389,9 @@
 							"console.log('- Response time:', pm.response.responseTime + 'ms');",
 							"console.log('- Status:', pm.response.json().status);"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
 					}
 				}
 			],
@@ -378,9 +408,9 @@
 					"raw": "{\n    \"user_uuids\": {{load_test_users}},\n    \"notification_type\": \"system\",\n    \"message\": \"🔄 LOAD TEST: This is a batch notification for performance testing. Message sent to multiple users simultaneously.\"\n}"
 				},
 				"url": {
-					"raw": "{{base_url}}/internal/notify",
+					"raw": "{{notification}}/internal/notify",
 					"host": [
-						"{{base_url}}"
+						"{{notification}}"
 					],
 					"path": [
 						"internal",
@@ -395,7 +425,8 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "global-prerequest",
+				"type": "text/javascript",
+				"requests": {},
 				"exec": [
 					"// Global pre-request script for all requests",
 					"console.log('🚀 Running request:', pm.info.requestName);",
@@ -406,14 +437,14 @@
 					"    pm.environment.set('base_url', 'http://localhost:8000');",
 					"    console.log('⚠️  Set default base_url to http://localhost:8000');",
 					"}"
-				],
-				"type": "text/javascript"
+				]
 			}
 		},
 		{
 			"listen": "test",
 			"script": {
-				"id": "global-test",
+				"type": "text/javascript",
+				"requests": {},
 				"exec": [
 					"// Global test script for all requests",
 					"pm.test(\"Response should not be null\", function () {",
@@ -429,26 +460,22 @@
 					"console.log('   Status:', pm.response.status);",
 					"console.log('   Time:', pm.response.responseTime + 'ms');",
 					"console.log('   Size:', pm.response.responseSize + ' bytes');"
-				],
-				"type": "text/javascript"
+				]
 			}
 		}
 	],
 	"variable": [
 		{
-			"key": "base_url",
-			"value": "http://localhost:8081",
-			"type": "string"
+			"key": "notification",
+			"value": "http://localhost:8889"
 		},
 		{
 			"key": "service_name",
-			"value": "WebSocket Notification Service",
-			"type": "string"
+			"value": "WebSocket Notification Service"
 		},
 		{
 			"key": "version",
-			"value": "1.0.0",
-			"type": "string"
+			"value": "1.0.0"
 		}
 	]
 }

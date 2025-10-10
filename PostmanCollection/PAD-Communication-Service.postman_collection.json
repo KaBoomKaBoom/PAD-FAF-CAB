@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "556cf01d-d573-48e7-8fbd-ff25a776c619",
+		"_postman_id": "6a0f8e81-5e0d-4e19-9d8d-ff3d8c6d31ef",
 		"name": "PAD-Communication-Service",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
-		"_exporter_id": "34239828"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37053972"
 	},
 	"item": [
 		{
@@ -21,9 +21,9 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "{{baseUrl}}/:channelUuid/users/:userUuid",
+											"raw": "{{communication}}/:channelUuid/users/:userUuid",
 											"host": [
-												"{{baseUrl}}"
+												"{{communication}}"
 											],
 											"path": [
 												":channelUuid",
@@ -85,9 +85,9 @@
 										"method": "DELETE",
 										"header": [],
 										"url": {
-											"raw": "{{baseUrl}}/:channelUuid/users/:userUuid",
+											"raw": "{{communication}}/:channelUuid/users/:userUuid",
 											"host": [
-												"{{baseUrl}}"
+												"{{communication}}"
 											],
 											"path": [
 												":channelUuid",
@@ -156,9 +156,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/:channelUuid/messages?skip=60707254&take=60707254",
+									"raw": "{{communication}}/:channelUuid/messages?skip=60707254&take=60707254",
 									"host": [
-										"{{baseUrl}}"
+										"{{communication}}"
 									],
 									"path": [
 										":channelUuid",
@@ -245,9 +245,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseUrl}}/:channelUuid/messages",
+									"raw": "{{communication}}/:channelUuid/messages",
 									"host": [
-										"{{baseUrl}}"
+										"{{communication}}"
 									],
 									"path": [
 										":channelUuid",
@@ -316,9 +316,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/:channelUuid",
+							"raw": "{{communication}}/:channelUuid",
 							"host": [
-								"{{baseUrl}}"
+								"{{communication}}"
 							],
 							"path": [
 								":channelUuid"
@@ -383,9 +383,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/:channelUuid",
+							"raw": "{{communication}}/:channelUuid",
 							"host": [
-								"{{baseUrl}}"
+								"{{communication}}"
 							],
 							"path": [
 								":channelUuid"
@@ -450,9 +450,9 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/:channelUuid",
+							"raw": "{{communication}}/:channelUuid",
 							"host": [
-								"{{baseUrl}}"
+								"{{communication}}"
 							],
 							"path": [
 								":channelUuid"
@@ -513,9 +513,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{baseUrl}}/user/:userUuid/channels?skip=60707254&take=60707254",
+											"raw": "{{communication}}/user/:userUuid/channels?skip=60707254&take=60707254",
 											"host": [
-												"{{baseUrl}}"
+												"{{communication}}"
 											],
 											"path": [
 												"user",
@@ -615,7 +615,16 @@
 										}
 									}
 								},
-								"url": "{{baseUrl}}/api/channels"
+								"url": {
+									"raw": "{{communication}}/api/channels",
+									"host": [
+										"{{communication}}"
+									],
+									"path": [
+										"api",
+										"channels"
+									]
+								}
 							},
 							"response": [
 								{
@@ -638,7 +647,16 @@
 												}
 											}
 										},
-										"url": "{{baseUrl}}/api/channels"
+										"url": {
+											"raw": "{{baseUrl}}/api/channels",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"channels"
+											]
+										}
 									},
 									"status": "OK",
 									"code": 200,
@@ -663,9 +681,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{baseUrl}}/api/chats/:uuid",
+											"raw": "{{communication}}/api/chats/:uuid",
 											"host": [
-												"{{baseUrl}}"
+												"{{communication}}"
 											],
 											"path": [
 												"api",
@@ -719,9 +737,9 @@
 										"method": "DELETE",
 										"header": [],
 										"url": {
-											"raw": "{{baseUrl}}/api/chats/:uuid",
+											"raw": "{{communication}}/api/chats/:uuid",
 											"host": [
-												"{{baseUrl}}"
+												"{{communication}}"
 											],
 											"path": [
 												"api",
@@ -783,9 +801,9 @@
 												"method": "GET",
 												"header": [],
 												"url": {
-													"raw": "{{baseUrl}}/api/chats/:chatUuid/messages?skip=60707254&take=60707254",
+													"raw": "{{communication}}/api/chats/:chatUuid/messages?skip=60707254&take=60707254",
 													"host": [
-														"{{baseUrl}}"
+														"{{communication}}"
 													],
 													"path": [
 														"api",
@@ -876,9 +894,9 @@
 													}
 												},
 												"url": {
-													"raw": "{{baseUrl}}/api/chats/:chatUuid/messages",
+													"raw": "{{communication}}/api/chats/:chatUuid/messages",
 													"host": [
-														"{{baseUrl}}"
+														"{{communication}}"
 													],
 													"path": [
 														"api",
@@ -967,7 +985,16 @@
 										}
 									}
 								},
-								"url": "{{baseUrl}}/api/chats"
+								"url": {
+									"raw": "{{communication}}/api/chats",
+									"host": [
+										"{{communication}}"
+									],
+									"path": [
+										"api",
+										"chats"
+									]
+								}
 							},
 							"response": [
 								{
@@ -990,7 +1017,16 @@
 												}
 											}
 										},
-										"url": "{{baseUrl}}/api/chats"
+										"url": {
+											"raw": "{{baseUrl}}/api/chats",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"chats"
+											]
+										}
 									},
 									"status": "OK",
 									"code": 200,
@@ -1020,9 +1056,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{baseUrl}}/users/:uuid/chats?skip=60707254&take=60707254",
+											"raw": "{{communication}}/users/:uuid/chats?skip=60707254&take=60707254",
 											"host": [
-												"{{baseUrl}}"
+												"{{communication}}"
 											],
 											"path": [
 												"users",
@@ -1100,14 +1136,41 @@
 			"name": "New Request",
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": ""
+				}
 			},
 			"response": []
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
-			"key": "baseUrl",
+			"key": "communication",
 			"value": "http://localhost:8083/"
 		}
 	]

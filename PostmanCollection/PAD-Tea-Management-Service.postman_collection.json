@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "e5c40934-84c0-4977-9e0b-d946f195f23d",
+		"_postman_id": "94445599-8c33-43e5-b7cf-3f6b3a2f4562",
 		"name": "PAD-Tea-Management-Service",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
-		"_exporter_id": "34239828"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37053972"
 	},
 	"item": [
 		{
@@ -35,7 +35,17 @@
 												}
 											}
 										},
-										"url": "{{baseUrl}}/api/changes/use"
+										"url": {
+											"raw": "{{baseUrl}}/api/changes/use",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"changes",
+												"use"
+											]
+										}
 									},
 									"response": [
 										{
@@ -58,7 +68,17 @@
 														}
 													}
 												},
-												"url": "{{baseUrl}}/api/changes/use"
+												"url": {
+													"raw": "{{baseUrl}}/api/changes/use",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"changes",
+														"use"
+													]
+												}
 											},
 											"status": "OK",
 											"code": 200,
@@ -94,7 +114,17 @@
 												}
 											}
 										},
-										"url": "{{baseUrl}}/api/changes/restock"
+										"url": {
+											"raw": "{{teaManagement}}/api/changes/restock",
+											"host": [
+												"{{teaManagement}}"
+											],
+											"path": [
+												"api",
+												"changes",
+												"restock"
+											]
+										}
 									},
 									"response": [
 										{
@@ -117,7 +147,17 @@
 														}
 													}
 												},
-												"url": "{{baseUrl}}/api/changes/restock"
+												"url": {
+													"raw": "{{baseUrl}}/api/changes/restock",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"changes",
+														"restock"
+													]
+												}
 											},
 											"status": "OK",
 											"code": 200,
@@ -136,9 +176,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/api/changes?skip=-90160187&take=-90160187",
+									"raw": "{{teaManagement}}/api/changes?skip=-90160187&take=-90160187",
 									"host": [
-										"{{baseUrl}}"
+										"{{teaManagement}}"
 									],
 									"path": [
 										"api",
@@ -206,9 +246,9 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{baseUrl}}/api/consumables/:uuid",
+											"raw": "{{teaManagement}}/api/consumables/:uuid",
 											"host": [
-												"{{baseUrl}}"
+												"{{teaManagement}}"
 											],
 											"path": [
 												"api",
@@ -277,9 +317,9 @@
 											}
 										},
 										"url": {
-											"raw": "{{baseUrl}}/api/consumables/:uuid",
+											"raw": "{{teaManagement}}/api/consumables/:uuid",
 											"host": [
-												"{{baseUrl}}"
+												"{{teaManagement}}"
 											],
 											"path": [
 												"api",
@@ -348,9 +388,9 @@
 										"method": "DELETE",
 										"header": [],
 										"url": {
-											"raw": "{{baseUrl}}/api/consumables/:uuid",
+											"raw": "{{teaManagement}}/api/consumables/:uuid",
 											"host": [
-												"{{baseUrl}}"
+												"{{teaManagement}}"
 											],
 											"path": [
 												"api",
@@ -406,9 +446,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/api/consumables?skip=-90160187&take=-90160187",
+									"raw": "{{teaManagement}}/api/consumables?skip=-90160187&take=-90160187",
 									"host": [
-										"{{baseUrl}}"
+										"{{teaManagement}}"
 									],
 									"path": [
 										"api",
@@ -482,7 +522,16 @@
 										}
 									}
 								},
-								"url": "{{baseUrl}}/api/consumables"
+								"url": {
+									"raw": "{{teaManagement}}/api/consumables",
+									"host": [
+										"{{teaManagement}}"
+									],
+									"path": [
+										"api",
+										"consumables"
+									]
+								}
 							},
 							"response": [
 								{
@@ -505,7 +554,16 @@
 												}
 											}
 										},
-										"url": "{{baseUrl}}/api/consumables"
+										"url": {
+											"raw": "{{baseUrl}}/api/consumables",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"consumables"
+											]
+										}
 									},
 									"status": "OK",
 									"code": 200,
@@ -521,9 +579,33 @@
 			]
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
-			"key": "baseUrl",
+			"key": "teaManagement",
 			"value": "http://localhost:8082/"
 		}
 	]

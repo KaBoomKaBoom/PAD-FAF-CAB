@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "70114d5d-55c5-4b13-b9ac-054d6729a1c5",
+		"_postman_id": "c7cb16b2-7be4-46db-8226-52e06b3dfd44",
 		"name": "PAD_Check-in_Service",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "40049840"
+		"_exporter_id": "37053972"
 	},
 	"item": [
 		{
@@ -24,12 +24,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8085/guests",
-							"protocol": "http",
+							"raw": "{{checkin}}/guests",
 							"host": [
-								"localhost"
+								"{{checkin}}"
 							],
-							"port": "8085",
 							"path": [
 								"guests"
 							]
@@ -43,12 +41,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8085/guests",
-							"protocol": "http",
+							"raw": "{{checkin}}/guests",
 							"host": [
-								"localhost"
+								"{{checkin}}"
 							],
-							"port": "8085",
 							"path": [
 								"guests"
 							]
@@ -62,12 +58,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8085/guests/548bed98-47ab-406a-bd97-5ce69fd0dad5",
-							"protocol": "http",
+							"raw": "{{checkin}}/guests/548bed98-47ab-406a-bd97-5ce69fd0dad5",
 							"host": [
-								"localhost"
+								"{{checkin}}"
 							],
-							"port": "8085",
 							"path": [
 								"guests",
 								"548bed98-47ab-406a-bd97-5ce69fd0dad5"
@@ -82,12 +76,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8085/guests/548bed98-47ab-406a-bd97-5ce69fd0dad5",
-							"protocol": "http",
+							"raw": "{{checkin}}/guests/548bed98-47ab-406a-bd97-5ce69fd0dad5",
 							"host": [
-								"localhost"
+								"{{checkin}}"
 							],
-							"port": "8085",
 							"path": [
 								"guests",
 								"548bed98-47ab-406a-bd97-5ce69fd0dad5"
@@ -116,12 +108,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8085/entries",
-							"protocol": "http",
+							"raw": "{{checkin}}/entries",
 							"host": [
-								"localhost"
+								"{{checkin}}"
 							],
-							"port": "8085",
 							"path": [
 								"entries"
 							]
@@ -135,12 +125,10 @@
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8085/entries/61a0165a-2eb0-45a8-a82b-404641781dfe/exit",
-							"protocol": "http",
+							"raw": "{{checkin}}/entries/61a0165a-2eb0-45a8-a82b-404641781dfe/exit",
 							"host": [
-								"localhost"
+								"{{checkin}}"
 							],
-							"port": "8085",
 							"path": [
 								"entries",
 								"61a0165a-2eb0-45a8-a82b-404641781dfe",
@@ -156,12 +144,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8085/entries",
-							"protocol": "http",
+							"raw": "{{checkin}}/entries",
 							"host": [
-								"localhost"
+								"{{checkin}}"
 							],
-							"port": "8085",
 							"path": [
 								"entries"
 							]
@@ -175,12 +161,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8085/entries/ed29dd14-952b-4a13-97ed-67ed6e7059fd",
-							"protocol": "http",
+							"raw": "{{checkin}}/entries/ed29dd14-952b-4a13-97ed-67ed6e7059fd",
 							"host": [
-								"localhost"
+								"{{checkin}}"
 							],
-							"port": "8085",
 							"path": [
 								"entries",
 								"ed29dd14-952b-4a13-97ed-67ed6e7059fd"
@@ -195,12 +179,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8085/entries/61a0165a-2eb0-45a8-a82b-404641781dfe",
-							"protocol": "http",
+							"raw": "{{checkin}}/entries/61a0165a-2eb0-45a8-a82b-404641781dfe",
 							"host": [
-								"localhost"
+								"{{checkin}}"
 							],
-							"port": "8085",
 							"path": [
 								"entries",
 								"61a0165a-2eb0-45a8-a82b-404641781dfe"
@@ -210,6 +192,37 @@
 					"response": []
 				}
 			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "checkin",
+			"value": "",
+			"type": "default"
 		}
 	]
 }
