@@ -1,6 +1,36 @@
 services:
-  budgeting_service.api:
-    image: andreiberco/pad-budgeting-service:1.1
+  api-gateway:
+    image: andreiberco/pad-faf-gateway:latest
+    # build: .
+    container_name: pad-gateway
+    ports:
+      - "8000:8000"  # External port (user-facing with JWT auth)
+      - "8001:8001"  # Internal port (service-to-service, no auth)
+    env_file:
+      - ./.env
+    environment:
+      - EXTERNAL_PORT=8000
+      - INTERNAL_PORT=8001
+    depends_on:
+      - redis
+      - user-management
+      - notification-service
+      - budgeting-service
+      - lost-found-service
+      - cab-booking-service
+      - checkin-service
+      - tea-management-service
+      - communication-service
+  redis:
+    image: redis:7
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: [ "redis-server", "--save", "60", "1", "--loglevel", "warning" ]
+  budgeting-service:
+    image: andreiberco/pad-budgeting-service:latest
     platform: linux/amd64
     container_name: pad-budgeting-service
     ports:
@@ -12,6 +42,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${BUDGETING_POSTGRES_DB};Username=${BUDGETING_POSTGRES_USER};Password=${BUDGETING_POSTGRES_PASSWORD}
+      - NOTIFICATION_SERVICE_URL=${NOTIFICATION_SERVICE_URL}
 
   budgeting_postgres:
     image: postgres:16
@@ -26,8 +57,8 @@ services:
     volumes:
       - budgeting_postgres_data:/var/lib/postgresql/data
 
-  lost_found_service.api:
-    image: andreiberco/pad-l-f-service:1.1
+  lost-found-service:
+    image: andreiberco/pad-l-f-service:latest
     platform: linux/amd64
     container_name: pad-l-f-service
     ports:
@@ -39,6 +70,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${LF_POSTGRES_DB};Username=${LF_POSTGRES_USER};Password=${LF_POSTGRES_PASSWORD}
+      - NOTIFICATION_SERVICE_URL=${NOTIFICATION_SERVICE_URL}
 
   lf_postgres:
     image: postgres:16
@@ -66,8 +98,8 @@ services:
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
     volumes:
       - um_postgres_data:/var/lib/postgresql/data
-    networks:
-      - user_management_network
+    # networks:
+    #   - user_management_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${UM_POSTGRES_USER} -d ${UM_POSTGRES_DB}"]
       interval: 10s
@@ -78,7 +110,7 @@ services:
 
   user-management:
     image: "russian17/pad-user-management-service:latest"
-    platform: linux/arm64
+    platform: linux/amd64
     container_name: user_management_service
     environment:
       UM_DATABASE_URL: ${UM_DATABASE_URL}
@@ -93,10 +125,12 @@ services:
       UM_ENVIRONMENT: ${UM_ENVIRONMENT:-development}
       UM_DB_ECHO: ${UM_DB_ECHO:-false}
       UM_APP_PORT: ${UM_APP_PORT}
+      UM_DISCORD_BOT_TOKEN: ${UM_DISCORD_BOT_TOKEN}
+      UM_DISCORD_GUILD_ID: ${UM_DISCORD_GUILD_ID}
     ports:
       - "${UM_APP_PORT}:${UM_APP_PORT}"
-    networks:
-      - user_management_network
+    # networks:
+    #   - user_management_network
     depends_on:
       um_postgres:
         condition: service_healthy
@@ -121,8 +155,8 @@ services:
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
     volumes:
       - ns_postgres_data:/var/lib/postgresql/data
-    networks:
-      - notification_service_network
+    # networks:
+    #   - notification_service_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${NS_POSTGRES_USER} -d ${NS_POSTGRES_DB}"]
       interval: 10s
@@ -133,17 +167,19 @@ services:
 
   notification-service:
     image: "russian17/pad-notification_service:latest"
-    platform: linux/arm64
+    platform: linux/amd64
     container_name: notification_service
     environment:
       NS_DATABASE_URL: ${NS_DATABASE_URL}
       NS_SYNC_DATABASE_URL: ${NS_SYNC_DATABASE_URL}
       NS_CORS_ORIGINS: ${NS_CORS_ORIGINS}
       NS_APP_PORT: ${NS_APP_PORT}
+      NS_DISCORD_BOT_TOKEN: ${NS_DISCORD_BOT_TOKEN}
+      NS_DISCORD_GUILD_ID: ${NS_DISCORD_GUILD_ID}
     ports:
       - "${NS_APP_PORT}:${NS_APP_PORT}"
-    networks:
-      - notification_service_network
+    # networks:
+    #   - notification_service_network
     depends_on:
       ns_postgres:
         condition: service_healthy
@@ -155,11 +191,9 @@ services:
       start_period: 40s
     restart: unless-stopped
 
-  cab_booking_service.api:
+  cab-booking-service:
     container_name: cab_booking_backend
-    image: 'victorrevenco/pad_cab_booking_service:1.0.0'
-    build:
-      context: .
+    image: 'victorrevenco/pad_cab_booking_service:latest'
     restart: always
     depends_on:
       cb_postgres:
@@ -191,11 +225,9 @@ services:
       timeout: 5s
       retries: 5
 
-  checkin_service.api:
+  checkin-service:
     container_name: checkin_backend
-    image: 'victorrevenco/pad_check-in_service:1.0.0'
-    build:
-      context: .
+    image: 'victorrevenco/pad_check-in_service:latest'
     restart: always
     depends_on:
       ci_postgres:
@@ -207,7 +239,7 @@ services:
     env_file:
       - ./.env
     ports:
-    - "8085:8085"
+      - "8085:8085"
 
   ci_postgres:
     container_name: checkin_db
@@ -227,7 +259,7 @@ services:
       timeout: 5s
       retries: 5
 
-  tea-management-db: 
+  tea-management-db:
     image: postgres
     environment:
       POSTGRES_USER: ${TM_DB_USER}
@@ -258,7 +290,7 @@ services:
       - "${C_LOCAL_DB_PORT}:5432"
     volumes:
       - communication-db_data:/var/lib/postgresql/data
-  
+
   communication-mongo:
     image: mongo
     environment:
@@ -271,13 +303,10 @@ services:
       - communication-mongo_data:/data/db
 
   communication-service:
-    image: "theboogheyman/pad-communication-service:1.0.1"
-    build:
-      context: .
-      dockerfile: WebAPI/Dockerfile
+    image: "theboogheyman/pad-communication-service:1.0.3"
     env_file:
       - ./.env
-    environment: 
+    environment:
       - HTTP_PORTS=${C_HTTP_PORTS}
       - ASPNETCORE_ENVIRONMENT=${C_ASPNETCORE_ENVIRONMENT}
     ports:
@@ -287,6 +316,7 @@ services:
       - communication-mongo
 
 volumes:
+  redis_data:
   budgeting_postgres_data:
   lf_postgres_data:
   cb_postgres_data:
@@ -296,9 +326,3 @@ volumes:
   tea-management-db_data:
   communication-db_data:
   communication-mongo_data:
-
-networks:
-  user_management_network:
-  notification_service_network:
-
-#Same goes the next microservices and data bases
