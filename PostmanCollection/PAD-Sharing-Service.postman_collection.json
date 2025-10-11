@@ -1,0 +1,1746 @@
+{
+	"info": {
+		"_postman_id": "b99dcf70-a89c-48bb-9519-f96efd2c0f8c",
+		"name": "PAD-Sharing-Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "34239828"
+	},
+	"item": [
+		{
+			"name": "api",
+			"item": [
+				{
+					"name": "sharing",
+					"item": [
+						{
+							"name": "categories",
+							"item": [
+								{
+									"name": "{categoryUuid}",
+									"item": [
+										{
+											"name": "/api/sharing/categories/:categoryUuid",
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "text/plain"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/sharing/categories/:categoryUuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"sharing",
+														"categories",
+														":categoryUuid"
+													],
+													"variable": [
+														{
+															"key": "categoryUuid",
+															"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "text/plain"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/sharing/categories/:categoryUuid",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"sharing",
+																"categories",
+																":categoryUuid"
+															],
+															"variable": [
+																{
+																	"key": "categoryUuid"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"uuid\": \"27c942cc-d3fa-0329-04d3-4b324ce091b1\",\n  \"normalized_name\": \"string\"\n}"
+												}
+											]
+										},
+										{
+											"name": "/api/sharing/categories/:categoryUuid",
+											"request": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "text/plain"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"normalized_name\": \"string\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/sharing/categories/:categoryUuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"sharing",
+														"categories",
+														":categoryUuid"
+													],
+													"variable": [
+														{
+															"key": "categoryUuid",
+															"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "PUT",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "text/plain"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"normalized_name\": \"string\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/sharing/categories/:categoryUuid",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"sharing",
+																"categories",
+																":categoryUuid"
+															],
+															"variable": [
+																{
+																	"key": "categoryUuid"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"uuid\": \"27c942cc-d3fa-0329-04d3-4b324ce091b1\",\n  \"normalized_name\": \"string\"\n}"
+												}
+											]
+										},
+										{
+											"name": "/api/sharing/categories/:categoryUuid",
+											"request": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/sharing/categories/:categoryUuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"sharing",
+														"categories",
+														":categoryUuid"
+													],
+													"variable": [
+														{
+															"key": "categoryUuid",
+															"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "DELETE",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}/api/sharing/categories/:categoryUuid",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"sharing",
+																"categories",
+																":categoryUuid"
+															],
+															"variable": [
+																{
+																	"key": "categoryUuid"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "/api/sharing/categories",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "text/plain"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/sharing/categories?skip=9016&take=9016",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"sharing",
+												"categories"
+											],
+											"query": [
+												{
+													"key": "skip",
+													"value": "9016"
+												},
+												{
+													"key": "take",
+													"value": "9016"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "text/plain"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/sharing/categories?skip=9016&take=9016",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"sharing",
+														"categories"
+													],
+													"query": [
+														{
+															"key": "skip",
+															"value": "9016"
+														},
+														{
+															"key": "take",
+															"value": "9016"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "[\n  {\n    \"uuid\": \"51c6dae3-7e76-b639-0adf-03f2e30cda0a\",\n    \"normalized_name\": \"string\"\n  },\n  {\n    \"uuid\": \"c85b82e2-0279-e6b8-623e-ce807b367369\",\n    \"normalized_name\": \"string\"\n  }\n]"
+										}
+									]
+								},
+								{
+									"name": "/api/sharing/categories",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "text/plain"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"normalized_name\": \"string\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{baseUrl}}/api/sharing/categories"
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "text/plain"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"normalized_name\": \"string\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": "{{baseUrl}}/api/sharing/categories"
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"uuid\": \"27c942cc-d3fa-0329-04d3-4b324ce091b1\",\n  \"normalized_name\": \"string\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "items",
+							"item": [
+								{
+									"name": "{itemUuid}",
+									"item": [
+										{
+											"name": "availability",
+											"item": [
+												{
+													"name": "/api/sharing/items/:itemUuid/availability",
+													"request": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "text/plain"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"is_available\": true\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/sharing/items/:itemUuid/availability",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"sharing",
+																"items",
+																":itemUuid",
+																"availability"
+															],
+															"variable": [
+																{
+																	"key": "itemUuid",
+																	"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+																}
+															]
+														}
+													},
+													"response": [
+														{
+															"name": "OK",
+															"originalRequest": {
+																"method": "POST",
+																"header": [
+																	{
+																		"key": "Content-Type",
+																		"value": "application/json"
+																	},
+																	{
+																		"key": "Accept",
+																		"value": "text/plain"
+																	}
+																],
+																"body": {
+																	"mode": "raw",
+																	"raw": "{\n  \"is_available\": true\n}",
+																	"options": {
+																		"raw": {
+																			"headerFamily": "json",
+																			"language": "json"
+																		}
+																	}
+																},
+																"url": {
+																	"raw": "{{baseUrl}}/api/sharing/items/:itemUuid/availability",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"sharing",
+																		"items",
+																		":itemUuid",
+																		"availability"
+																	],
+																	"variable": [
+																		{
+																			"key": "itemUuid"
+																		}
+																	]
+																}
+															},
+															"status": "OK",
+															"code": 200,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "{\n  \"uuid\": \"d85dc8db-76e4-341a-6536-c32bc34dad65\",\n  \"owner_uuid\": \"74539405-f57c-b58d-ea29-9f397a316f54\",\n  \"category\": \"string\",\n  \"name\": \"string\",\n  \"is_available\": true,\n  \"is_usable\": true,\n  \"state\": \"string\"\n}"
+														}
+													]
+												}
+											]
+										},
+										{
+											"name": "usability",
+											"item": [
+												{
+													"name": "/api/sharing/items/:itemUuid/usability",
+													"request": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "text/plain"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"is_usable\": true\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/sharing/items/:itemUuid/usability",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"sharing",
+																"items",
+																":itemUuid",
+																"usability"
+															],
+															"variable": [
+																{
+																	"key": "itemUuid",
+																	"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+																}
+															]
+														}
+													},
+													"response": [
+														{
+															"name": "OK",
+															"originalRequest": {
+																"method": "POST",
+																"header": [
+																	{
+																		"key": "Content-Type",
+																		"value": "application/json"
+																	},
+																	{
+																		"key": "Accept",
+																		"value": "text/plain"
+																	}
+																],
+																"body": {
+																	"mode": "raw",
+																	"raw": "{\n  \"is_usable\": true\n}",
+																	"options": {
+																		"raw": {
+																			"headerFamily": "json",
+																			"language": "json"
+																		}
+																	}
+																},
+																"url": {
+																	"raw": "{{baseUrl}}/api/sharing/items/:itemUuid/usability",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"sharing",
+																		"items",
+																		":itemUuid",
+																		"usability"
+																	],
+																	"variable": [
+																		{
+																			"key": "itemUuid"
+																		}
+																	]
+																}
+															},
+															"status": "OK",
+															"code": 200,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "{\n  \"uuid\": \"d85dc8db-76e4-341a-6536-c32bc34dad65\",\n  \"owner_uuid\": \"74539405-f57c-b58d-ea29-9f397a316f54\",\n  \"category\": \"string\",\n  \"name\": \"string\",\n  \"is_available\": true,\n  \"is_usable\": true,\n  \"state\": \"string\"\n}"
+														}
+													]
+												}
+											]
+										},
+										{
+											"name": "rent",
+											"item": [
+												{
+													"name": "/api/sharing/items/:itemUuid/rent",
+													"request": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "text/plain"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"user_uuid\": \"59569025-d44b-76de-49df-da2e8d617d3e\",\n  \"to_be_returned_at\": \"2012-08-06T01:32:27.056Z\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/sharing/items/:itemUuid/rent",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"sharing",
+																"items",
+																":itemUuid",
+																"rent"
+															],
+															"variable": [
+																{
+																	"key": "itemUuid",
+																	"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+																}
+															]
+														}
+													},
+													"response": [
+														{
+															"name": "OK",
+															"originalRequest": {
+																"method": "POST",
+																"header": [
+																	{
+																		"key": "Content-Type",
+																		"value": "application/json"
+																	},
+																	{
+																		"key": "Accept",
+																		"value": "text/plain"
+																	}
+																],
+																"body": {
+																	"mode": "raw",
+																	"raw": "{\n  \"user_uuid\": \"59569025-d44b-76de-49df-da2e8d617d3e\",\n  \"to_be_returned_at\": \"2012-08-06T01:32:27.056Z\"\n}",
+																	"options": {
+																		"raw": {
+																			"headerFamily": "json",
+																			"language": "json"
+																		}
+																	}
+																},
+																"url": {
+																	"raw": "{{baseUrl}}/api/sharing/items/:itemUuid/rent",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"sharing",
+																		"items",
+																		":itemUuid",
+																		"rent"
+																	],
+																	"variable": [
+																		{
+																			"key": "itemUuid"
+																		}
+																	]
+																}
+															},
+															"status": "OK",
+															"code": 200,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "{\n  \"uuid\": \"e7deb08d-39a1-2fe3-e370-d7df818b8e75\",\n  \"user_uuid\": \"7b9dff64-a16f-c6aa-5311-5649c89cfece\",\n  \"item_uuid\": \"dcc38614-bcc0-f97c-9ccc-13ef78e28a2f\",\n  \"borrowed_at\": \"2004-10-15T08:51:03.109Z\",\n  \"to_be_returned_at\": \"2003-12-05T05:57:01.714Z\",\n  \"returned_at\": \"2006-01-02T20:46:58.121Z\",\n  \"return_confirmed\": true,\n  \"return_state_borrower\": \"string\",\n  \"return_state_owner\": \"string\"\n}"
+														}
+													]
+												}
+											]
+										},
+										{
+											"name": "/api/sharing/items/:itemUuid",
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "text/plain"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/sharing/items/:itemUuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"sharing",
+														"items",
+														":itemUuid"
+													],
+													"variable": [
+														{
+															"key": "itemUuid",
+															"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "text/plain"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/sharing/items/:itemUuid",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"sharing",
+																"items",
+																":itemUuid"
+															],
+															"variable": [
+																{
+																	"key": "itemUuid"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"uuid\": \"d85dc8db-76e4-341a-6536-c32bc34dad65\",\n  \"owner_uuid\": \"74539405-f57c-b58d-ea29-9f397a316f54\",\n  \"category\": \"string\",\n  \"name\": \"string\",\n  \"is_available\": true,\n  \"is_usable\": true,\n  \"state\": \"string\"\n}"
+												}
+											]
+										},
+										{
+											"name": "/api/sharing/items/:itemUuid",
+											"request": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "text/plain"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"name\": \"string\",\n  \"state\": \"string\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/sharing/items/:itemUuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"sharing",
+														"items",
+														":itemUuid"
+													],
+													"variable": [
+														{
+															"key": "itemUuid",
+															"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "PUT",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "text/plain"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"name\": \"string\",\n  \"state\": \"string\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/sharing/items/:itemUuid",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"sharing",
+																"items",
+																":itemUuid"
+															],
+															"variable": [
+																{
+																	"key": "itemUuid"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"uuid\": \"d85dc8db-76e4-341a-6536-c32bc34dad65\",\n  \"owner_uuid\": \"74539405-f57c-b58d-ea29-9f397a316f54\",\n  \"category\": \"string\",\n  \"name\": \"string\",\n  \"is_available\": true,\n  \"is_usable\": true,\n  \"state\": \"string\"\n}"
+												}
+											]
+										},
+										{
+											"name": "/api/sharing/items/:itemUuid",
+											"request": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/sharing/items/:itemUuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"sharing",
+														"items",
+														":itemUuid"
+													],
+													"variable": [
+														{
+															"key": "itemUuid",
+															"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "DELETE",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}/api/sharing/items/:itemUuid",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"sharing",
+																"items",
+																":itemUuid"
+															],
+															"variable": [
+																{
+																	"key": "itemUuid"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "owner",
+									"item": [
+										{
+											"name": "{ownerUuid}",
+											"item": [
+												{
+													"name": "/api/sharing/items/owner/:ownerUuid",
+													"request": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "text/plain"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/sharing/items/owner/:ownerUuid?skip=9016&take=9016",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"sharing",
+																"items",
+																"owner",
+																":ownerUuid"
+															],
+															"query": [
+																{
+																	"key": "skip",
+																	"value": "9016"
+																},
+																{
+																	"key": "take",
+																	"value": "9016"
+																}
+															],
+															"variable": [
+																{
+																	"key": "ownerUuid",
+																	"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+																}
+															]
+														}
+													},
+													"response": [
+														{
+															"name": "OK",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "text/plain"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/api/sharing/items/owner/:ownerUuid?skip=9016&take=9016",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"sharing",
+																		"items",
+																		"owner",
+																		":ownerUuid"
+																	],
+																	"query": [
+																		{
+																			"key": "skip",
+																			"value": "9016"
+																		},
+																		{
+																			"key": "take",
+																			"value": "9016"
+																		}
+																	],
+																	"variable": [
+																		{
+																			"key": "ownerUuid"
+																		}
+																	]
+																}
+															},
+															"status": "OK",
+															"code": 200,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "[\n  {\n    \"uuid\": \"e22f17b2-1aa8-9767-025e-fbc72ad9fe90\",\n    \"owner_uuid\": \"fb9c8fcc-2a90-08cc-b00e-02c7d5a103d7\",\n    \"category\": \"string\",\n    \"name\": \"string\",\n    \"is_available\": false,\n    \"is_usable\": true,\n    \"state\": \"string\"\n  },\n  {\n    \"uuid\": \"3a99e8c0-8649-42c1-657f-705922b6b103\",\n    \"owner_uuid\": \"8ade2eff-d4fb-761a-8ba9-273524cd28a3\",\n    \"category\": \"string\",\n    \"name\": \"string\",\n    \"is_available\": true,\n    \"is_usable\": false,\n    \"state\": \"string\"\n  }\n]"
+														}
+													]
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "rent",
+									"item": [
+										{
+											"name": "{rentalUuid}",
+											"item": [
+												{
+													"name": "/api/sharing/items/rent/:rentalUuid",
+													"request": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "text/plain"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/sharing/items/rent/:rentalUuid",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"sharing",
+																"items",
+																"rent",
+																":rentalUuid"
+															],
+															"variable": [
+																{
+																	"key": "rentalUuid",
+																	"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+																}
+															]
+														}
+													},
+													"response": [
+														{
+															"name": "OK",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "text/plain"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/api/sharing/items/rent/:rentalUuid",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"sharing",
+																		"items",
+																		"rent",
+																		":rentalUuid"
+																	],
+																	"variable": [
+																		{
+																			"key": "rentalUuid"
+																		}
+																	]
+																}
+															},
+															"status": "OK",
+															"code": 200,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "{\n  \"uuid\": \"e7deb08d-39a1-2fe3-e370-d7df818b8e75\",\n  \"user_uuid\": \"7b9dff64-a16f-c6aa-5311-5649c89cfece\",\n  \"item_uuid\": \"dcc38614-bcc0-f97c-9ccc-13ef78e28a2f\",\n  \"borrowed_at\": \"2004-10-15T08:51:03.109Z\",\n  \"to_be_returned_at\": \"2003-12-05T05:57:01.714Z\",\n  \"returned_at\": \"2006-01-02T20:46:58.121Z\",\n  \"return_confirmed\": true,\n  \"return_state_borrower\": \"string\",\n  \"return_state_owner\": \"string\"\n}"
+														}
+													]
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "/api/sharing/items",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "text/plain"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/sharing/items?skip=9016&take=9016",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"sharing",
+												"items"
+											],
+											"query": [
+												{
+													"key": "skip",
+													"value": "9016"
+												},
+												{
+													"key": "take",
+													"value": "9016"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "text/plain"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/sharing/items?skip=9016&take=9016",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"sharing",
+														"items"
+													],
+													"query": [
+														{
+															"key": "skip",
+															"value": "9016"
+														},
+														{
+															"key": "take",
+															"value": "9016"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "[\n  {\n    \"uuid\": \"e22f17b2-1aa8-9767-025e-fbc72ad9fe90\",\n    \"owner_uuid\": \"fb9c8fcc-2a90-08cc-b00e-02c7d5a103d7\",\n    \"category\": \"string\",\n    \"name\": \"string\",\n    \"is_available\": false,\n    \"is_usable\": true,\n    \"state\": \"string\"\n  },\n  {\n    \"uuid\": \"3a99e8c0-8649-42c1-657f-705922b6b103\",\n    \"owner_uuid\": \"8ade2eff-d4fb-761a-8ba9-273524cd28a3\",\n    \"category\": \"string\",\n    \"name\": \"string\",\n    \"is_available\": true,\n    \"is_usable\": false,\n    \"state\": \"string\"\n  }\n]"
+										}
+									]
+								},
+								{
+									"name": "/api/sharing/items",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "text/plain"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"owner_uuid\": \"2749d40a-e20d-9a4c-553e-9688103036b8\",\n  \"category\": \"string\",\n  \"name\": \"string\",\n  \"state\": \"string\",\n  \"is_available\": false,\n  \"is_usable\": true\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{baseUrl}}/api/sharing/items"
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "text/plain"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"owner_uuid\": \"2749d40a-e20d-9a4c-553e-9688103036b8\",\n  \"category\": \"string\",\n  \"name\": \"string\",\n  \"state\": \"string\",\n  \"is_available\": false,\n  \"is_usable\": true\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": "{{baseUrl}}/api/sharing/items"
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"uuid\": \"d85dc8db-76e4-341a-6536-c32bc34dad65\",\n  \"owner_uuid\": \"74539405-f57c-b58d-ea29-9f397a316f54\",\n  \"category\": \"string\",\n  \"name\": \"string\",\n  \"is_available\": true,\n  \"is_usable\": true,\n  \"state\": \"string\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "rent",
+							"item": [
+								{
+									"name": "{rentalUuid}",
+									"item": [
+										{
+											"name": "return-item",
+											"item": [
+												{
+													"name": "/api/sharing/rent/:rentalUuid/return-item",
+													"request": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "text/plain"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"is_usable\": true,\n  \"state\": \"string\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/sharing/rent/:rentalUuid/return-item",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"sharing",
+																"rent",
+																":rentalUuid",
+																"return-item"
+															],
+															"variable": [
+																{
+																	"key": "rentalUuid",
+																	"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+																}
+															]
+														}
+													},
+													"response": [
+														{
+															"name": "OK",
+															"originalRequest": {
+																"method": "POST",
+																"header": [
+																	{
+																		"key": "Content-Type",
+																		"value": "application/json"
+																	},
+																	{
+																		"key": "Accept",
+																		"value": "text/plain"
+																	}
+																],
+																"body": {
+																	"mode": "raw",
+																	"raw": "{\n  \"is_usable\": true,\n  \"state\": \"string\"\n}",
+																	"options": {
+																		"raw": {
+																			"headerFamily": "json",
+																			"language": "json"
+																		}
+																	}
+																},
+																"url": {
+																	"raw": "{{baseUrl}}/api/sharing/rent/:rentalUuid/return-item",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"sharing",
+																		"rent",
+																		":rentalUuid",
+																		"return-item"
+																	],
+																	"variable": [
+																		{
+																			"key": "rentalUuid"
+																		}
+																	]
+																}
+															},
+															"status": "OK",
+															"code": 200,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "{\n  \"uuid\": \"e7deb08d-39a1-2fe3-e370-d7df818b8e75\",\n  \"user_uuid\": \"7b9dff64-a16f-c6aa-5311-5649c89cfece\",\n  \"item_uuid\": \"dcc38614-bcc0-f97c-9ccc-13ef78e28a2f\",\n  \"borrowed_at\": \"2004-10-15T08:51:03.109Z\",\n  \"to_be_returned_at\": \"2003-12-05T05:57:01.714Z\",\n  \"returned_at\": \"2006-01-02T20:46:58.121Z\",\n  \"return_confirmed\": true,\n  \"return_state_borrower\": \"string\",\n  \"return_state_owner\": \"string\"\n}"
+														}
+													]
+												}
+											]
+										},
+										{
+											"name": "confirm-return",
+											"item": [
+												{
+													"name": "/api/sharing/rent/:rentalUuid/confirm-return",
+													"request": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "text/plain"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"is_usable\": true,\n  \"state\": \"string\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/sharing/rent/:rentalUuid/confirm-return",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"sharing",
+																"rent",
+																":rentalUuid",
+																"confirm-return"
+															],
+															"variable": [
+																{
+																	"key": "rentalUuid",
+																	"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+																}
+															]
+														}
+													},
+													"response": [
+														{
+															"name": "OK",
+															"originalRequest": {
+																"method": "POST",
+																"header": [
+																	{
+																		"key": "Content-Type",
+																		"value": "application/json"
+																	},
+																	{
+																		"key": "Accept",
+																		"value": "text/plain"
+																	}
+																],
+																"body": {
+																	"mode": "raw",
+																	"raw": "{\n  \"is_usable\": true,\n  \"state\": \"string\"\n}",
+																	"options": {
+																		"raw": {
+																			"headerFamily": "json",
+																			"language": "json"
+																		}
+																	}
+																},
+																"url": {
+																	"raw": "{{baseUrl}}/api/sharing/rent/:rentalUuid/confirm-return",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"sharing",
+																		"rent",
+																		":rentalUuid",
+																		"confirm-return"
+																	],
+																	"variable": [
+																		{
+																			"key": "rentalUuid"
+																		}
+																	]
+																}
+															},
+															"status": "OK",
+															"code": 200,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "{\n  \"uuid\": \"e7deb08d-39a1-2fe3-e370-d7df818b8e75\",\n  \"user_uuid\": \"7b9dff64-a16f-c6aa-5311-5649c89cfece\",\n  \"item_uuid\": \"dcc38614-bcc0-f97c-9ccc-13ef78e28a2f\",\n  \"borrowed_at\": \"2004-10-15T08:51:03.109Z\",\n  \"to_be_returned_at\": \"2003-12-05T05:57:01.714Z\",\n  \"returned_at\": \"2006-01-02T20:46:58.121Z\",\n  \"return_confirmed\": true,\n  \"return_state_borrower\": \"string\",\n  \"return_state_owner\": \"string\"\n}"
+														}
+													]
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "history",
+									"item": [
+										{
+											"name": "item",
+											"item": [
+												{
+													"name": "{itemUuid}",
+													"item": [
+														{
+															"name": "/api/sharing/rent/history/item/:itemUuid",
+															"request": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "text/plain"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/api/sharing/rent/history/item/:itemUuid?skip=9016&take=9016",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"sharing",
+																		"rent",
+																		"history",
+																		"item",
+																		":itemUuid"
+																	],
+																	"query": [
+																		{
+																			"key": "skip",
+																			"value": "9016"
+																		},
+																		{
+																			"key": "take",
+																			"value": "9016"
+																		}
+																	],
+																	"variable": [
+																		{
+																			"key": "itemUuid",
+																			"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+																		}
+																	]
+																}
+															},
+															"response": [
+																{
+																	"name": "OK",
+																	"originalRequest": {
+																		"method": "GET",
+																		"header": [
+																			{
+																				"key": "Accept",
+																				"value": "text/plain"
+																			}
+																		],
+																		"url": {
+																			"raw": "{{baseUrl}}/api/sharing/rent/history/item/:itemUuid?skip=9016&take=9016",
+																			"host": [
+																				"{{baseUrl}}"
+																			],
+																			"path": [
+																				"api",
+																				"sharing",
+																				"rent",
+																				"history",
+																				"item",
+																				":itemUuid"
+																			],
+																			"query": [
+																				{
+																					"key": "skip",
+																					"value": "9016"
+																				},
+																				{
+																					"key": "take",
+																					"value": "9016"
+																				}
+																			],
+																			"variable": [
+																				{
+																					"key": "itemUuid"
+																				}
+																			]
+																		}
+																	},
+																	"status": "OK",
+																	"code": 200,
+																	"_postman_previewlanguage": "json",
+																	"header": [
+																		{
+																			"key": "Content-Type",
+																			"value": "application/json"
+																		}
+																	],
+																	"cookie": [],
+																	"body": "[\n  {\n    \"uuid\": \"f5e314a2-90b3-4112-9c76-c231879c2823\",\n    \"item_uuid\": \"630d4ad1-225d-05c0-b895-771f3cd91f70\",\n    \"user_uuid\": \"f2d9f486-814e-f81e-5aad-403bf19edaaa\",\n    \"borrowed_at\": \"2015-01-24T11:48:22.303Z\",\n    \"returned_at\": \"1966-05-22T14:29:32.397Z\",\n    \"return_confirmed\": true\n  },\n  {\n    \"uuid\": \"526a2db7-0d84-20cf-aa4c-fdbb37cb5d7f\",\n    \"item_uuid\": \"96b442e8-7547-054f-2160-93c7fa4121c4\",\n    \"user_uuid\": \"29fa97e3-27d9-6c08-1f33-6770fc1e5f20\",\n    \"borrowed_at\": \"1992-04-03T23:09:16.715Z\",\n    \"returned_at\": \"1947-09-12T07:42:03.087Z\",\n    \"return_confirmed\": false\n  }\n]"
+																}
+															]
+														}
+													]
+												}
+											]
+										},
+										{
+											"name": "user",
+											"item": [
+												{
+													"name": "{userUuid}",
+													"item": [
+														{
+															"name": "/api/sharing/rent/history/user/:userUuid",
+															"request": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "text/plain"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/api/sharing/rent/history/user/:userUuid?skip=9016&take=9016",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"sharing",
+																		"rent",
+																		"history",
+																		"user",
+																		":userUuid"
+																	],
+																	"query": [
+																		{
+																			"key": "skip",
+																			"value": "9016"
+																		},
+																		{
+																			"key": "take",
+																			"value": "9016"
+																		}
+																	],
+																	"variable": [
+																		{
+																			"key": "userUuid",
+																			"value": "819a1d78-d673-26f7-a34d-11d0c602d644"
+																		}
+																	]
+																}
+															},
+															"response": [
+																{
+																	"name": "OK",
+																	"originalRequest": {
+																		"method": "GET",
+																		"header": [
+																			{
+																				"key": "Accept",
+																				"value": "text/plain"
+																			}
+																		],
+																		"url": {
+																			"raw": "{{baseUrl}}/api/sharing/rent/history/user/:userUuid?skip=9016&take=9016",
+																			"host": [
+																				"{{baseUrl}}"
+																			],
+																			"path": [
+																				"api",
+																				"sharing",
+																				"rent",
+																				"history",
+																				"user",
+																				":userUuid"
+																			],
+																			"query": [
+																				{
+																					"key": "skip",
+																					"value": "9016"
+																				},
+																				{
+																					"key": "take",
+																					"value": "9016"
+																				}
+																			],
+																			"variable": [
+																				{
+																					"key": "userUuid"
+																				}
+																			]
+																		}
+																	},
+																	"status": "OK",
+																	"code": 200,
+																	"_postman_previewlanguage": "json",
+																	"header": [
+																		{
+																			"key": "Content-Type",
+																			"value": "application/json"
+																		}
+																	],
+																	"cookie": [],
+																	"body": "[\n  {\n    \"uuid\": \"f5e314a2-90b3-4112-9c76-c231879c2823\",\n    \"item_uuid\": \"630d4ad1-225d-05c0-b895-771f3cd91f70\",\n    \"user_uuid\": \"f2d9f486-814e-f81e-5aad-403bf19edaaa\",\n    \"borrowed_at\": \"2015-01-24T11:48:22.303Z\",\n    \"returned_at\": \"1966-05-22T14:29:32.397Z\",\n    \"return_confirmed\": true\n  },\n  {\n    \"uuid\": \"526a2db7-0d84-20cf-aa4c-fdbb37cb5d7f\",\n    \"item_uuid\": \"96b442e8-7547-054f-2160-93c7fa4121c4\",\n    \"user_uuid\": \"29fa97e3-27d9-6c08-1f33-6770fc1e5f20\",\n    \"borrowed_at\": \"1992-04-03T23:09:16.715Z\",\n    \"returned_at\": \"1947-09-12T07:42:03.087Z\",\n    \"return_confirmed\": false\n  }\n]"
+																}
+															]
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "/"
+		}
+	]
+}

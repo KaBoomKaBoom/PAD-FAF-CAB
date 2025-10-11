@@ -1,0 +1,676 @@
+{
+	"info": {
+		"_postman_id": "cdcbae56-93df-4f76-9227-4c37e454d7dd",
+		"name": "PAD-Fundraising-Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "34239828"
+	},
+	"item": [
+		{
+			"name": "api",
+			"item": [
+				{
+					"name": "fundraising",
+					"item": [
+						{
+							"name": "donations",
+							"item": [
+								{
+									"name": "/api/fundraising/donations",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "text/plain"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"fundraiserUuid\": \"e04c9589-e2d2-50d7-707f-0d7dfb6bd3da\",\n  \"userUuid\": \"759a755a-1966-0801-ec4b-5e81539d410a\",\n  \"amount\": 3320.342541686245\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{baseUrl}}/api/fundraising/donations"
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "text/plain"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"fundraiserUuid\": \"e04c9589-e2d2-50d7-707f-0d7dfb6bd3da\",\n  \"userUuid\": \"759a755a-1966-0801-ec4b-5e81539d410a\",\n  \"amount\": 3320.342541686245\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": "{{baseUrl}}/api/fundraising/donations"
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"uuid\": \"7c5bcc62-b4eb-ed25-2671-8df4653dfdaa\",\n  \"userUuid\": \"26807eb5-9ed1-3b46-eb0e-b86197aaf908\",\n  \"fundraiserUuid\": \"d91d6ead-f56c-71ce-a483-aa161c23c193\",\n  \"amount\": 9499.492011855322,\n  \"createdAt\": \"1977-06-23T10:39:32.140Z\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "{fundraiserUuid}",
+							"item": [
+								{
+									"name": "donations",
+									"item": [
+										{
+											"name": "/api/fundraising/:fundraiserUuid/donations",
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "text/plain"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/fundraising/:fundraiserUuid/donations?skip=7402&take=7402",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"fundraising",
+														":fundraiserUuid",
+														"donations"
+													],
+													"query": [
+														{
+															"key": "skip",
+															"value": "7402"
+														},
+														{
+															"key": "take",
+															"value": "7402"
+														}
+													],
+													"variable": [
+														{
+															"key": "fundraiserUuid",
+															"value": "b344efb8-1127-97dc-6147-8c203b3123fc"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "text/plain"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/fundraising/:fundraiserUuid/donations?skip=7402&take=7402",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"fundraising",
+																":fundraiserUuid",
+																"donations"
+															],
+															"query": [
+																{
+																	"key": "skip",
+																	"value": "7402"
+																},
+																{
+																	"key": "take",
+																	"value": "7402"
+																}
+															],
+															"variable": [
+																{
+																	"key": "fundraiserUuid"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "[\n  {\n    \"uuid\": \"7ba8acf4-7de3-783c-9027-2162411d979c\",\n    \"userUuid\": \"f8925a12-1693-0dc7-2454-38a4f60f0d5e\",\n    \"fundraiserUuid\": \"a8f182f4-b80f-78dd-79a2-373799a80c21\",\n    \"amount\": 5716.4456339868975,\n    \"createdAt\": \"2017-08-14T23:38:02.313Z\"\n  },\n  {\n    \"uuid\": \"3636aeb0-fb84-10ec-71bc-f7dfb0478fcf\",\n    \"userUuid\": \"20466c14-da81-d7f7-89d5-504a82b8b2bf\",\n    \"fundraiserUuid\": \"8042bffb-a69d-03e6-b4e3-572f7998361c\",\n    \"amount\": 5172.374760889258,\n    \"createdAt\": \"1947-04-08T22:32:46.560Z\"\n  }\n]"
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "/api/fundraising/:fundraiserUuid",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "text/plain"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/fundraising/:fundraiserUuid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"fundraising",
+												":fundraiserUuid"
+											],
+											"variable": [
+												{
+													"key": "fundraiserUuid",
+													"value": "b344efb8-1127-97dc-6147-8c203b3123fc"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "text/plain"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/fundraising/:fundraiserUuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"fundraising",
+														":fundraiserUuid"
+													],
+													"variable": [
+														{
+															"key": "fundraiserUuid"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"uuid\": \"a08bc049-5e66-368f-e7a1-0dd3961fd380\",\n  \"authorUuid\": \"f8151c7c-bb7f-634e-10fa-bb03b90c0592\",\n  \"goodName\": \"string\",\n  \"goodAmount\": 2077.4790752386175,\n  \"goodType\": \"string\",\n  \"goodUuid\": \"ba73759f-195b-f7c4-066c-3e0fb5adc7c5\",\n  \"title\": \"string\",\n  \"description\": \"string\",\n  \"amount\": 9833.00632832003,\n  \"target\": 742.7273076601226,\n  \"createdAt\": \"1975-07-01T23:22:31.158Z\",\n  \"expiresAt\": \"1953-01-02T21:35:41.152Z\",\n  \"isActive\": false\n}"
+										}
+									]
+								},
+								{
+									"name": "/api/fundraising/:fundraiserUuid",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "text/plain"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"goodName\": \"string\",\n  \"goodAmount\": 1363.112286895205,\n  \"goodType\": \"string\",\n  \"title\": \"string\",\n  \"description\": \"string\",\n  \"target\": 8334.76482476681,\n  \"expiresAt\": \"2004-01-18T08:27:24.283Z\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/fundraising/:fundraiserUuid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"fundraising",
+												":fundraiserUuid"
+											],
+											"variable": [
+												{
+													"key": "fundraiserUuid",
+													"value": "b344efb8-1127-97dc-6147-8c203b3123fc"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "text/plain"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"goodName\": \"string\",\n  \"goodAmount\": 1363.112286895205,\n  \"goodType\": \"string\",\n  \"title\": \"string\",\n  \"description\": \"string\",\n  \"target\": 8334.76482476681,\n  \"expiresAt\": \"2004-01-18T08:27:24.283Z\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/fundraising/:fundraiserUuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"fundraising",
+														":fundraiserUuid"
+													],
+													"variable": [
+														{
+															"key": "fundraiserUuid"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"uuid\": \"a08bc049-5e66-368f-e7a1-0dd3961fd380\",\n  \"authorUuid\": \"f8151c7c-bb7f-634e-10fa-bb03b90c0592\",\n  \"goodName\": \"string\",\n  \"goodAmount\": 2077.4790752386175,\n  \"goodType\": \"string\",\n  \"goodUuid\": \"ba73759f-195b-f7c4-066c-3e0fb5adc7c5\",\n  \"title\": \"string\",\n  \"description\": \"string\",\n  \"amount\": 9833.00632832003,\n  \"target\": 742.7273076601226,\n  \"createdAt\": \"1975-07-01T23:22:31.158Z\",\n  \"expiresAt\": \"1953-01-02T21:35:41.152Z\",\n  \"isActive\": false\n}"
+										}
+									]
+								},
+								{
+									"name": "/api/fundraising/:fundraiserUuid",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/fundraising/:fundraiserUuid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"fundraising",
+												":fundraiserUuid"
+											],
+											"variable": [
+												{
+													"key": "fundraiserUuid",
+													"value": "b344efb8-1127-97dc-6147-8c203b3123fc"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/fundraising/:fundraiserUuid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"fundraising",
+														":fundraiserUuid"
+													],
+													"variable": [
+														{
+															"key": "fundraiserUuid"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "users",
+							"item": [
+								{
+									"name": "{userUuid}",
+									"item": [
+										{
+											"name": "donations",
+											"item": [
+												{
+													"name": "/api/fundraising/users/:userUuid/donations",
+													"request": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "text/plain"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/fundraising/users/:userUuid/donations?skip=7402&take=7402",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"fundraising",
+																"users",
+																":userUuid",
+																"donations"
+															],
+															"query": [
+																{
+																	"key": "skip",
+																	"value": "7402"
+																},
+																{
+																	"key": "take",
+																	"value": "7402"
+																}
+															],
+															"variable": [
+																{
+																	"key": "userUuid",
+																	"value": "b344efb8-1127-97dc-6147-8c203b3123fc"
+																}
+															]
+														}
+													},
+													"response": [
+														{
+															"name": "OK",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "text/plain"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/api/fundraising/users/:userUuid/donations?skip=7402&take=7402",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"fundraising",
+																		"users",
+																		":userUuid",
+																		"donations"
+																	],
+																	"query": [
+																		{
+																			"key": "skip",
+																			"value": "7402"
+																		},
+																		{
+																			"key": "take",
+																			"value": "7402"
+																		}
+																	],
+																	"variable": [
+																		{
+																			"key": "userUuid"
+																		}
+																	]
+																}
+															},
+															"status": "OK",
+															"code": 200,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "[\n  {\n    \"uuid\": \"7ba8acf4-7de3-783c-9027-2162411d979c\",\n    \"userUuid\": \"f8925a12-1693-0dc7-2454-38a4f60f0d5e\",\n    \"fundraiserUuid\": \"a8f182f4-b80f-78dd-79a2-373799a80c21\",\n    \"amount\": 5716.4456339868975,\n    \"createdAt\": \"2017-08-14T23:38:02.313Z\"\n  },\n  {\n    \"uuid\": \"3636aeb0-fb84-10ec-71bc-f7dfb0478fcf\",\n    \"userUuid\": \"20466c14-da81-d7f7-89d5-504a82b8b2bf\",\n    \"fundraiserUuid\": \"8042bffb-a69d-03e6-b4e3-572f7998361c\",\n    \"amount\": 5172.374760889258,\n    \"createdAt\": \"1947-04-08T22:32:46.560Z\"\n  }\n]"
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "/api/fundraising",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "text/plain"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/fundraising?skip=7402&take=7402",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"fundraising"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "7402"
+										},
+										{
+											"key": "take",
+											"value": "7402"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "text/plain"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/fundraising?skip=7402&take=7402",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"fundraising"
+											],
+											"query": [
+												{
+													"key": "skip",
+													"value": "7402"
+												},
+												{
+													"key": "take",
+													"value": "7402"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"uuid\": \"11620f9d-ec54-201f-2681-23287d67a548\",\n    \"authorUuid\": \"fb4b649f-500d-c0c7-517f-9753fe20834b\",\n    \"goodName\": \"string\",\n    \"goodAmount\": 9147.564595684878,\n    \"goodType\": \"string\",\n    \"goodUuid\": \"16296fdc-cb73-7d7b-287e-03dfde2be9ae\",\n    \"title\": \"string\",\n    \"description\": \"string\",\n    \"amount\": 6763.210929972852,\n    \"target\": 8709.38274831998,\n    \"createdAt\": \"2010-10-31T00:22:51.397Z\",\n    \"expiresAt\": \"1996-06-23T20:38:51.470Z\",\n    \"isActive\": true\n  },\n  {\n    \"uuid\": \"5e01ed43-9356-2ec9-afe5-211f20bc35bd\",\n    \"authorUuid\": \"653c4c13-2364-5cb3-6d91-95b0f556840f\",\n    \"goodName\": \"string\",\n    \"goodAmount\": 5116.665664576463,\n    \"goodType\": \"string\",\n    \"goodUuid\": \"054f12ac-d8e6-ba09-f545-70d13d92fe90\",\n    \"title\": \"string\",\n    \"description\": \"string\",\n    \"amount\": 414.94347797550455,\n    \"target\": 2246.374578521293,\n    \"createdAt\": \"2020-05-02T23:16:08.510Z\",\n    \"expiresAt\": \"1979-05-17T15:59:07.246Z\",\n    \"isActive\": true\n  }\n]"
+								}
+							]
+						},
+						{
+							"name": "/api/fundraising",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "text/plain"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"authorUuid\": \"37e7858f-886d-a4a3-ccbb-84f1e7e3b6d8\",\n  \"goodName\": \"string\",\n  \"goodAmount\": 1927.8959493397974,\n  \"goodType\": \"string\",\n  \"goodUuid\": \"6b9857ad-7c01-c995-669f-9aac04d7a9d1\",\n  \"title\": \"string\",\n  \"description\": \"string\",\n  \"target\": 5030.763420170115,\n  \"expiresAt\": \"1968-08-17T00:42:59.221Z\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/api/fundraising"
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "text/plain"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"authorUuid\": \"37e7858f-886d-a4a3-ccbb-84f1e7e3b6d8\",\n  \"goodName\": \"string\",\n  \"goodAmount\": 1927.8959493397974,\n  \"goodType\": \"string\",\n  \"goodUuid\": \"6b9857ad-7c01-c995-669f-9aac04d7a9d1\",\n  \"title\": \"string\",\n  \"description\": \"string\",\n  \"target\": 5030.763420170115,\n  \"expiresAt\": \"1968-08-17T00:42:59.221Z\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{baseUrl}}/api/fundraising"
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"uuid\": \"a08bc049-5e66-368f-e7a1-0dd3961fd380\",\n  \"authorUuid\": \"f8151c7c-bb7f-634e-10fa-bb03b90c0592\",\n  \"goodName\": \"string\",\n  \"goodAmount\": 2077.4790752386175,\n  \"goodType\": \"string\",\n  \"goodUuid\": \"ba73759f-195b-f7c4-066c-3e0fb5adc7c5\",\n  \"title\": \"string\",\n  \"description\": \"string\",\n  \"amount\": 9833.00632832003,\n  \"target\": 742.7273076601226,\n  \"createdAt\": \"1975-07-01T23:22:31.158Z\",\n  \"expiresAt\": \"1953-01-02T21:35:41.152Z\",\n  \"isActive\": false\n}"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "/"
+		}
+	]
+}
