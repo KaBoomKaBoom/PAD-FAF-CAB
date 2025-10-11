@@ -5,6 +5,48 @@ Each service has a **clear boundary** and encapsulates specific functionality to
 
 ---
 
+## Table of Contents
+- [Overview](#overview)
+- [Service Boundaries](#-service-boundaries)
+  - [1. User Management Service](#1-user-management-service)
+  - [2. Notification Service](#2-notification-service)
+  - [3. Tea Management Service](#3-tea-management-service)
+  - [4. Communication Service](#4-communication-service)
+  - [5. Cab Booking Service](#5-cab-booking-service)
+  - [6. Check-in Service](#6-check-in-service)
+  - [7. Lost & Found Service](#7-lost--found-service)
+  - [8. Budgeting Service](#8-budgeting-service)
+  - [9. Fund Raising Service](#9-fund-raising-service)
+  - [10. Sharing Service](#10-sharing-service)
+- [Architecture Diagram](#-architecture-diagram)
+- [Technologies and Communication Patterns](#️-technologies-and-communication-patterns)
+- [Communication Contract and Data Management](#-communication-contract-and-data-management)
+- [API Endpoints](#-api-endpoints)
+  - [Lost & Found Service](#-lost--found-service-1)
+  - [Budgeting Service](#-budgeting-service-1)
+  - [Cab Booking Service](#cab-booking-service-1)
+  - [Check-in Service](#check-in-service-1)
+  - [Tea Management Service](#️-tea-management-service-1)
+  - [Communication Service](#-communication-service-1)
+  - [Sharing Service](#-sharing-service-1)
+  - [Fund Raising Service](#-fund-raising-service-1)
+- [Docker Images](#-docker-images)
+- [Running the Project](#-running-the-project)
+  - [Prerequisites](#prerequisites)
+  - [Step-by-Step Guide](#step-1-clone-the-repository)
+- [Troubleshooting](#-troubleshooting)
+- [Health Checks](#-health-checks)
+- [Monitoring](#-monitoring)
+- [Updating Services](#-updating-services)
+- [Contribution Guidelines](#-contribution-guidelines)
+  - [Branching Strategy](#-branching-strategy)
+  - [Merging Strategy](#-merging-strategy)
+  - [Pull Request Template](#-pull-request-template)
+  - [Example Workflow](#-example-workflow)
+
+---
+
+
 ## 📌 Service Boundaries
 
 ### 1. User Management Service
@@ -1514,3 +1556,335 @@ Each PR should include:
    git pull origin development
    git checkout -b feature/communication-censorship
 
+---
+
+## 🐳 Docker Images
+
+All microservices are available as pre-built Docker images hosted on Docker Hub:
+
+| Service | Docker Image | Platform |
+|---------|-------------|----------|
+| API Gateway | `andreiberco/pad-faf-gateway:latest` | linux/amd64 |
+| User Management Service | `russian17/pad-user-management-service:latest` | linux/amd64 |
+| Notification Service | `russian17/pad-notification_service:latest` | linux/amd64 |
+| Budgeting Service | `andreiberco/pad-budgeting-service:latest` | linux/amd64 |
+| Lost & Found Service | `andreiberco/pad-l-f-service:latest` | linux/amd64 |
+| Cab Booking Service | `victorrevenco/pad_cab_booking_service:latest` | linux/amd64 |
+| Check-in Service | `victorrevenco/pad_check-in_service:latest` | linux/amd64 |
+| Tea Management Service | `theboogheyman/pad-tea-management-service:1.0.1` | linux/amd64 |
+| Communication Service | `theboogheyman/pad-communication-service:1.0.3` | linux/amd64 |
+| Sharing Service | `iulianach/pad-sharing-service:latest` | linux/amd64 |
+| Fund Raising Service | `iulianach/pad-fund-raising-service:latest` | linux/amd64 |
+
+### Supporting Services
+- **Redis**: `redis:7`
+- **PostgreSQL**: `postgres:16`, `postgres:15-alpine`, `postgres:16-alpine`
+- **MongoDB**: `mongo`
+
+---
+
+## 🚀 Running the Project
+
+### Prerequisites
+- Docker (version 20.10 or higher)
+- Docker Compose (version 2.0 or higher)
+- Git
+
+### Step 1: Clone the Repository
+```bash
+git clone https://github.com/your-org/PAD-FAF-CAB.git
+cd PAD-FAF-CAB
+```
+
+### Step 2: Configure Environment Variables
+Create a `.env` file in the root directory based on the provided template:
+
+```bash
+cp .env.example .env
+```
+
+Edit the `.env` file and configure the following required variables:
+
+**Redis Configuration:**
+```env
+REDIS_HOST=redis
+REDIS_PORT=6379
+```
+
+**JWT Configuration:**
+```env
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-min-32-chars
+```
+
+**User Management Service:**
+```env
+UM_POSTGRES_DB=user_management_db
+UM_POSTGRES_USER=user_management_user
+UM_POSTGRES_PASSWORD=secure_password
+UM_DATABASE_URL=postgresql+asyncpg://user_management_user:secure_password@um_postgres:5432/user_management_db
+UM_SYNC_DATABASE_URL=postgresql://user_management_user:secure_password@um_postgres:5432/user_management_db
+UM_JWT_SECRET_KEY=your-jwt-secret-key
+UM_JWT_ALGORITHM=HS256
+UM_JWT_EXPIRE_MINUTES=30
+UM_JWT_REFRESH_EXPIRE_DAYS=7
+UM_SECURE_COOKIES=false
+UM_COOKIE_DOMAIN=localhost
+UM_CORS_ORIGINS=["http://localhost:3000"]
+UM_ENVIRONMENT=development
+UM_DB_ECHO=false
+UM_APP_PORT=8088
+UM_DISCORD_BOT_TOKEN=your_discord_bot_token
+UM_DISCORD_GUILD_ID=your_discord_guild_id
+```
+
+**Notification Service:**
+```env
+NS_POSTGRES_DB=notification_service_db
+NS_POSTGRES_USER=notification_service_user
+NS_POSTGRES_PASSWORD=secure_password
+NS_DATABASE_URL=postgresql+asyncpg://notification_service_user:secure_password@ns_postgres:5432/notification_service_db
+NS_SYNC_DATABASE_URL=postgresql://notification_service_user:secure_password@ns_postgres:5432/notification_service_db
+NS_CORS_ORIGINS=["http://localhost:3000"]
+NS_APP_PORT=8089
+NS_DISCORD_BOT_TOKEN=your_discord_bot_token
+NS_DISCORD_GUILD_ID=your_discord_guild_id
+NOTIFICATION_SERVICE_URL=http://pad-gateway:8001/internal/notification
+```
+
+**Budgeting Service:**
+```env
+BUDGETING_POSTGRES_DB=budgeting_db
+BUDGETING_POSTGRES_USER=budgeting_user
+BUDGETING_POSTGRES_PASSWORD=secure_password
+ASPNETCORE_ENVIRONMENT=Development
+```
+
+**Lost & Found Service:**
+```env
+LF_POSTGRES_DB=lost_found_db
+LF_POSTGRES_USER=lost_found_user
+LF_POSTGRES_PASSWORD=secure_password
+```
+
+**Cab Booking Service:**
+```env
+CAB_BOOKING_POSTGRES_DB=cab_booking_db
+CAB_BOOKING_POSTGRES_USER=cab_booking_user
+CAB_BOOKING_POSTGRES_PASSWORD=secure_password
+CAB_BOOKING_SPRING_DATASOURCE_URL=jdbc:postgresql://cb_postgres:5432/cab_booking_db
+CAB_BOOKING_SPRING_DATASOURCE_USERNAME=cab_booking_user
+CAB_BOOKING_SPRING_DATASOURCE_PASSWORD=secure_password
+```
+
+**Check-in Service:**
+```env
+CHECKIN_POSTGRES_DB=checkindb
+CHECKIN_POSTGRES_USER=checkin_user
+CHECKIN_POSTGRES_PASSWORD=secure_password
+CHECKIN_SPRING_DATASOURCE_URL=jdbc:postgresql://ci_postgres:5432/checkindb
+CHECKIN_SPRING_DATASOURCE_USERNAME=checkin_user
+CHECKIN_SPRING_DATASOURCE_PASSWORD=secure_password
+```
+
+**Tea Management Service:**
+```env
+TM_HTTP_PORTS=8082
+TM_DB_HOST=tea-management-db
+TM_DB_PORT=5432
+TM_DB_USER=tea_management_service_user
+TM_DB_PASSWORD=cyngos-wikpuT-bukmo8
+TM_DB_NAME=tea_management_service_db
+TM_ASPNETCORE_ENVIRONMENT=Development
+```
+
+**Communication Service:**
+```env
+C_HTTP_PORTS=8083
+C_DB_HOST=communication-db
+C_DB_PORT=5432
+C_DB_USER=communication_service_user
+C_DB_PASSWORD=cyngos-wikpuT-bukmo8
+C_DB_NAME=communication_service_db
+C_LOCAL_DB_PORT=5432
+C_MONGO_DB_ROOT_USER=root
+C_MONGO_DB_ROOT_PASSWORD=example
+C_MONGO_DB_NAME=communication
+C_MONGO_DB_PORT=27017
+C_ASPNETCORE_ENVIRONMENT=Development
+```
+
+**Sharing Service:**
+```env
+S_HTTP_PORTS=8090
+S_DB_HOST=s_postgres
+S_DB_PORT=5432
+S_DB_USER=sharing_user
+S_DB_PASSWORD=secure_password
+S_DB_NAME=sharing_db
+S_LOCAL_DB_PORT=5438
+S_ASPNETCORE_ENVIRONMENT=Development
+```
+
+**Fund Raising Service:**
+```env
+FR_HTTP_PORTS=8091
+FR_DB_HOST=fr_postgres
+FR_DB_PORT=5432
+FR_DB_USER=fundraising_user
+FR_DB_PASSWORD=secure_password
+FR_DB_NAME=fundraising_db
+FR_LOCAL_DB_PORT=5439
+FR_ASPNETCORE_ENVIRONMENT=Development
+```
+
+### Step 3: Pull Docker Images
+Pull all required Docker images from Docker Hub:
+
+```bash
+docker compose pull
+```
+
+This will download all the pre-built images for the microservices.
+
+### Step 4: Start All Services
+Start all services using Docker Compose:
+
+```bash
+docker compose up -d
+```
+
+The `-d` flag runs the containers in detached mode (background).
+
+### Step 5: Verify Services Are Running
+Check the status of all containers:
+
+```bash
+docker compose ps
+```
+
+All services should show a status of "Up" or "healthy".
+
+### Step 6: Access the Services
+Once all services are running, you can access them at the following ports:
+
+| Service | Port | URL |
+|---------|------|-----|
+| API Gateway (External) | 8000 | http://localhost:8000 |
+| API Gateway (Internal) | 8001 | http://localhost:8001 |
+| User Management Service | 8088 | http://localhost:8088/docs |
+| Notification Service | 8089 | http://localhost:8089/docs |
+| Tea Management Service | 8082 | http://localhost:8082 |
+| Communication Service | 8083 | http://localhost:8083 |
+| Cab Booking Service | 8084 | http://localhost:8084 |
+| Check-in Service | 8085 | http://localhost:8085 |
+| Lost & Found Service | 8086 | http://localhost:8086 |
+| Budgeting Service | 8087 | http://localhost:8087 |
+| Sharing Service | 8090 | http://localhost:8090 |
+| Fund Raising Service | 8091 | http://localhost:8091 |
+
+### Step 7: View Logs
+To view logs for all services:
+
+```bash
+docker compose logs -f
+```
+
+To view logs for a specific service:
+
+```bash
+docker compose logs -f <service-name>
+```
+
+Example:
+```bash
+docker compose logs -f user-management
+```
+
+### Step 8: Stop All Services
+To stop all running services:
+
+```bash
+docker compose down
+```
+
+To stop services and remove all volumes (including databases):
+
+```bash
+docker compose down -v
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**1. Port Conflicts**
+If you encounter port conflicts, modify the port mappings in [`docker-compose.yml`](docker-compose.yml ) or change the exposed ports in your [`.env`](.env ) file.
+
+**2. Database Connection Errors**
+Ensure that:
+- Database containers are healthy: `docker compose ps`
+- Connection strings in [`.env`](.env ) match the service names in [`docker-compose.yml`](docker-compose.yml )
+- Wait for databases to initialize (check logs: `docker compose logs <db-service>`)
+
+**3. Image Pull Errors**
+If images fail to pull:
+```bash
+docker login
+docker compose pull
+```
+
+**4. Memory Issues**
+If services crash due to memory limits, increase Docker's memory allocation in Docker Desktop settings (recommend at least 8GB).
+
+**5. Service Dependencies**
+Services have dependencies on databases. If a service fails to start:
+1. Check database health: `docker compose ps`
+2. Restart the specific service: `docker compose restart <service-name>`
+
+---
+
+## 🧪 Health Checks
+
+Most services include health checks. To verify:
+
+```bash
+docker compose ps
+```
+
+Services should show "healthy" status when ready.
+
+Individual health check endpoints (where available):
+- User Management: `http://localhost:8088/docs`
+- Notification Service: `http://localhost:8089/docs`
+
+---
+
+## 📊 Monitoring
+
+To monitor resource usage:
+
+```bash
+docker stats
+```
+
+This shows CPU, memory, and network usage for all running containers.
+
+---
+
+## 🔄 Updating Services
+
+To update to the latest version of a service:
+
+```bash
+docker compose pull <service-name>
+docker compose up -d <service-name>
+```
+
+To update all services:
+
+```bash
+docker compose pull
+docker compose up -d
+```
