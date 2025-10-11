@@ -4,8 +4,8 @@ services:
     # build: .
     container_name: pad-gateway
     ports:
-      - "8000:8000"  # External port (user-facing with JWT auth)
-      - "8001:8001"  # Internal port (service-to-service, no auth)
+      - "8000:8000" # External port (user-facing with JWT auth)
+      - "8001:8001" # Internal port (service-to-service, no auth)
     env_file:
       - ./.env
     environment:
@@ -101,7 +101,7 @@ services:
     # networks:
     #   - user_management_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${UM_POSTGRES_USER} -d ${UM_POSTGRES_DB}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${UM_POSTGRES_USER} -d ${UM_POSTGRES_DB}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -135,7 +135,7 @@ services:
       um_postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "python -c \"import requests; requests.get('http://localhost:${UM_APP_PORT}/docs', timeout=10)\""]
+      test: [ "CMD-SHELL", "python -c \"import requests; requests.get('http://localhost:${UM_APP_PORT}/docs', timeout=10)\"" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -158,7 +158,7 @@ services:
     # networks:
     #   - notification_service_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${NS_POSTGRES_USER} -d ${NS_POSTGRES_DB}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${NS_POSTGRES_USER} -d ${NS_POSTGRES_DB}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -184,7 +184,7 @@ services:
       ns_postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "python -c \"import requests; requests.get('http://localhost:${NS_APP_PORT}/docs', timeout=10)\""]
+      test: [ "CMD-SHELL", "python -c \"import requests; requests.get('http://localhost:${NS_APP_PORT}/docs', timeout=10)\"" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -315,6 +315,71 @@ services:
       - communication-db
       - communication-mongo
 
+  s_postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: ${S_DB_USER}
+      POSTGRES_PASSWORD: ${S_DB_PASSWORD}
+      POSTGRES_DB: ${S_DB_NAME}
+    ports:
+      - "${S_LOCAL_DB_PORT}:5432"
+    volumes:
+      - s_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${S_DB_USER} -d ${S_DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  s-service:
+    image: iulianach/pad-sharing-service:latest
+    container_name: sharing_service
+    platform: linux/amd64
+    env_file:
+      - ./.env
+    environment:
+      - HTTP_PORTS=${S_HTTP_PORTS}
+      - S_HTTP_PORTS=${S_HTTP_PORTS}
+      - ASPNETCORE_ENVIRONMENT=${S_ASPNETCORE_ENVIRONMENT}
+    ports:
+      - "${S_HTTP_PORTS}:${S_HTTP_PORTS}"
+    depends_on:
+      s_postgres:
+        condition: service_healthy
+    restart: on-failure
+
+  fr_postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: ${FR_DB_USER}
+      POSTGRES_PASSWORD: ${FR_DB_PASSWORD}
+      POSTGRES_DB: ${FR_DB_NAME}
+    ports:
+      - "${FR_LOCAL_DB_PORT}:5432"
+    volumes:
+      - fr_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${FR_DB_USER} -d ${FR_DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  fr-service:
+    image: iulianach/pad-fund-raising-service:latest
+    platform: linux/amd64
+    container_name: fund_raising_service
+    env_file:
+      - ./.env
+    environment:
+      - HTTP_PORTS=${FR_HTTP_PORTS}
+      - ASPNETCORE_ENVIRONMENT=${FR_ASPNETCORE_ENVIRONMENT}
+    ports:
+      - "${FR_HTTP_PORTS}:${FR_HTTP_PORTS}"
+    depends_on:
+      fr_postgres:
+        condition: service_healthy
+    restart: on-failure
+
 volumes:
   redis_data:
   budgeting_postgres_data:
@@ -326,3 +391,6 @@ volumes:
   tea-management-db_data:
   communication-db_data:
   communication-mongo_data:
+  s_pgdata:
+
+
