@@ -5,6 +5,42 @@ Each service has a **clear boundary** and encapsulates specific functionality to
 
 ---
 
+## 📑 Table of Contents
+- [Overview](#-overview)
+- [Service Boundaries](#-service-boundaries)
+  - [1. User Management Service](#1-user-management-service)
+  - [2. Notification Service](#2-notification-service)
+  - [3. Budgeting Service](#3-budgeting-service)
+  - [4. Lost & Found Service](#4-lost--found-service)
+  - [5. Cab Booking Service](#5-cab-booking-service)
+  - [6. Check-in Service](#6-check-in-service)
+  - [7. Tea Management Service](#7-tea-management-service)
+  - [8. Communication Service](#8-communication-service)
+  - [9. Fund Raising Service](#9-fund-raising-service)
+  - [10. Sharing Service](#10-sharing-service)
+- [Architecture Diagram](#-architecture-diagram)
+- [Technologies and Communication Patterns](#️-technologies-and-communication-patterns)
+- [Communication Contract and Data Management](#-communication-contract-and-data-management)
+- [API Endpoints](#-api-endpoints)
+- [Docker Images](#-docker-images)
+- [Running the Project](#-running-the-project)
+- [Infrastructure Documentation](#-infrastructure-documentation)
+  - [Service Discovery](#service-discovery)
+  - [API Gateway](#api-gateway)
+- [Troubleshooting](#-troubleshooting)
+- [Health Checks](#-health-checks)
+- [Monitoring](#-monitoring)
+- [Updating Services](#-updating-services)
+- [Contribution Guidelines](#-contribution-guidelines)
+
+---
+
+## 🎯 Overview
+
+FAF Cab is a microservices-based platform designed to manage various aspects of the FAF (Faculty of Automation and Computers) community operations. The platform consists of 11 independent microservices, each handling specific business domains, with an API Gateway coordinating external and internal communication.
+
+---
+
 ## 📌 Service Boundaries
 
 ### 1. User Management Service
@@ -32,27 +68,26 @@ Each service has a **clear boundary** and encapsulates specific functionality to
 
 ---
 
-### 3. Tea Management Service
+### 3. Budgeting Service
 - **Responsibilities**:
-  - Track consumables (tea, sugar, paper cups, markers, etc.).
-  - Record which user consumes what and when.
-  - Trigger notifications when consumables run low or when a user overuses resources.
+  - Track funds flowing in and out of FAF Cab & FAF NGO.
+  - Maintain logs of spending and donations.
+  - Manage a debt book for users who overuse or break property.
+  - Allow admins to export reports as CSV.
 - **Boundaries**:
-  - Owns inventory data for consumables.
-  - Provides events to **Notification Service** and **Budgeting Service**.
+  - Owns treasury and financial data.
+  - Receives updates from **Tea Management Service**, **Sharing Service**, and **Fund Raising Service**.
 
 ---
 
-### 4. Communication Service
+### 4. Lost & Found Service
 - **Responsibilities**:
-  - Allow users to find each other by nickname.
-  - Enable public and private chats with individuals or groups.
-  - Apply censorship with a banned-words list.
-  - Enforce infractions and bans (temporary or permanent).
+  - Allow users to post announcements about lost or found items.
+  - Support multiple comment threads per post.
+  - Allow posts to be marked as resolved.
 - **Boundaries**:
-  - Owns messaging data and moderation logic.
-  - Relies on **User Management Service** for nicknames and roles.
-  - Sends infractions to **Notification Service**.
+  - Owns lost & found posts and comments.
+  - Can trigger notifications when a new post is created or resolved.
 
 ---
 
@@ -82,26 +117,27 @@ Each service has a **clear boundary** and encapsulates specific functionality to
 
 ---
 
-### 7. Lost & Found Service
+### 7. Tea Management Service
 - **Responsibilities**:
-  - Allow users to post announcements about lost or found items.
-  - Support multiple comment threads per post.
-  - Allow posts to be marked as resolved.
+  - Track consumables (tea, sugar, paper cups, markers, etc.).
+  - Record which user consumes what and when.
+  - Trigger notifications when consumables run low or when a user overuses resources.
 - **Boundaries**:
-  - Owns lost & found posts and comments.
-  - Can trigger notifications when a new post is created or resolved.
+  - Owns inventory data for consumables.
+  - Provides events to **Notification Service** and **Budgeting Service**.
 
 ---
 
-### 8. Budgeting Service
+### 8. Communication Service
 - **Responsibilities**:
-  - Track funds flowing in and out of FAF Cab & FAF NGO.
-  - Maintain logs of spending and donations.
-  - Manage a debt book for users who overuse or break property.
-  - Allow admins to export reports as CSV.
+  - Allow users to find each other by nickname.
+  - Enable public and private chats with individuals or groups.
+  - Apply censorship with a banned-words list.
+  - Enforce infractions and bans (temporary or permanent).
 - **Boundaries**:
-  - Owns treasury and financial data.
-  - Receives updates from **Tea Management Service**, **Sharing Service**, and **Fund Raising Service**.
+  - Owns messaging data and moderation logic.
+  - Relies on **User Management Service** for nicknames and roles.
+  - Sends infractions to **Notification Service**.
 
 ---
 
@@ -133,7 +169,7 @@ Each service has a **clear boundary** and encapsulates specific functionality to
 
 ## 🔗 Architecture Diagram
 
-![Architecture Diagram](docs/architecture_diagram.jpg)
+![Architecture Diagram](docs/PAD.drawio.png)
 
 ---
 
@@ -166,7 +202,7 @@ Each microservice is implemented with a different technology stack to ensure div
 
 ---
 
-### 3. Tea Management Service
+### 3. Budgeting Service
 - **Technology**: .NET 8 (ASP.NET Core Web API)
 - **Database**: PostgreSQL
 - **Communication**: REST APIs (for querying consumables), publishes events (low stock, overuse) to the Message Broker.
@@ -177,16 +213,14 @@ Each microservice is implemented with a different technology stack to ensure div
 
 ---
 
-### 4. Communication Service
-- **Technology**: .NET 8 (SignalR for real-time communication)
+### 4. Lost & Found Service
+- **Technology**: .NET 8 (ASP.NET Core Web API)
 - **Database**: PostgreSQL
-- **Communication**:  
-  - Real-time via WebSockets/SignalR.  
-  - Publishes infractions to Notification Service via Message Broker.  
+- **Communication**: REST APIs (create posts, comment threads), publishes events (post created/resolved) to Notification Service.
 - **Motivation**:  
-  Real-time chat requires stable, scalable WebSocket support. SignalR abstracts much of this complexity.  
-  MongoDB handles unstructured chat data well (flexible schema).  
-  Trade-off: Eventual consistency with NoSQL, but acceptable for chat data.
+  Flexible structure of posts and comments makes MongoDB a natural choice.  
+  .NET ensures good performance and developer productivity.  
+  Trade-off: Requires extra moderation logic, but performance is not a bottleneck here.
 
 ---
 
@@ -214,27 +248,27 @@ Each microservice is implemented with a different technology stack to ensure div
 
 ---
 
-### 7. Lost & Found Service
+### 7. Tea Management Service
 - **Technology**: .NET 8 (ASP.NET Core Web API)
 - **Database**: PostgreSQL
-- **Communication**: REST APIs (create posts, comment threads), publishes events (post created/resolved) to Notification Service.
+- **Communication**: REST APIs (for querying consumables), publishes events (low stock, overuse) to the Message Broker.
 - **Motivation**:  
-  Flexible structure of posts and comments makes MongoDB a natural choice.  
-  .NET ensures good performance and developer productivity.  
-  Trade-off: Requires extra moderation logic, but performance is not a bottleneck here.
+  .NET provides strong enterprise support and excellent integration with SQL Server.  
+  Since this service tracks inventory with structured data, relational DB is a natural fit.  
+  Trade-off: More rigid than NoSQL, but consistency and relational queries matter here.
 
 ---
 
-### 8. Budgeting Service
-- **Technology**: .NET 8 (ASP.NET Core Web API)
+### 8. Communication Service
+- **Technology**: .NET 8 (SignalR for real-time communication)
 - **Database**: PostgreSQL
 - **Communication**:  
-  - REST APIs for reports and financial logs.  
-  - Consumes events from Tea Management, Sharing, and Fund Raising Services.  
+  - Real-time via WebSockets/SignalR.  
+  - Publishes infractions to Notification Service via Message Broker.  
 - **Motivation**:  
-  Requires ACID compliance to handle treasury logs, debts, and donations.  
-  SQL Server provides strong consistency guarantees.  
-  Trade-off: Higher maintenance cost vs NoSQL, but correctness is crucial.
+  Real-time chat requires stable, scalable WebSocket support. SignalR abstracts much of this complexity.  
+  MongoDB handles unstructured chat data well (flexible schema).  
+  Trade-off: Eventual consistency with NoSQL, but acceptable for chat data.
 
 ---
 
@@ -347,243 +381,568 @@ All services expose REST APIs and exchange data in **JSON format** (`Content-Typ
 
 ## 🔎 Lost & Found Service
 
-**Base URL:** `/api/lost-found`  
-**Database:** MongoDB  
-**Technology Stack:** .NET  
+**Base URL:** `/api`  
+**Database:** PostgreSQL  
+**Technology Stack:** .NET
 
-### 1. Create a Post
+---
 
-- **POST** `/posts`
-- **Description:** Create a new lost or found item post.
+## Endpoints
 
-**Request:**
-```json
-{
-  "title": "Lost USB Stick",
-  "description": "Black Kingston USB stick, lost in FAFCab kitchen",
-  "type": "lost", 
-  "authorId": "u123"
-}
-```
+### Health Check
 
-**Response (201 Created):**
-```json
-{
-  "postId": "p001",
-  "title": "Lost USB Stick",
-  "description": "Black Kingston USB stick, lost in FAFCab kitchen",
-  "type": "lost",
-  "authorId": "u123",
-  "status": "open",
-  "createdAt": "2025-09-02T10:30:00Z"
-}
-```
+#### Service Health Status
+- **GET** `/api/post/health`
+- **Description:** Check service health and get request statistics.
+- **Response (200 OK):**
+    ```json
+    {
+      "message": "Service is healthy and running",
+      "requestCount": 1234,
+      "timestamp": "2025-10-24T10:30:00Z"
+    }
+    ```
 
-### 2. Get All Posts
+---
 
-- **GET** `/posts`
+### Posts
+
+#### Get All Posts
+- **GET** `/api/post`
 - **Description:** Retrieve all lost & found posts.
+- **Response (200 OK):**
+    ```json
+    [
+      {
+        "postId": "p001",
+        "title": "Lost USB Stick",
+        "description": "Black Kingston USB stick, lost in FAFCab kitchen",
+        "type": "lost",
+        "userId": "u123",
+        "status": "open",
+        "createdAt": "2025-09-02T10:30:00Z",
+        "comments": []
+      }
+    ]
+    ```
 
-**Response (200 OK):**
-```json
-[
-  {
-    "postId": "p001",
-    "title": "Lost USB Stick",
-    "type": "lost",
-    "status": "open"
-  },
-  {
-    "postId": "p002",
-    "title": "Found Jacket",
-    "type": "found",
-    "status": "resolved"
-  }
-]
-```
-
-### 3. Get a Single Post
-
-- **GET** `/posts/{postId}`
+#### Get Post by ID
+- **GET** `/api/post/{postId}`
 - **Description:** Retrieve details of a specific post.
+- **Response (200 OK):**
+    ```json
+    {
+      "postId": "p001",
+      "title": "Lost USB Stick",
+      "description": "Black Kingston USB stick, lost in FAFCab kitchen",
+      "type": "lost",
+      "userId": "u123",
+      "status": "open",
+      "createdAt": "2025-09-02T10:30:00Z",
+      "comments": [
+        {
+          "commentId": "c001",
+          "postId": "p001",
+          "userId": "u555",
+          "content": "I saw one in the main room yesterday",
+          "createdAt": "2025-09-02T11:00:00Z"
+        }
+      ]
+    }
+    ```
+- **Response (404 Not Found):** If not found.
 
-**Response (200 OK):**
-```json
-{
-  "postId": "p001",
-  "title": "Lost USB Stick",
-  "description": "Black Kingston USB stick, lost in FAFCab kitchen",
-  "type": "lost",
-  "authorId": "u123",
-  "status": "open",
-  "createdAt": "2025-09-02T10:30:00Z",
-  "comments": [
+#### Create a Post
+- **POST** `/api/post`
+- **Description:** Create a new lost or found item post.
+- **Request:**
+    ```json
+    {
+      "title": "Lost USB Stick",
+      "description": "Black Kingston USB stick, lost in FAFCab kitchen",
+      "type": "lost",
+      "authorId": "u123"
+    }
+    ```
+- **Response (201 Created):**
+    ```json
+    {
+      "postId": "p001",
+      "title": "Lost USB Stick",
+      "description": "Black Kingston USB stick, lost in FAFCab kitchen",
+      "type": "lost",
+      "userId": "u123",
+      "status": "open",
+      "createdAt": "2025-09-02T10:30:00Z"
+    }
+    ```
+
+#### Update a Post
+- **PUT** `/api/post/{postId}`
+- **Description:** Update an existing post.
+- **Request:**
+    ```json
+    {
+      "title": "Lost USB Stick (updated)",
+      "description": "Updated description",
+      "type": "lost",
+      "authorId": "u123"
+    }
+    ```
+- **Response (204 No Content):** On success.
+
+#### Delete a Post
+- **DELETE** `/api/post/{postId}`
+- **Description:** Delete a post.
+- **Response (204 No Content):** On success.
+
+#### Resolve Post
+- **POST** `/api/post/{postId}/resolve`
+- **Description:** Mark a post as resolved by its creator.
+- **Response (200 OK):**
+    ```json
+    "Post with ID p001 resolved successfully."
+    ```
+
+---
+
+### Comments
+
+#### Get All Comments for a Post
+- **GET** `/api/post/{postId}/comments`
+- **Description:** Retrieve all comments for a specific post.
+- **Response (200 OK):**
+    ```json
+    [
+      {
+        "commentId": "c001",
+        "postId": "p001",
+        "userId": "u555",
+        "content": "I saw one in the main room yesterday",
+        "createdAt": "2025-09-02T11:00:00Z"
+      }
+    ]
+    ```
+
+#### Add Comment to Post
+- **POST** `/api/post/{postId}/comments`
+- **Description:** Add a comment to a post.
+- **Request:**
+    ```json
+    {
+      "postId": "p001",
+      "authorId": "u555",
+      "content": "I saw one in the main room yesterday"
+    }
+    ```
+- **Response (201 Created):**
+    ```json
     {
       "commentId": "c001",
-      "authorId": "u555",
-      "text": "I saw one in the main room yesterday",
+      "postId": "p001",
+      "userId": "u555",
+      "content": "I saw one in the main room yesterday",
       "createdAt": "2025-09-02T11:00:00Z"
     }
-  ]
-}
-```
+    ```
 
-### 4. Add Comment to Post
+#### Update a Comment
+- **PUT** `/api/post/{postId}/comments/{commentId}`
+- **Description:** Update a comment.
+- **Request:**
+    ```json
+    {
+      "postId": "p001",
+      "authorId": "u555", 
+      "content": "Updated comment"
+    }
+    ```
+- **Response (204 No Content):** On success.
 
-- **POST** `/posts/{postId}/comments`
-
-**Request:**
-```json
-{
-  "authorId": "u555",
-  "text": "I saw one in the main room yesterday"
-}
-```
-
-**Response (201 Created):**
-```json
-{
-  "commentId": "c001",
-  "authorId": "u555",
-  "text": "I saw one in the main room yesterday",
-  "createdAt": "2025-09-02T11:00:00Z"
-}
-```
-
-### 5. Resolve Post
-
-- **PATCH** `/posts/{postId}/resolve`
-- **Description:** Mark a post as resolved by its creator.
-
-**Response (200 OK):**
-```json
-{
-  "postId": "p001",
-  "status": "resolved",
-  "resolvedAt": "2025-09-02T12:00:00Z"
-}
-```
+#### Delete a Comment
+- **DELETE** `/api/post/{postId}/comments/{commentId}`
+- **Description:** Delete a comment.
+- **Response (204 No Content):** On success.
 
 ---
 
 ## 💰 Budgeting Service
 
-**Base URL:** `/api/budget`  
-**Database:** SQL Server  
-**Technology Stack:** .NET
-
-### 1. Get Current Balance
-
-- **GET** `/balance`
-- **Description:** Returns the current treasury balance.
-
-**Response (200 OK):**
-```json
-{
-  "balance": 1520.75,
-  "currency": "EUR",
-  "lastUpdated": "2025-09-02T09:00:00Z"
-}
-```
-
-### 2. Get All Transactions
-
-- **GET** `/transactions`
-- **Description:** Retrieve a list of all treasury transactions.
-
-**Response (200 OK):**
-```json
-[
-  {
-    "transactionId": "t001",
-    "type": "donation",
-    "amount": 200.00,
-    "currency": "EUR",
-    "source": "Partner NGO",
-    "createdAt": "2025-08-20T14:30:00Z"
-  },
-  {
-    "transactionId": "t002",
-    "type": "expense",
-    "amount": 50.00,
-    "currency": "EUR",
-    "source": "Tea Supplies",
-    "createdAt": "2025-08-21T09:15:00Z"
-  }
-]
-```
-
-### 3. Add a Transaction
-
-- **POST** `/transactions`
-
-**Request:**
-```json
-{
-  "type": "expense",
-  "amount": 75.00,
-  "currency": "EUR",
-  "source": "New Board Markers",
-  "authorId": "u123"
-}
-```
-
-**Response (201 Created):**
-```json
-{
-  "transactionId": "t003",
-  "type": "expense",
-  "amount": 75.00,
-  "currency": "EUR",
-  "source": "New Board Markers",
-  "authorId": "u123",
-  "createdAt": "2025-09-02T10:00:00Z"
-}
-```
-
-### 4. Get Debt Book
-
-- **GET** `/debts`
-- **Description:** Retrieve a list of users who owe money for overuse or damages.
-
-**Response (200 OK):**
-```json
-[
-  {
-    "debtId": "d001",
-    "userId": "u321",
-    "reason": "Broke kettle",
-    "amount": 30.00,
-    "currency": "EUR",
-    "status": "unpaid"
-  },
-  {
-    "debtId": "d002",
-    "userId": "u789",
-    "reason": "Overused tea",
-    "amount": 15.00,
-    "currency": "EUR",
-    "status": "paid"
-  }
-]
-```
-
-### 5. Export Transactions as CSV
-
-- **GET** `/transactions/export`
-- **Description:** Allows admins to export transactions as CSV.
-
-**Response (200 OK):**
-```
-Content-Type: text/csv
-
-transactionId,type,amount,currency,source,createdAt
-t001,donation,200.00,EUR,Partner NGO,2025-08-20T14:30:00Z
-t002,expense,50.00,EUR,Tea Supplies,2025-08-21T09:15:00Z
-t003,expense,75.00,EUR,New Board Markers,2025-09-02T10:00:00Z
-```
+**Base URL:** `/api`  
+**Database:** PostgreSQL  
+**Technology Stack:** .NET 9, Entity Framework Core
 
 ---
+
+## Endpoints
+
+### Balances
+
+#### Get All Balances
+- **GET** `/api/balance`
+- **Description:** Returns all balances.
+- **Response (200 OK):**
+    ```json
+    [
+      {
+        "balanceId": "guid",
+        "currency": "EUR",
+        "amount": 1520.75,
+        "updatedAt": "2025-09-02T09:00:00Z"
+      }
+    ]
+    ```
+
+#### Get Balance by ID
+- **GET** `/api/balance/{id}`
+- **Description:** Returns a balance by its ID.
+- **Response (200 OK):**
+    ```json
+    {
+      "balanceId": "guid",
+      "currency": "EUR",
+      "amount": 1520.75,
+      "updatedAt": "2025-09-02T09:00:00Z"
+    }
+    ```
+- **Response (404 Not Found):** If not found.
+
+#### Create Balance
+- **POST** `/api/balance`
+- **Request:**
+    ```json
+    {
+      "currency": "EUR",
+      "amount": 1000
+    }
+    ```
+- **Response (201 Created):**
+    ```json
+    {
+      "balanceId": "guid",
+      "currency": "EUR",
+      "amount": 1000,
+      "updatedAt": "2025-09-02T09:00:00Z"
+    }
+    ```
+
+#### Update Balance
+- **PUT** `/api/balance/{id}/{transaction}`
+- **Description:** Updates the balance amount by applying a transaction value (positive or negative).
+- **Response (204 No Content):** On success.
+
+#### Delete Balance
+- **DELETE** `/api/balance/{id}`
+- **Description:** Deletes a balance by ID.
+- **Response (204 No Content):** On success.
+
+#### Health Check
+- **GET** `/api/balance/health`
+- **Description:** Returns the health status of the balance service.
+- **Response (200 OK):**
+    ```json
+    {
+      "status": "Healthy",
+      "timestamp": "2025-10-09T12:00:00Z"
+    }
+    ```
+
+#### Test Gateway Timeout
+- **GET** `/api/balance/test-timeout?delaySeconds=5`
+- **Description:** Test endpoint to verify gateway timeout functionality. Delays response for specified seconds.
+- **Query Parameters:**
+  - `delaySeconds` (optional, default: 5): Number of seconds to delay the response
+- **Response (200 OK):**
+    ```json
+    {
+      "requestId": "guid",
+      "message": "Request completed successfully after 5 seconds",
+      "completedAt": "2025-10-09T12:00:05Z",
+      "delaySeconds": 5
+    }
+    ```
+- **Response (408 Request Timeout):** If gateway timeout is exceeded
+
+#### Test Gateway Concurrency
+- **GET** `/api/balance/test-concurrency?workDurationSeconds=3`
+- **Description:** Test endpoint to verify gateway concurrency limits. Simulates work for specified duration.
+- **Query Parameters:**
+  - `workDurationSeconds` (optional, default: 3): Duration of simulated work in seconds
+- **Response (200 OK):**
+    ```json
+    {
+      "requestId": "guid",
+      "message": "Concurrency test completed successfully",
+      "startTime": "2025-10-09T12:00:00Z",
+      "endTime": "2025-10-09T12:00:03Z",
+      "durationSeconds": 3.001,
+      "workDurationSeconds": 3
+    }
+    ```
+
+#### Test Concurrency Batch Instructions
+- **GET** `/api/balance/test-concurrency-batch?count=10&workDurationSeconds=3`
+- **Description:** Returns instructions and examples for testing gateway concurrency with multiple simultaneous requests.
+- **Query Parameters:**
+  - `count` (optional, default: 10): Number of concurrent requests to suggest
+  - `workDurationSeconds` (optional, default: 3): Duration for each test request
+- **Response (200 OK):**
+    ```json
+    {
+      "message": "Make 10 concurrent GET requests to /api/balance/test-concurrency?workDurationSeconds=3",
+      "endpoint": "/api/balance/test-concurrency?workDurationSeconds=3",
+      "suggestedTool": "Use a tool like Apache Bench, wrk, or a script to send concurrent requests",
+      "examples": [
+        "curl (sequential): for i in {1..10}; do curl http://localhost:8087/api/balance/test-concurrency?workDurationSeconds=3 & done; wait",
+        "Apache Bench: ab -n 10 -c 10 http://localhost:8087/api/balance/test-concurrency?workDurationSeconds=3"
+      ],
+      "expectedBehavior": {
+        "withConcurrencyLimit": "Some requests will wait in queue if limit is exceeded",
+        "withTimeout": "Requests taking longer than gateway timeout will fail with 408 or 504",
+        "successfulRequests": "Should return 200 OK with timing information"
+      }
+    }
+    ```
+
+---
+
+### Transactions
+
+#### Get All Transactions
+- **GET** `/api/transactions`
+- **Description:** Retrieve a list of all transactions.
+- **Response (200 OK):**
+    ```json
+    [
+      {
+        "transactionId": "guid",
+        "balanceId": "guid",
+        "type": "income",
+        "amount": 200.00,
+        "currency": "EUR",
+        "source": "Partner NGO",
+        "userId": "guid",
+        "createdAt": "2025-08-20T14:30:00Z"
+      }
+    ]
+    ```
+
+#### Get Transaction by ID
+- **GET** `/api/transactions/{id}`
+- **Description:** Retrieve a transaction by its ID.
+- **Response (200 OK):**
+    ```json
+    {
+      "transactionId": "guid",
+      "balanceId": "guid",
+      "type": "income",
+      "amount": 200.00,
+      "currency": "EUR",
+      "source": "Partner NGO",
+      "userId": "guid",
+      "createdAt": "2025-08-20T14:30:00Z"
+    }
+    ```
+- **Response (404 Not Found):** If not found.
+
+#### Add a Transaction
+- **POST** `/api/transactions`
+- **Description:** Create a new transaction and automatically send notification to the user.
+- **Request:**
+    ```json
+    {
+      "balanceId": "guid",
+      "type": "expense",
+      "amount": 75.00,
+      "currency": "EUR",
+      "source": "New Board Markers",
+      "userId": "guid"
+    }
+    ```
+- **Response (201 Created):**
+    ```json
+    {
+      "transactionId": "guid",
+      "balanceId": "guid",
+      "type": "expense",
+      "amount": 75.00,
+      "currency": "EUR",
+      "source": "New Board Markers",
+      "userId": "guid",
+      "createdAt": "2025-09-02T10:00:00Z"
+    }
+    ```
+
+#### Delete Transaction
+- **DELETE** `/api/transactions/{id}`
+- **Description:** Deletes a transaction by ID.
+- **Response (204 No Content):** On success.
+
+#### Export Transactions as CSV
+- **GET** `/api/transactions/export`
+- **Description:** Export all transactions as CSV.
+- **Response (200 OK):**
+    ```
+    Content-Type: text/csv
+
+    TransactionId,BalanceId,Type,Amount,Currency,Source,UserId,CreatedAt
+    ...
+    ```
+
+#### Test Notification Connectivity
+- **GET** `/api/transactions/test-notification`
+- **Description:** Test endpoint to verify connectivity to the notification service.
+- **Response (200 OK):**
+    ```json
+    {
+      "success": true,
+      "statusCode": 200,
+      "responseBody": "...",
+      "envVars": {
+        "notificationUrl": "http://api-gateway:8001/internal/notification",
+        "httpProxy": null,
+        "httpsProxy": null,
+        "noProxy": null
+      }
+    }
+    ```
+- **Response (500 Internal Server Error):** If connectivity test fails
+
+#### Broadcast Notification to All Users
+- **POST** `/api/transactions/broadcast-notification`
+- **Description:** Send a notification to all users in the system (admin only).
+- **Request:**
+    ```json
+    {
+      "notificationType": "info",
+      "message": "📢 System maintenance scheduled for tonight at 10 PM UTC"
+    }
+    ```
+- **Response (200 OK):** If notification sent successfully
+- **Response (500 Internal Server Error):** If notification failed
+
+#### Notify Admins
+- **POST** `/api/transactions/notify-admins`
+- **Description:** Send a notification to all admin users.
+- **Request:**
+    ```json
+    {
+      "notificationType": "warning",
+      "message": "⚠️ High debt amount detected for user XYZ"
+    }
+    ```
+- **Response (200 OK):** If notification sent successfully
+- **Response (404 Not Found):** If no admin users found
+- **Response (500 Internal Server Error):** If notification failed
+
+---
+
+### Debts
+
+#### Get All Debts
+- **GET** `/api/debts`
+- **Description:** Retrieve a list of all debts.
+- **Response (200 OK):**
+    ```json
+    [
+      {
+        "debtId": "guid",
+        "userId": "guid",
+        "description": "Broke kettle",
+        "amount": 30.00,
+        "currency": "EUR",
+        "status": "Pending",
+        "createdAt": "2025-09-02T09:00:00Z",
+        "dueDate": "2025-09-12T09:00:00Z",
+        "paidAt": null,
+        "paymentMethod": null
+      }
+    ]
+    ```
+
+#### Get Debt by ID
+- **GET** `/api/debts/{id}`
+- **Description:** Retrieve a debt by its ID.
+- **Response (200 OK):**
+    ```json
+    {
+      "debtId": "guid",
+      "userId": "guid",
+      "description": "Broke kettle",
+      "amount": 30.00,
+      "currency": "EUR",
+      "status": "Pending",
+      "createdAt": "2025-09-02T09:00:00Z",
+      "dueDate": "2025-09-12T09:00:00Z",
+      "paidAt": null,
+      "paymentMethod": null
+    }
+    ```
+- **Response (404 Not Found):** If not found.
+
+#### Register Debt
+- **POST** `/api/debts`
+- **Description:** Create a new debt record.
+- **Request:**
+    ```json
+    {
+      "userId": "guid",
+      "description": "Consumed 10 tea bags in one day",
+      "amount": 5.00,
+      "currency": "EUR",
+      "dueDate": "2025-09-12T09:00:00Z"
+    }
+    ```
+- **Response (201 Created):**
+    ```json
+    {
+      "debtId": "guid",
+      "userId": "guid",
+      "description": "Consumed 10 tea bags in one day",
+      "amount": 5.00,
+      "currency": "EUR",
+      "status": "Pending",
+      "createdAt": "2025-09-02T13:00:00Z",
+      "dueDate": "2025-09-12T09:00:00Z",
+      "paidAt": null,
+      "paymentMethod": null
+    }
+    ```
+
+#### Pay Debt
+- **PUT** `/api/debts/{id}/pay`
+- **Description:** Mark a debt as paid with the specified payment method.
+- **Request:**
+    ```json
+    "cash"
+    ```
+- **Response (204 No Content):** On success.
+
+---
+
+## Background Services
+
+### Balance Monitor
+Automatically monitors system balances and sends notifications to admins when balances fall below configured thresholds.
+
+- **Check Interval:** Configurable via `BALANCE_CHECK_INTERVAL_MINUTES` (default: 5 minutes)
+- **Thresholds:**
+  - USD: `LOW_BALANCE_THRESHOLD_USD` (default: 100)
+  - EUR: `LOW_BALANCE_THRESHOLD_EUR` (default: 100)
+  - MDL: `LOW_BALANCE_THRESHOLD_MDL` (default: 2000)
+  - RON: `LOW_BALANCE_THRESHOLD_RON` (default: 500)
+
+### Debt Expiration Monitor
+Automatically monitors unpaid debts and sends notifications to users and admins when debts are approaching due date or overdue.
+
+- **Check Interval:** Configurable via `DEBT_CHECK_INTERVAL_HOURS` (default: 12 hours)
+- **Notification Days:** Configurable via `DEBT_NOTIFICATION_DAYS` (default: 7,3,1,0 days before due date)
+- **Features:**
+  - Sends notifications at 7, 3, 1 days before due date
+  - Sends notification on due date (day 0)
+  - Sends notifications for overdue debts
+  - Different urgency levels based on days until due
+
 
 ## Cab Booking Service
 **Base url:** `/api/bookings`
@@ -1294,46 +1653,6 @@ _No body_
   "is_active": true
 }
 ```   
-### 5. Delete a Fundraising Campaign 
-- **DELETE** `/{fundraiser_uuid}`
-- **Description:** Delete a specific fundraising campaign by its UUID.
-**Response (204 No Content):**
-_No body_
-### 6. Create a Donation
-- **POST** `/donations`
-- **Description:** Create a new donation towards a fundraising campaign.
-**Request:**
-```json
-{
-  "fundraiser_uuid": "00000000-0000-0000-0000-000000000000",
-  "user_uuid": "00000000-0000-0000-0000-000000000000",
-  "amount": 0.0,
-  "currency": "EUR",
-  "payment_method": "CREDIT_CARD",
-  "reason": "string"
-}
-```
-- **Description:** Retrieve details of a specific fundraising campaign by its UUID.
-**Response (200 OK):**
-```json
-{
-  "uuid": "00000000-0000-0000-0000-000000000000",
-  "author_name": "string",
-  "author_surname": "string",
-  "author_uuid": "00000000-0000-0000-0000-000000000000",
-  "good_name": "string",
-  "good_amount": 0.0,
-  "good_type": "MONEY",
-  "good_uuid": "00000000-0000-0000-0000-000000000000",
-  "title": "string",
-  "description": "string",
-  "amount": 0.0,
-  "target": 0.0,
-  "created_at": "2025-09-02T10:30:00Z",
-  "expires_at": "2025-09-02T10:30:00Z",
-  "is_active": true
-}
-```
 ### 3. Create a New Fundraising Campaign
 - **POST** `/`
 - **Description:** Create a new fundraising campaign.
@@ -1470,47 +1789,42 @@ _No body_
 ```
 ---
 
-## 🤝 Contribution Guidelines
+## 📚 Infrastructure Documentation
 
-### 🔀 Branching Strategy
-- **Main Branches:**
-  - `main` → Stable production-ready code
-  - `development` → Active development branch where features are merged before release
-- **Naming Branches:**  
-  - Naming convention: `<ticket-number>/<short-description>` 
+This project includes two critical infrastructure components that enable service orchestration and communication. For detailed technical information, please refer to the dedicated documentation:
 
----
+### Service Discovery
+The **Service Discovery** system provides automatic service registration, health monitoring, and load balancing information for the API Gateway. It's built in Go and maintains a real-time registry of all microservice instances.
 
-### 🔧 Merging Strategy
-- All changes must be introduced via **Pull Requests (PRs)**.
-- PRs into `main` and `development` require:
-  - **At least 2 approvals** from team members.
-  - All checks/tests to pass successfully.
-- Use **Squash and Merge** strategy to keep history clean.
-- Commit messages should be descriptive and follow [Conventional Commits](https://www.conventionalcommits.org/) style:
-  - `feat: add comment endpoint to Lost & Found service`
-  - `fix: correct balance calculation in Budgeting service`
-  - `doc: update contribution guidelines`
+**Key Features:**
+- 🔍 Automatic service registration and deregistration
+- 🏥 Periodic health checking of registered services
+- 📊 Request count tracking per service instance
+- ⚖️ Load balancing support with least-connection routing
+- 📧 Email alerts for critical events (startup, deregistration, high load)
 
----
+📖 **[Read Full Service Discovery Documentation →](README_SERVICE_DISCOVERY.md)**
 
-### 📋 Pull Request Template
-Each PR should include:
-1. **Summary** – Short description of the change.
-2. **Related Issue** – Reference to issue number (if applicable).
-3. **Changes Made** – List of modifications.
-4. **Testing Done** – How was this tested (manual/automated).
-5. **Checklist**:
-   - [ ] Code follows project coding style
-   - [ ] Tests added/updated
-   - [ ] Documentation updated (if required)
+### API Gateway
+The **API Gateway** serves as the central entry point for all client requests, implementing a dual-port architecture that separates external user traffic (port 8000) from internal service-to-service communication (port 8001).
+
+**Key Features:**
+- 🔐 JWT authentication and token management
+- ⚡ Redis-based caching for GET requests
+- 🚦 Concurrency limiting and rate control
+- 🔄 Dynamic load balancing with service discovery integration
+- ⚡ Circuit breaker pattern for fault tolerance
+- 📊 Comprehensive Prometheus metrics and Grafana dashboards
+
+📖 **[Read Full API Gateway Documentation →](README_GATEWAY.md)**
 
 ---
 
-### 🗂 Example Workflow
-1. Create a new branch from `development`:  
-   ```bash
-   git checkout development
-   git pull origin development
-   git checkout -b feature/communication-censorship
+## 🔗 Architecture Diagram
+
+<!-- ...existing architecture diagram... -->
+
+---
+
+<!-- ...rest of existing README content... -->
 
