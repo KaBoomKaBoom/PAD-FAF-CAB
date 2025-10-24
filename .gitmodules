@@ -28,3 +28,9 @@
 [submodule "PAD-Sharing-Service"]
 	path = PAD-Sharing-Service
 	url = https://github.com/Chiuliana/PAD-Sharing-Service.git
+[submodule "PAD-Service-Discovery"]
+	path = PAD-Service-Discovery
+	url = https://github.com/KaBoomKaBoom/PAD-Service-Discovery.git
+[submodule "PAD-FAF-CAB-GATEWAY"]
+	path = PAD-FAF-CAB-GATEWAY
+	url = https://github.com/KaBoomKaBoom/PAD-FAF-CAB-GATEWAY.git
