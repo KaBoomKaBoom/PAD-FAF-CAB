@@ -1,0 +1,29 @@
+services:
+  api-gateway:
+    image: andreiberco/pad-faf-gateway:latest
+    # build: .
+    container_name: pad-gateway
+    ports:
+      - "8000:8000" # External port (user-facing with JWT auth)
+      - "8001:8001" # Internal port (service-to-service, no auth)
+    env_file:
+      - ./.env
+    environment:
+      - EXTERNAL_PORT=8000
+      - INTERNAL_PORT=8001
+      - SERVICE_DISCOVERY_URL=http://service-discovery:8002
+      
+    networks:
+      - test-stack_default
+    restart: on-failure
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+
+networks:
+  test-stack_default:
+    external: true

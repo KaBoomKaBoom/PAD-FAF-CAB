@@ -1,0 +1,46 @@
+services:
+  service-discovery:
+    build:
+      context: ./service-discovery
+      dockerfile: Dockerfile
+    image: andreiberco/pad-service-discovery:latest
+    ports:
+      - "8002:8002"
+    env_file:
+      - ./.env
+    environment:
+      - PORT=8002
+    networks:
+      - test-stack_default
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8500/health || exit 1"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 10s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+networks:
+  test-stack_default:
+    external: true
+
+volumes:
+  redis_data:
+  budgeting_postgres_data:
+  lf_postgres_data:
+  cb_postgres_data:
+  ci_postgres_data:
+  um_postgres_data:
+  ns_postgres_data:
+  tm_pgdata:
+  c_pgdata:
+  c_mongo_data:
+  c_mongo_config:
+  s_pgdata:
+  fr_pgdata:
