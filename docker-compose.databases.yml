@@ -1,0 +1,218 @@
+services:
+  redis:
+    image: redis:7
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    networks:
+      - test-stack_default
+    volumes:
+      - redis_data:/data
+    command: [ "redis-server", "--save", "60", "1", "--loglevel", "warning" ]
+
+  budgeting_postgres:
+    image: postgres:16
+    container_name: pad-budgeting-service.db
+    env_file:
+      - ./.env.budgeting_postgres
+    networks:
+      - test-stack_default
+    ports:
+      - "5437:5432"
+    volumes:
+      - budgeting_postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pad-budgeting-service-user -d pad-budgeting-service-db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  lf_postgres:
+    image: postgres:16
+    container_name: pad-l-f-service.db
+    env_file:
+      - ./.env.lf_postgres
+    networks:
+      - test-stack_default
+    ports:
+      - "5436:5432"
+    volumes:
+      - lf_postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pad-l-f-service-user -d pad-l-f-service-db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  um_postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5430:5432"
+    container_name: user_management_db
+    env_file:
+      - ./.env.um_postgres
+    networks:
+      - test-stack_default
+    volumes:
+      - um_postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d faf_cab_users" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  ns_postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5431:5432"
+    container_name: notification_service_db
+    env_file:
+      - ./.env.ns_postgres
+    networks:
+      - test-stack_default
+    volumes:
+      - ns_postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d ns_faf_cab_users" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  cb_postgres:
+    container_name: cab_booking_db
+    image: 'postgres:16-alpine'
+    env_file:
+      - ./.env.cb_postgres
+    networks:
+      - test-stack_default
+    ports:
+      - "5434:5432"
+    volumes:
+      - cb_postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  ci_postgres:
+    container_name: checkin_db
+    image: 'postgres:16-alpine'
+    env_file:
+      - ./.env.ci_postgres
+    networks:
+      - test-stack_default
+    ports:
+      - "5435:5432"
+    volumes:
+      - ci_postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  tm_postgres:
+    image: postgres
+    env_file:
+      - ./.env.tm_postgres
+    networks:
+      - test-stack_default
+    volumes:
+      - tm_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U tea_management_service_user -d tea_management_service_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  c_postgres:
+    image: postgres
+    env_file:
+      - ./.env.c_postgres
+    networks:
+      - test-stack_default
+    volumes:
+      - c_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U communication_service_user -d communication_service_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  c_mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: communication_service_root
+      MONGO_INITDB_ROOT_PASSWORD: cyngos-wikpuT-bukmo8
+      MONGO_INITDB_DATABASE: communication_service_mongo_db
+    networks:
+      - test-stack_default
+    ports:
+      - "27017:27017"
+    volumes:
+      - c_mongo_data:/data/db
+      - c_mongo_config:/data/configdb
+    healthcheck:
+      test: [ "CMD-SHELL", "mongosh --quiet -u communication_service_root -p cyngos-wikpuT-bukmo8 --authenticationDatabase admin --eval \"db.adminCommand('ping').ok\" | grep 1" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  s_postgres:
+    image: postgres
+    env_file:
+      - ./.env.s_postgres
+    networks:
+      - test-stack_default
+    volumes:
+      - s_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U sharing_service_user -d sharing_service_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  fr_postgres:
+    image: postgres
+    env_file:
+      - ./.env.fr_postgres
+    networks:
+      - test-stack_default
+    volumes:
+      - fr_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U fund_raising_service_user -d fund_raising_service_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  redis_data:
+  budgeting_postgres_data:
+  lf_postgres_data:
+  cb_postgres_data:
+  ci_postgres_data:
+  um_postgres_data:
+  ns_postgres_data:
+  tm_pgdata:
+  c_pgdata:
+  c_mongo_data:
+  c_mongo_config:
+  s_pgdata:
+  fr_pgdata:
+
+networks:
+  test-stack_default:
+    external: true
