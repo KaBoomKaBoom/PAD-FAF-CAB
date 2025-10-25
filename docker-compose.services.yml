@@ -71,6 +71,7 @@ services:
       - ./.env
     environment:
       - SERVICE_NAME_FULL={{.Task.Name}}
+
     ports:
       - "8081:8081"
     networks:
@@ -136,8 +137,10 @@ services:
     networks:
       - test-stack_default
     environment:
-      - HTTP_PORTS=${TM_HTTP_PORTS}
-      - ASPNETCORE_ENVIRONMENT=${TM_ASPNETCORE_ENVIRONMENT}
+      - HTTP_PORTS=8082
+      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
+      - SERVICE_NAME_FULL={{.Task.Name}}
+      
     ports:
       - "8082:8082"
     deploy:
@@ -155,8 +158,10 @@ services:
     networks:
       - test-stack_default
     environment:
-      - HTTP_PORTS=${C_HTTP_PORTS}
-      - ASPNETCORE_ENVIRONMENT=${C_ASPNETCORE_ENVIRONMENT}
+      - HTTP_PORTS=8083
+      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
+      # - SERVICE_DISCOVERY_URL=http://service-discovery:8002/register
+      - SERVICE_NAME_FULL={{.Task.Name}}
     ports:
       - "8083:8083"
     deploy:
@@ -209,9 +214,9 @@ services:
     networks:
       - test-stack_default
     environment:
-      - HTTP_PORTS=${S_HTTP_PORTS}
-      - S_HTTP_PORTS=${S_HTTP_PORTS}
-      - ASPNETCORE_ENVIRONMENT=${S_ASPNETCORE_ENVIRONMENT}
+      - HTTP_PORTS=8089
+      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
+      - SERVICE_NAME_FULL={{.Task.Name}}
     ports:
       - "8089:8089"
     deploy:
@@ -227,8 +232,9 @@ services:
     env_file:
       - ./.env
     environment:
-      - HTTP_PORTS=${FR_HTTP_PORTS}
-      - ASPNETCORE_ENVIRONMENT=${FR_ASPNETCORE_ENVIRONMENT}
+      - HTTP_PORTS=8088
+      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
+      - SERVICE_NAME_FULL={{.Task.Name}}
     ports:
       - "8088:8088"
     networks:
