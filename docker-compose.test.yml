@@ -1,0 +1,52 @@
+services:
+  budgeting-service:
+    image: andreiberco/pad-budgeting-service:latest
+    ports:
+      - "8087:8087"
+    networks:
+      - test-stack_default
+    env_file:
+      - ./.env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=Host=budgeting_postgres;Port=5432;Database=${BUDGETING_POSTGRES_DB};Username=${BUDGETING_POSTGRES_USER};Password=${BUDGETING_POSTGRES_PASSWORD}
+      - NOTIFICATION_SERVICE_URL=${NOTIFICATION_SERVICE_URL}
+      - SERVICE_NAME_FULL={{.Task.Name}}
+      - SERVICE_ID={{.Task.ID}}
+      - SERVICE_SLOT={{.Task.Slot}}
+      - SERVICE_NAME={{.Service.Name}}
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    
+  lost-found-service:
+    image: andreiberco/pad-l-f-service:latest
+    ports:
+      - "8086:8086"
+    networks:
+      - test-stack_default
+    env_file:
+      - ./.env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=Host=lf_postgres;Port=5432;Database=${LF_POSTGRES_DB};Username=${LF_POSTGRES_USER};Password=${LF_POSTGRES_PASSWORD}
+      - NOTIFICATION_SERVICE_URL=${NOTIFICATION_SERVICE_URL}
+      - SERVICE_NAME_FULL={{.Task.Name}}
+      - SERVICE_ID={{.Task.ID}}
+      - SERVICE_SLOT={{.Task.Slot}}
+      - SERVICE_NAME={{.Service.Name}}
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+networks:
+  test-stack_default:
+    external: true

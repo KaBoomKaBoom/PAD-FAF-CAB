@@ -1,0 +1,22 @@
+services:
+  message-broker:
+    image: andreiberco/pad-message-broker:latest
+    container_name: message-broker
+    ports:
+      - "5000:5000"
+    networks:
+      - test-stack_default
+
+    restart: on-failure
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+
+networks:
+  test-stack_default:
+    external: true
+    
