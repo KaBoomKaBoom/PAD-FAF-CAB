@@ -1,4 +1,5 @@
 #!/bin/bash
+# filepath: c:\Users\andre\OneDrive\Desktop\PAD-FAF-CAB\deploy-all.sh
 
 # Four-Stage Deployment Script for PAD Microservices
 echo "============================================"
@@ -31,22 +32,22 @@ fi
 
 echo ""
 echo "Checking/Creating overlay network..."
-NETWORK_EXISTS=$(docker network ls --filter name=test-stack_default --format "{{.Name}}")
-if [ "$NETWORK_EXISTS" != "test-stack_default" ]; then
-    echo "Creating test-stack_default network..."
-    if docker network create --driver overlay --attachable test-stack_default; then
+NETWORK_EXISTS=$(docker network ls --filter name=padstack_default --format "{{.Name}}")
+if [ "$NETWORK_EXISTS" != "padstack_default" ]; then
+    echo "Creating padstack_default network..."
+    if docker network create --driver overlay --attachable padstack_default; then
         echo "✓ Network created successfully"
     else
         echo "✗ Failed to create network"
         exit 1
     fi
 else
-    echo "✓ Network test-stack_default already exists"
+    echo "✓ Network padstack_default already exists"
 fi
 
 echo ""
 echo "STAGE 1: Deploying Databases"
-if docker stack deploy -c docker-compose.databases.yml test-stack; then
+if docker stack deploy -c docker-compose.databases.yml padstack; then
     echo "✓ Databases deployment initiated"
 else
     echo "✗ Database deployment failed"
@@ -57,8 +58,20 @@ echo "Waiting 10 seconds..."
 sleep 10
 
 echo ""
-echo "STAGE 2: Deploying Service Discovery"
-if docker stack deploy -c docker-compose.discovery.yml test-stack; then
+echo "STAGE 2: Deploying Message Broker"
+if docker stack deploy -c docker-compose.broker.yml padstack; then
+    echo "✓ Message Broker deployment initiated"
+else
+    echo "✗ Message Broker deployment failed"
+    exit 1
+fi
+
+echo "Waiting 10 seconds..."
+sleep 10
+
+echo ""
+echo "STAGE 3: Deploying Service Discovery"
+if docker stack deploy -c docker-compose.discovery.yml padstack; then
     echo "✓ Service Discovery deployment initiated"
 else
     echo "✗ Service Discovery deployment failed"
@@ -69,8 +82,8 @@ echo "Waiting 10 seconds..."
 sleep 10
 
 echo ""
-echo "STAGE 3: Deploying Microservices"
-if docker stack deploy -c docker-compose.services.yml test-stack; then
+echo "STAGE 4: Deploying Microservices"
+if docker stack deploy -c docker-compose.services.yml padstack; then
     echo "✓ Microservices deployment initiated"
 else
     echo "✗ Microservices deployment failed"
@@ -81,8 +94,8 @@ echo "Waiting 30 seconds..."
 sleep 30
 
 echo ""
-echo "STAGE 4: Deploying API Gateway"
-if docker stack deploy -c docker-compose.gateway.yml test-stack; then
+echo "STAGE 5: Deploying API Gateway"
+if docker stack deploy -c docker-compose.gateway.yml padstack; then
     echo "✓ API Gateway deployment initiated"
 else
     echo "✗ API Gateway deployment failed"
@@ -98,7 +111,8 @@ echo ""
 echo "Service endpoints:"
 echo "  API Gateway:        http://localhost:8000"
 echo "  Service Discovery:  http://localhost:8002"
+echo "  Broker:             http://localhost:5000"
 echo "  Adminer:            http://localhost:8090"
 echo "  Mongo Express:      http://localhost:8091"
 echo ""
-docker stack services test-stack
+docker stack services padstack

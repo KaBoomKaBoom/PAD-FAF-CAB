@@ -59,7 +59,20 @@ Write-Host "Waiting 10 seconds..." -ForegroundColor Yellow
 Start-Sleep -Seconds 10
 
 Write-Host ""
-Write-Host "STAGE 2: Deploying Service Discovery" -ForegroundColor Cyan
+Write-Host "STAGE 2: Deploying Message Broker" -ForegroundColor Cyan
+docker stack deploy -c docker-compose.broker.yml padstack
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "Message Broker deployment initiated" -ForegroundColor Green
+} else {
+    Write-Host "Message Broker deployment failed" -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "Waiting 10 seconds..." -ForegroundColor Yellow
+Start-Sleep -Seconds 10
+
+Write-Host ""
+Write-Host "STAGE 3: Deploying Service Discovery" -ForegroundColor Cyan
 docker stack deploy -c docker-compose.discovery.yml padstack
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Service Discovery deployment initiated" -ForegroundColor Green
@@ -72,7 +85,7 @@ Write-Host "Waiting 10 seconds..." -ForegroundColor Yellow
 Start-Sleep -Seconds 10
 
 Write-Host ""
-Write-Host "STAGE 3: Deploying Microservices" -ForegroundColor Cyan
+Write-Host "STAGE 4: Deploying Microservices" -ForegroundColor Cyan
 docker stack deploy -c docker-compose.services.yml padstack
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Microservices deployment initiated" -ForegroundColor Green
@@ -85,7 +98,7 @@ Write-Host "Waiting 30 seconds..." -ForegroundColor Yellow
 Start-Sleep -Seconds 30
 
 Write-Host ""
-Write-Host "STAGE 4: Deploying API Gateway" -ForegroundColor Cyan
+Write-Host "STAGE 5: Deploying API Gateway" -ForegroundColor Cyan
 docker stack deploy -c docker-compose.gateway.yml padstack
 if ($LASTEXITCODE -eq 0) {
     Write-Host "API Gateway deployment initiated" -ForegroundColor Green
@@ -103,6 +116,7 @@ Write-Host ""
 Write-Host "Service endpoints:" -ForegroundColor Cyan
 Write-Host "  API Gateway:        http://localhost:8000"
 Write-Host "  Service Discovery:  http://localhost:8002"
+Write-Host "  Broker:             http://localhost:5000"
 Write-Host "  Adminer:            http://localhost:8090"
 Write-Host "  Mongo Express:      http://localhost:8091"
 Write-Host ""
