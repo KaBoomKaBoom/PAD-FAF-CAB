@@ -169,7 +169,7 @@ FAF Cab is a microservices-based platform designed to manage various aspects of 
 
 ## 🔗 Architecture Diagram
 
-![Architecture Diagram](docs/PAD3.drawio.png)
+![Architecture Diagram](docs/PAD.png)
 
 ---
 
