@@ -34,3 +34,6 @@
 [submodule "PAD-FAF-CAB-GATEWAY"]
 	path = PAD-FAF-CAB-GATEWAY
 	url = https://github.com/KaBoomKaBoom/PAD-FAF-CAB-GATEWAY.git
+[submodule "PAD_Message_Broker"]
+	path = PAD_Message_Broker
+	url = https://github.com/KaBoomKaBoom/PAD-Message-Broker.git
