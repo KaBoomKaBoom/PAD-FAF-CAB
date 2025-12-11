@@ -1,0 +1,57 @@
+version: '3.9'
+
+services:
+  # Data Warehouse PostgreSQL Database
+  dw_postgres:
+    image: postgres:16-alpine
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      POSTGRES_DB: dw_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5433:5432"
+    volumes:
+      - dw_data:/var/lib/postgresql/data
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d dw_db || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Data Warehouse ETL Service
+  etl-service:
+    image: andreiberco/pad-dw:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8050
+      - ConnectionStrings_BudgetingSourceDb=Host=postgres_budgeting_primary;Database=pad-budgeting-service-db;Username=pad-budgeting-service-user;Password=pad-budgeting-service-password;
+      - ConnectionStrings_DataWarehouse=Host=dw_postgres;Port=5432;Database=dw_db;Username=admin;Password=admin;
+      - ETL_SCHEDULE_CRON=*/30 * * * * *
+      - ETL_INTERVAL_SECONDS=60
+      - ETL_ENABLE_SCHEDULING=true
+    ports:
+      - "8050:8050"
+    networks:
+      - test-stack_default
+
+volumes:
+  dw_data:
+    driver: local
+
+networks:
+  test-stack_default:
+    external: true

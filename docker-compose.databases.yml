@@ -1,50 +1,1422 @@
 services:
-  redis:
-    image: redis:7
-    container_name: redis-cache
-    ports:
-      - "6379:6379"
+  # Redis Shard 1
+  redis-1:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis1-data:/data
     networks:
       - test-stack_default
-    volumes:
-      - redis_data:/data
-    command: [ "redis-server", "--save", "60", "1", "--loglevel", "warning" ]
-
-  budgeting_postgres:
-    image: postgres:16
-    container_name: pad-budgeting-service.db
-    env_file:
-      - ./.env.budgeting_postgres
-    networks:
-      - test-stack_default
-    ports:
-      - "5437:5432"
-    volumes:
-      - budgeting_postgres_data:/var/lib/postgresql
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U pad-budgeting-service-user -d pad-budgeting-service-db" ]
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Redis Shard 2
+  redis-2:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis2-data:/data
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Redis Shard 3
+  redis-3:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis3-data:/data
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # PostgreSQL Primary Node for Budgeting Service
+  postgres_budgeting_primary:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_DB=pad-budgeting-service-db
+      - POSTGRES_USER=pad-budgeting-service-user
+      - POSTGRES_PASSWORD=pad-budgeting-service-password
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_password
+    volumes:
+      - postgres_budgeting_primary_data:/var/lib/postgresql/data
+      - ./postgres-config/primary:/docker-entrypoint-initdb.d:ro
+      - ./postgres-config/postgresql-primary.conf:/etc/postgresql/postgresql.conf:ro
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pad-budgeting-service-user -d pad-budgeting-service-db"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
 
-  lf_postgres:
+  # PostgreSQL Budgeting Replica 1
+  postgres_budgeting_replica1:
     image: postgres:16
-    container_name: pad-l-f-service.db
-    env_file:
-      - ./.env.lf_postgres
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=pad-budgeting-service-user
+      - POSTGRES_PASSWORD=pad-budgeting-service-password
+      - PGUSER=pad-budgeting-service-user
+      - PRIMARY_HOST=postgres_budgeting_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica1_slot
+    volumes:
+      - postgres_budgeting_replica1_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
     networks:
       - test-stack_default
-    ports:
-      - "5436:5432"
-    volumes:
-      - lf_postgres_data:/var/lib/postgresql
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U pad-l-f-service-user -d pad-l-f-service-db" ]
+      test: ["CMD-SHELL", "pg_isready -U pad-budgeting-service-user -d pad-budgeting-service-db || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # PostgreSQL Budgeting Replica 2
+  postgres_budgeting_replica2:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=pad-budgeting-service-user
+      - POSTGRES_PASSWORD=pad-budgeting-service-password
+      - PGUSER=pad-budgeting-service-user
+      - PRIMARY_HOST=postgres_budgeting_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica2_slot
+    volumes:
+      - postgres_budgeting_replica2_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pad-budgeting-service-user -d pad-budgeting-service-db || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  pgpool1:
+    image: pgpool/pgpool:4.0.23
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 5
+    environment:
+      # PostgreSQL backends
+      - POSTGRES_USERNAME=pad-budgeting-service-user
+      - POSTGRES_PASSWORD=pad-budgeting-service-password
+      - PGPOOL_PARAMS_PORT=5432
+      
+      # Backend configuration
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME0=postgres_budgeting_primary
+      - PGPOOL_PARAMS_BACKEND_PORT0=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT0=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY0=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME1=postgres_budgeting_replica1
+      - PGPOOL_PARAMS_BACKEND_PORT1=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT1=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY1=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME2=postgres_budgeting_replica2
+      - PGPOOL_PARAMS_BACKEND_PORT2=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT2=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY2=/var/lib/postgresql/data
+      
+      # Health check settings
+      - PGPOOL_PARAMS_HEALTH_CHECK_PERIOD=30
+      - PGPOOL_PARAMS_HEALTH_CHECK_TIMEOUT=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_MAX_RETRIES=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_RETRY_DELAY=5
+      - PGPOOL_PARAMS_HEALTH_CHECK_USER=pad-budgeting-service-user
+      - PGPOOL_PARAMS_HEALTH_CHECK_PASSWORD=pad-budgeting-service-password
+      - PGPOOL_PARAMS_HEALTH_CHECK_DATABASE=pad-budgeting-service-db
+      
+      - PGPOOL_PARAMS_ALLOW_CLEAR_TEXT_FRONTEND_AUTH=on
+
+      # SR (Streaming Replication) check
+      - PGPOOL_PARAMS_SR_CHECK_USER=pad-budgeting-service-user
+      - PGPOOL_PARAMS_SR_CHECK_PASSWORD=pad-budgeting-service-password
+      - PGPOOL_PARAMS_SR_CHECK_PERIOD=10
+      - PGPOOL_PARAMS_SR_CHECK_DATABASE=pad-budgeting-service-db
+      
+      # Streaming replication mode
+      - PGPOOL_PARAMS_BACKEND_CLUSTERING_MODE=streaming_replication
+      - PGPOOL_PARAMS_MASTER_SLAVE_MODE=on
+      - PGPOOL_PARAMS_MASTER_SLAVE_SUB_MODE=stream
+      
+      # Load balancing - KEEP OFF for write safety
+      - PGPOOL_PARAMS_LOAD_BALANCE_MODE=off
+      - PGPOOL_PARAMS_STATEMENT_LEVEL_LOAD_BALANCE=off
+      
+      # Write query detection - route these to primary
+      - PGPOOL_PARAMS_WRITE_FUNCTION_LIST=nextval,setval,currval
+      - PGPOOL_PARAMS_PRIMARY_ROUTING_QUERY_PATTERN_LIST=^INSERT.*;^UPDATE.*;^DELETE.*;^CREATE.*;^ALTER.*;^DROP.*;^TRUNCATE.*;^SELECT.*FOR UPDATE;^SELECT.*FOR SHARE
+      
+      # Connection pooling
+      - PGPOOL_PARAMS_NUM_INIT_CHILDREN=32
+      - PGPOOL_PARAMS_MAX_POOL=4
+      - PGPOOL_PARAMS_CHILD_LIFE_TIME=300
+      - PGPOOL_PARAMS_CONNECTION_LIFE_TIME=0
+      - PGPOOL_PARAMS_CLIENT_IDLE_LIMIT=0
+      
+      # Failover disabled (for stability)
+      - PGPOOL_PARAMS_FAILOVER_ON_BACKEND_ERROR=off
+      
+      # Enable pool_hba for authentication
+      - PGPOOL_ENABLE_POOL_HBA=on
+      - PGPOOL_PARAMS_ENABLE_POOL_HBA=on
+      
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=pad-budgeting-service-password psql -h localhost -U pad-budgeting-service-user -d pad-budgeting-service-db -c 'SELECT 1' || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+
+# PostgreSQL Primary Node for LostFound Service
+  postgres_lostFound_primary:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_DB=pad-l-f-service-db
+      - POSTGRES_USER=pad-l-f-service-user
+      - POSTGRES_PASSWORD=pad-l-f-service-password
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_password
+    volumes:
+      - postgres_lostFound_primary_data:/var/lib/postgresql/data
+      - ./postgres-config/primary:/docker-entrypoint-initdb.d:ro
+      - ./postgres-config/postgresql-primary.conf:/etc/postgresql/postgresql.conf:ro
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pad-l-f-service-user -d pad-l-f-service-db"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+
+  # PostgreSQL Budgeting Replica 1
+  postgres_lostFound_replica1:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=pad-l-f-service-user
+      - POSTGRES_PASSWORD=pad-l-f-service-password
+      - PGUSER=pad-l-f-service-user
+      - PRIMARY_HOST=postgres_lostFound_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica1_slot
+    volumes:
+      - postgres_lostFound_replica1_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pad-l-f-service-user -d pad-l-f-service-db || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # PostgreSQL Budgeting Replica 2
+  postgres_lostFound_replica2:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=pad-l-f-service-user
+      - POSTGRES_PASSWORD=pad-l-f-service-password
+      - PGUSER=pad-l-f-service-user
+      - PRIMARY_HOST=postgres_lostFound_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica2_slot
+    volumes:
+      - postgres_lostFound_replica2_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pad-l-f-service-user -d pad-l-f-service-db || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  pgpool2:
+    image: pgpool/pgpool:4.0.23
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 5
+    environment:
+      # PostgreSQL backends
+      - POSTGRES_USERNAME=pad-l-f-service-user
+      - POSTGRES_PASSWORD=pad-l-f-service-password
+      - PGPOOL_PARAMS_PORT=5432
+      
+      # Backend configuration
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME0=postgres_lostFound_primary
+      - PGPOOL_PARAMS_BACKEND_PORT0=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT0=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY0=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME1=postgres_lostFound_replica1
+      - PGPOOL_PARAMS_BACKEND_PORT1=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT1=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY1=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME2=postgres_lostFound_replica2
+      - PGPOOL_PARAMS_BACKEND_PORT2=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT2=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY2=/var/lib/postgresql/data
+      
+      # Health check settings
+      - PGPOOL_PARAMS_HEALTH_CHECK_PERIOD=30
+      - PGPOOL_PARAMS_HEALTH_CHECK_TIMEOUT=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_MAX_RETRIES=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_RETRY_DELAY=5
+      - PGPOOL_PARAMS_HEALTH_CHECK_USER=pad-l-f-service-user
+      - PGPOOL_PARAMS_HEALTH_CHECK_PASSWORD=pad-l-f-service-password
+      - PGPOOL_PARAMS_HEALTH_CHECK_DATABASE=pad-l-f-service-db
+      
+      - PGPOOL_PARAMS_ALLOW_CLEAR_TEXT_FRONTEND_AUTH=on
+
+      # SR (Streaming Replication) check
+      - PGPOOL_PARAMS_SR_CHECK_USER=pad-l-f-service-user
+      - PGPOOL_PARAMS_SR_CHECK_PASSWORD=pad-l-f-service-password
+      - PGPOOL_PARAMS_SR_CHECK_PERIOD=10
+      - PGPOOL_PARAMS_SR_CHECK_DATABASE=pad-l-f-service-db
+      
+      # Streaming replication mode
+      - PGPOOL_PARAMS_BACKEND_CLUSTERING_MODE=streaming_replication
+      - PGPOOL_PARAMS_MASTER_SLAVE_MODE=on
+      - PGPOOL_PARAMS_MASTER_SLAVE_SUB_MODE=stream
+      
+      # Load balancing - KEEP OFF for write safety
+      - PGPOOL_PARAMS_LOAD_BALANCE_MODE=off
+      - PGPOOL_PARAMS_STATEMENT_LEVEL_LOAD_BALANCE=off
+      
+      # Write query detection - route these to primary
+      - PGPOOL_PARAMS_WRITE_FUNCTION_LIST=nextval,setval,currval
+      - PGPOOL_PARAMS_PRIMARY_ROUTING_QUERY_PATTERN_LIST=^INSERT.*;^UPDATE.*;^DELETE.*;^CREATE.*;^ALTER.*;^DROP.*;^TRUNCATE.*;^SELECT.*FOR UPDATE;^SELECT.*FOR SHARE
+      
+      # Connection pooling
+      - PGPOOL_PARAMS_NUM_INIT_CHILDREN=32
+      - PGPOOL_PARAMS_MAX_POOL=4
+      - PGPOOL_PARAMS_CHILD_LIFE_TIME=300
+      - PGPOOL_PARAMS_CONNECTION_LIFE_TIME=0
+      - PGPOOL_PARAMS_CLIENT_IDLE_LIMIT=0
+      
+      # Failover disabled (for stability)
+      - PGPOOL_PARAMS_FAILOVER_ON_BACKEND_ERROR=off
+      
+      # Enable pool_hba for authentication
+      - PGPOOL_ENABLE_POOL_HBA=on
+      - PGPOOL_PARAMS_ENABLE_POOL_HBA=on
+      
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=pad-l-f-service-password psql -h localhost -U pad-l-f-service-user -d pad-l-f-service-db -c 'SELECT 1' || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+      
+  postgres_cb_primary:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_DB=cab_booking_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_password
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgpool3:5432/cab_booking_db
+    volumes:
+      - postgres_cb_primary_data:/var/lib/postgresql/data
+      - ./postgres-config/primary:/docker-entrypoint-initdb.d:ro
+      - ./postgres-config/postgresql-primary.conf:/etc/postgresql/postgresql.conf:ro
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cab_booking_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # PostgreSQL Budgeting Replica 1
+  postgres_cb_replica1:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pass
+      - PGUSER=postgres
+      - PRIMARY_HOST=postgres_cb_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica1_slot
+    volumes:
+      - postgres_cb_replica1_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cab_booking_db || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # PostgreSQL Budgeting Replica 2
+  postgres_cb_replica2:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pass
+      - PGUSER=postgres
+      - PRIMARY_HOST=postgres_cb_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica2_slot
+    volumes:
+      - postgres_cb_replica2_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cab_booking_db || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  pgpool3:
+    image: pgpool/pgpool:4.0.23
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 5
+    environment:
+      # PostgreSQL backends
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=pass
+      - PGPOOL_PARAMS_PORT=5432
+      
+      # Backend configuration
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME0=postgres_cb_primary
+      - PGPOOL_PARAMS_BACKEND_PORT0=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT0=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY0=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME1=postgres_cb_replica1
+      - PGPOOL_PARAMS_BACKEND_PORT1=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT1=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY1=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME2=postgres_cb_replica2
+      - PGPOOL_PARAMS_BACKEND_PORT2=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT2=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY2=/var/lib/postgresql/data
+      
+      # Health check settings
+      - PGPOOL_PARAMS_HEALTH_CHECK_PERIOD=30
+      - PGPOOL_PARAMS_HEALTH_CHECK_TIMEOUT=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_MAX_RETRIES=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_RETRY_DELAY=5
+      - PGPOOL_PARAMS_HEALTH_CHECK_USER=postgres
+      - PGPOOL_PARAMS_HEALTH_CHECK_PASSWORD=pass
+      - PGPOOL_PARAMS_HEALTH_CHECK_DATABASE=cab_booking_db
+      
+      - PGPOOL_PARAMS_ALLOW_CLEAR_TEXT_FRONTEND_AUTH=on
+
+      # SR (Streaming Replication) check
+      - PGPOOL_PARAMS_SR_CHECK_USER=postgres
+      - PGPOOL_PARAMS_SR_CHECK_PASSWORD=pass
+      - PGPOOL_PARAMS_SR_CHECK_PERIOD=10
+      - PGPOOL_PARAMS_SR_CHECK_DATABASE=cab_booking_db
+      
+      # Streaming replication mode
+      - PGPOOL_PARAMS_BACKEND_CLUSTERING_MODE=streaming_replication
+      - PGPOOL_PARAMS_MASTER_SLAVE_MODE=on
+      - PGPOOL_PARAMS_MASTER_SLAVE_SUB_MODE=stream
+      
+      # Load balancing - KEEP OFF for write safety
+      - PGPOOL_PARAMS_LOAD_BALANCE_MODE=off
+      - PGPOOL_PARAMS_STATEMENT_LEVEL_LOAD_BALANCE=off
+      
+      # Write query detection - route these to primary
+      - PGPOOL_PARAMS_WRITE_FUNCTION_LIST=nextval,setval,currval
+      - PGPOOL_PARAMS_PRIMARY_ROUTING_QUERY_PATTERN_LIST=^INSERT.*;^UPDATE.*;^DELETE.*;^CREATE.*;^ALTER.*;^DROP.*;^TRUNCATE.*;^SELECT.*FOR UPDATE;^SELECT.*FOR SHARE
+      
+      # Connection pooling
+      - PGPOOL_PARAMS_NUM_INIT_CHILDREN=32
+      - PGPOOL_PARAMS_MAX_POOL=4
+      - PGPOOL_PARAMS_CHILD_LIFE_TIME=300
+      - PGPOOL_PARAMS_CONNECTION_LIFE_TIME=0
+      - PGPOOL_PARAMS_CLIENT_IDLE_LIMIT=0
+      
+      # Failover disabled (for stability)
+      - PGPOOL_PARAMS_FAILOVER_ON_BACKEND_ERROR=off
+      
+      # Enable pool_hba for authentication
+      - PGPOOL_ENABLE_POOL_HBA=on
+      - PGPOOL_PARAMS_ENABLE_POOL_HBA=on
+      
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=pass psql -h localhost -U postgres -d cab_booking_db -c 'SELECT 1' || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+
+
+  postgres_ci_primary:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_DB=checkindb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_password
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgpool4:5432/checkindb
+    volumes:
+      - postgres_ci_primary_data:/var/lib/postgresql/data
+      - ./postgres-config/primary:/docker-entrypoint-initdb.d:ro
+      - ./postgres-config/postgresql-primary.conf:/etc/postgresql/postgresql.conf:ro
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d checkindb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # PostgreSQL Budgeting Replica 1
+  postgres_ci_replica1:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pass
+      - PGUSER=postgres
+      - PRIMARY_HOST=postgres_ci_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica1_slot
+    volumes:
+      - postgres_ci_replica1_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d checkindb || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # PostgreSQL Budgeting Replica 2
+  postgres_ci_replica2:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pass
+      - PGUSER=postgres
+      - PRIMARY_HOST=postgres_ci_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica2_slot
+    volumes:
+      - postgres_ci_replica2_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d checkindb || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  pgpool4:
+    image: pgpool/pgpool:4.0.23
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 5
+    environment:
+      # PostgreSQL backends
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=pass
+      - PGPOOL_PARAMS_PORT=5432
+      
+      # Backend configuration
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME0=postgres_ci_primary
+      - PGPOOL_PARAMS_BACKEND_PORT0=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT0=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY0=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME1=postgres_ci_replica1
+      - PGPOOL_PARAMS_BACKEND_PORT1=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT1=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY1=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME2=postgres_ci_replica2
+      - PGPOOL_PARAMS_BACKEND_PORT2=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT2=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY2=/var/lib/postgresql/data
+      
+      # Health check settings
+      - PGPOOL_PARAMS_HEALTH_CHECK_PERIOD=30
+      - PGPOOL_PARAMS_HEALTH_CHECK_TIMEOUT=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_MAX_RETRIES=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_RETRY_DELAY=5
+      - PGPOOL_PARAMS_HEALTH_CHECK_USER=postgres
+      - PGPOOL_PARAMS_HEALTH_CHECK_PASSWORD=pass
+      - PGPOOL_PARAMS_HEALTH_CHECK_DATABASE=checkindb
+      
+      - PGPOOL_PARAMS_ALLOW_CLEAR_TEXT_FRONTEND_AUTH=on
+
+      # SR (Streaming Replication) check
+      - PGPOOL_PARAMS_SR_CHECK_USER=postgres
+      - PGPOOL_PARAMS_SR_CHECK_PASSWORD=pass
+      - PGPOOL_PARAMS_SR_CHECK_PERIOD=10
+      - PGPOOL_PARAMS_SR_CHECK_DATABASE=checkindb
+      
+      # Streaming replication mode
+      - PGPOOL_PARAMS_BACKEND_CLUSTERING_MODE=streaming_replication
+      - PGPOOL_PARAMS_MASTER_SLAVE_MODE=on
+      - PGPOOL_PARAMS_MASTER_SLAVE_SUB_MODE=stream
+      
+      # Load balancing - KEEP OFF for write safety
+      - PGPOOL_PARAMS_LOAD_BALANCE_MODE=off
+      - PGPOOL_PARAMS_STATEMENT_LEVEL_LOAD_BALANCE=off
+      
+      # Write query detection - route these to primary
+      - PGPOOL_PARAMS_WRITE_FUNCTION_LIST=nextval,setval,currval
+      - PGPOOL_PARAMS_PRIMARY_ROUTING_QUERY_PATTERN_LIST=^INSERT.*;^UPDATE.*;^DELETE.*;^CREATE.*;^ALTER.*;^DROP.*;^TRUNCATE.*;^SELECT.*FOR UPDATE;^SELECT.*FOR SHARE
+      
+      # Connection pooling
+      - PGPOOL_PARAMS_NUM_INIT_CHILDREN=32
+      - PGPOOL_PARAMS_MAX_POOL=4
+      - PGPOOL_PARAMS_CHILD_LIFE_TIME=300
+      - PGPOOL_PARAMS_CONNECTION_LIFE_TIME=0
+      - PGPOOL_PARAMS_CLIENT_IDLE_LIMIT=0
+      
+      # Failover disabled (for stability)
+      - PGPOOL_PARAMS_FAILOVER_ON_BACKEND_ERROR=off
+      
+      # Enable pool_hba for authentication
+      - PGPOOL_ENABLE_POOL_HBA=on
+      - PGPOOL_PARAMS_ENABLE_POOL_HBA=on
+      
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=pass psql -h localhost -U postgres -d checkindb -c 'SELECT 1' || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+
+  postgres_tm_primary:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_DB=tea_management_service_db
+      - POSTGRES_USER=tea_management_service_user
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_HOST=pgpool5
+    volumes:
+      - postgres_tm_primary_data:/var/lib/postgresql/data
+      - ./postgres-config/primary:/docker-entrypoint-initdb.d:ro
+      - ./postgres-config/postgresql-primary.conf:/etc/postgresql/postgresql.conf:ro
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tea_management_service_user -d tea_management_service_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # PostgreSQL Budgeting Replica 1
+  postgres_tm_replica1:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=tea_management_service_user
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGUSER=tea_management_service_user
+      - PRIMARY_HOST=postgres_tm_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica1_slot
+    volumes:
+      - postgres_tm_replica1_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tea_management_service_user -d tea_management_service_db || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # PostgreSQL Budgeting Replica 2
+  postgres_tm_replica2:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=tea_management_service_user
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGUSER=postgres
+      - PRIMARY_HOST=postgres_tm_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica2_slot
+    volumes:
+      - postgres_tm_replica2_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tea_management_service_user -d tea_management_service_db || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  pgpool5:
+    image: pgpool/pgpool:4.0.23
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 5
+    environment:
+      # PostgreSQL backends
+      - POSTGRES_USERNAME=tea_management_service_user
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGPOOL_PARAMS_PORT=5432
+      
+      # Backend configuration
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME0=postgres_tm_primary
+      - PGPOOL_PARAMS_BACKEND_PORT0=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT0=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY0=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME1=postgres_tm_replica1
+      - PGPOOL_PARAMS_BACKEND_PORT1=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT1=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY1=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME2=postgres_tm_replica2
+      - PGPOOL_PARAMS_BACKEND_PORT2=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT2=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY2=/var/lib/postgresql/data
+      
+      # Health check settings
+      - PGPOOL_PARAMS_HEALTH_CHECK_PERIOD=30
+      - PGPOOL_PARAMS_HEALTH_CHECK_TIMEOUT=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_MAX_RETRIES=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_RETRY_DELAY=5
+      - PGPOOL_PARAMS_HEALTH_CHECK_USER=tea_management_service_user
+      - PGPOOL_PARAMS_HEALTH_CHECK_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGPOOL_PARAMS_HEALTH_CHECK_DATABASE=tea_management_service_db
+      
+      - PGPOOL_PARAMS_ALLOW_CLEAR_TEXT_FRONTEND_AUTH=on
+
+      # SR (Streaming Replication) check
+      - PGPOOL_PARAMS_SR_CHECK_USER=tea_management_service_user
+      - PGPOOL_PARAMS_SR_CHECK_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGPOOL_PARAMS_SR_CHECK_PERIOD=10
+      - PGPOOL_PARAMS_SR_CHECK_DATABASE=tea_management_service_db
+      
+      # Streaming replication mode
+      - PGPOOL_PARAMS_BACKEND_CLUSTERING_MODE=streaming_replication
+      - PGPOOL_PARAMS_MASTER_SLAVE_MODE=on
+      - PGPOOL_PARAMS_MASTER_SLAVE_SUB_MODE=stream
+      
+      # Load balancing - KEEP OFF for write safety
+      - PGPOOL_PARAMS_LOAD_BALANCE_MODE=off
+      - PGPOOL_PARAMS_STATEMENT_LEVEL_LOAD_BALANCE=off
+      
+      # Write query detection - route these to primary
+      - PGPOOL_PARAMS_WRITE_FUNCTION_LIST=nextval,setval,currval
+      - PGPOOL_PARAMS_PRIMARY_ROUTING_QUERY_PATTERN_LIST=^INSERT.*;^UPDATE.*;^DELETE.*;^CREATE.*;^ALTER.*;^DROP.*;^TRUNCATE.*;^SELECT.*FOR UPDATE;^SELECT.*FOR SHARE
+      
+      # Connection pooling
+      - PGPOOL_PARAMS_NUM_INIT_CHILDREN=32
+      - PGPOOL_PARAMS_MAX_POOL=4
+      - PGPOOL_PARAMS_CHILD_LIFE_TIME=300
+      - PGPOOL_PARAMS_CONNECTION_LIFE_TIME=0
+      - PGPOOL_PARAMS_CLIENT_IDLE_LIMIT=0
+      
+      # Failover disabled (for stability)
+      - PGPOOL_PARAMS_FAILOVER_ON_BACKEND_ERROR=off
+      
+      # Enable pool_hba for authentication
+      - PGPOOL_ENABLE_POOL_HBA=on
+      - PGPOOL_PARAMS_ENABLE_POOL_HBA=on
+      
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=cyngos-wikpuT-bukmo8 psql -h localhost -U tea_management_service_user -d tea_management_service_db -c 'SELECT 1' || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+
+  postgres_c_primary:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_DB=communication_service_db
+      - POSTGRES_USER=communication_service_db
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_HOST=pgpool6
+    volumes:
+      - postgres_c_primary_data:/var/lib/postgresql/data
+      - ./postgres-config/primary:/docker-entrypoint-initdb.d:ro
+      - ./postgres-config/postgresql-primary.conf:/etc/postgresql/postgresql.conf:ro
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U communication_service_db -d communication_service_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # PostgreSQL Budgeting Replica 1
+  postgres_c_replica1:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=communication_service_db
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGUSER=communication_service_db
+      - PRIMARY_HOST=postgres_c_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica1_slot
+    volumes:
+      - postgres_c_replica1_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U communication_service_db -d communication_service_db || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # PostgreSQL Budgeting Replica 2
+  postgres_c_replica2:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=communication_service_db
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGUSER=communication_service_db
+      - PRIMARY_HOST=postgres_c_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica2_slot
+    volumes:
+      - postgres_c_replica2_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U communication_service_db -d communication_service_db || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  pgpool6:
+    image: pgpool/pgpool:4.0.23
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 5
+    environment:
+      # PostgreSQL backends
+      - POSTGRES_USERNAME=communication_service_db
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGPOOL_PARAMS_PORT=5432
+      
+      # Backend configuration
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME0=postgres_c_primary
+      - PGPOOL_PARAMS_BACKEND_PORT0=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT0=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY0=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME1=postgres_c_replica1
+      - PGPOOL_PARAMS_BACKEND_PORT1=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT1=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY1=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME2=postgres_c_replica2
+      - PGPOOL_PARAMS_BACKEND_PORT2=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT2=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY2=/var/lib/postgresql/data
+      
+      # Health check settings
+      - PGPOOL_PARAMS_HEALTH_CHECK_PERIOD=30
+      - PGPOOL_PARAMS_HEALTH_CHECK_TIMEOUT=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_MAX_RETRIES=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_RETRY_DELAY=5
+      - PGPOOL_PARAMS_HEALTH_CHECK_USER=communication_service_db
+      - PGPOOL_PARAMS_HEALTH_CHECK_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGPOOL_PARAMS_HEALTH_CHECK_DATABASE=communication_service_db
+      
+      - PGPOOL_PARAMS_ALLOW_CLEAR_TEXT_FRONTEND_AUTH=on
+
+      # SR (Streaming Replication) check
+      - PGPOOL_PARAMS_SR_CHECK_USER=communication_service_db
+      - PGPOOL_PARAMS_SR_CHECK_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGPOOL_PARAMS_SR_CHECK_PERIOD=10
+      - PGPOOL_PARAMS_SR_CHECK_DATABASE=communication_service_db
+      
+      # Streaming replication mode
+      - PGPOOL_PARAMS_BACKEND_CLUSTERING_MODE=streaming_replication
+      - PGPOOL_PARAMS_MASTER_SLAVE_MODE=on
+      - PGPOOL_PARAMS_MASTER_SLAVE_SUB_MODE=stream
+      
+      # Load balancing - KEEP OFF for write safety
+      - PGPOOL_PARAMS_LOAD_BALANCE_MODE=off
+      - PGPOOL_PARAMS_STATEMENT_LEVEL_LOAD_BALANCE=off
+      
+      # Write query detection - route these to primary
+      - PGPOOL_PARAMS_WRITE_FUNCTION_LIST=nextval,setval,currval
+      - PGPOOL_PARAMS_PRIMARY_ROUTING_QUERY_PATTERN_LIST=^INSERT.*;^UPDATE.*;^DELETE.*;^CREATE.*;^ALTER.*;^DROP.*;^TRUNCATE.*;^SELECT.*FOR UPDATE;^SELECT.*FOR SHARE
+      
+      # Connection pooling
+      - PGPOOL_PARAMS_NUM_INIT_CHILDREN=32
+      - PGPOOL_PARAMS_MAX_POOL=4
+      - PGPOOL_PARAMS_CHILD_LIFE_TIME=300
+      - PGPOOL_PARAMS_CONNECTION_LIFE_TIME=0
+      - PGPOOL_PARAMS_CLIENT_IDLE_LIMIT=0
+      
+      # Failover disabled (for stability)
+      - PGPOOL_PARAMS_FAILOVER_ON_BACKEND_ERROR=off
+      
+      # Enable pool_hba for authentication
+      - PGPOOL_ENABLE_POOL_HBA=on
+      - PGPOOL_PARAMS_ENABLE_POOL_HBA=on
+      
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=cyngos-wikpuT-bukmo8 psql -h localhost -U communication_service_db -d communication_service_db -c 'SELECT 1' || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+
+  postgres_s_primary:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_DB=sharing_service_db
+      - POSTGRES_USER=sharing_service_user
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_HOST=pgpool7
+    volumes:
+      - postgres_s_primary_data:/var/lib/postgresql/data
+      - ./postgres-config/primary:/docker-entrypoint-initdb.d:ro
+      - ./postgres-config/postgresql-primary.conf:/etc/postgresql/postgresql.conf:ro
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sharing_service_user -d sharing_service_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # PostgreSQL Budgeting Replica 1
+  postgres_s_replica1:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=sharing_service_user
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGUSER=sharing_service_user
+      - PRIMARY_HOST=postgres_s_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica1_slot
+    volumes:
+      - postgres_s_replica1_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sharing_service_user -d sharing_service_db || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # PostgreSQL Budgeting Replica 2
+  postgres_s_replica2:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=sharing_service_user
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGUSER=sharing_service_user
+      - PRIMARY_HOST=postgres_s_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica2_slot
+    volumes:
+      - postgres_s_replica2_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sharing_service_user -d sharing_service_db || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  pgpool7:
+    image: pgpool/pgpool:4.0.23
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 5
+    environment:
+      # PostgreSQL backends
+      - POSTGRES_USERNAME=sharing_service_user
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGPOOL_PARAMS_PORT=5432
+      
+      # Backend configuration
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME0=postgres_s_primary
+      - PGPOOL_PARAMS_BACKEND_PORT0=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT0=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY0=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME1=postgres_s_replica1
+      - PGPOOL_PARAMS_BACKEND_PORT1=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT1=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY1=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME2=postgres_s_replica2
+      - PGPOOL_PARAMS_BACKEND_PORT2=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT2=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY2=/var/lib/postgresql/data
+      
+      # Health check settings
+      - PGPOOL_PARAMS_HEALTH_CHECK_PERIOD=30
+      - PGPOOL_PARAMS_HEALTH_CHECK_TIMEOUT=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_MAX_RETRIES=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_RETRY_DELAY=5
+      - PGPOOL_PARAMS_HEALTH_CHECK_USER=sharing_service_user
+      - PGPOOL_PARAMS_HEALTH_CHECK_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGPOOL_PARAMS_HEALTH_CHECK_DATABASE=sharing_service_db
+      
+      - PGPOOL_PARAMS_ALLOW_CLEAR_TEXT_FRONTEND_AUTH=on
+
+      # SR (Streaming Replication) check
+      - PGPOOL_PARAMS_SR_CHECK_USER=sharing_service_user
+      - PGPOOL_PARAMS_SR_CHECK_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGPOOL_PARAMS_SR_CHECK_PERIOD=10
+      - PGPOOL_PARAMS_SR_CHECK_DATABASE=sharing_service_db
+      
+      # Streaming replication mode
+      - PGPOOL_PARAMS_BACKEND_CLUSTERING_MODE=streaming_replication
+      - PGPOOL_PARAMS_MASTER_SLAVE_MODE=on
+      - PGPOOL_PARAMS_MASTER_SLAVE_SUB_MODE=stream
+      
+      # Load balancing - KEEP OFF for write safety
+      - PGPOOL_PARAMS_LOAD_BALANCE_MODE=off
+      - PGPOOL_PARAMS_STATEMENT_LEVEL_LOAD_BALANCE=off
+      
+      # Write query detection - route these to primary
+      - PGPOOL_PARAMS_WRITE_FUNCTION_LIST=nextval,setval,currval
+      - PGPOOL_PARAMS_PRIMARY_ROUTING_QUERY_PATTERN_LIST=^INSERT.*;^UPDATE.*;^DELETE.*;^CREATE.*;^ALTER.*;^DROP.*;^TRUNCATE.*;^SELECT.*FOR UPDATE;^SELECT.*FOR SHARE
+      
+      # Connection pooling
+      - PGPOOL_PARAMS_NUM_INIT_CHILDREN=32
+      - PGPOOL_PARAMS_MAX_POOL=4
+      - PGPOOL_PARAMS_CHILD_LIFE_TIME=300
+      - PGPOOL_PARAMS_CONNECTION_LIFE_TIME=0
+      - PGPOOL_PARAMS_CLIENT_IDLE_LIMIT=0
+      
+      # Failover disabled (for stability)
+      - PGPOOL_PARAMS_FAILOVER_ON_BACKEND_ERROR=off
+      
+      # Enable pool_hba for authentication
+      - PGPOOL_ENABLE_POOL_HBA=on
+      - PGPOOL_PARAMS_ENABLE_POOL_HBA=on
+      
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=cyngos-wikpuT-bukmo8 psql -h localhost -U sharing_service_user -d sharing_service_db -c 'SELECT 1' || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+
+  postgres_fr_primary:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_DB=fund_raising_service_db
+      - POSTGRES_USER=fund_raising_service_user
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_HOST=pgpool8
+    volumes:
+      - postgres_fr_primary_data:/var/lib/postgresql/data
+      - ./postgres-config/primary:/docker-entrypoint-initdb.d:ro
+      - ./postgres-config/postgresql-primary.conf:/etc/postgresql/postgresql.conf:ro
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fund_raising_service_user -d fund_raising_service_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # PostgreSQL Budgeting Replica 1
+  postgres_fr_replica1:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=fund_raising_service_user
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGUSER=fund_raising_service_user
+      - PRIMARY_HOST=postgres_fr_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica1_slot
+    volumes:
+      - postgres_fr_replica1_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fund_raising_service_user -d fund_raising_service_db || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # PostgreSQL Budgeting Replica 2
+  postgres_fr_replica2:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - POSTGRES_USER=fund_raising_service_user
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGUSER=fund_raising_service_user
+      - PRIMARY_HOST=postgres_fr_primary
+      - PRIMARY_PORT=5432
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASSWORD=replicator_password
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - REPLICA_SLOT_NAME=replica2_slot
+    volumes:
+      - postgres_fr_replica2_data:/var/lib/postgresql/data
+      - ./postgres-config/replica/setup-replica.sh:/usr/local/bin/setup-replica.sh:ro
+    command: ["/bin/bash", "/usr/local/bin/setup-replica.sh"]
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fund_raising_service_user -d fund_raising_service_user || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  pgpool8:
+    image: pgpool/pgpool:4.0.23
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 5
+    environment:
+      # PostgreSQL backends
+      - POSTGRES_USERNAME=fund_raising_service_user
+      - POSTGRES_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGPOOL_PARAMS_PORT=5432
+      
+      # Backend configuration
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME0=postgres_fr_primary
+      - PGPOOL_PARAMS_BACKEND_PORT0=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT0=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY0=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME1=postgres_fr_replica1
+      - PGPOOL_PARAMS_BACKEND_PORT1=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT1=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY1=/var/lib/postgresql/data
+      
+      - PGPOOL_PARAMS_BACKEND_HOSTNAME2=postgres_fr_replica2
+      - PGPOOL_PARAMS_BACKEND_PORT2=5432
+      - PGPOOL_PARAMS_BACKEND_WEIGHT2=1
+      - PGPOOL_PARAMS_BACKEND_DATA_DIRECTORY2=/var/lib/postgresql/data
+      
+      # Health check settings
+      - PGPOOL_PARAMS_HEALTH_CHECK_PERIOD=30
+      - PGPOOL_PARAMS_HEALTH_CHECK_TIMEOUT=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_MAX_RETRIES=20
+      - PGPOOL_PARAMS_HEALTH_CHECK_RETRY_DELAY=5
+      - PGPOOL_PARAMS_HEALTH_CHECK_USER=fund_raising_service_user
+      - PGPOOL_PARAMS_HEALTH_CHECK_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGPOOL_PARAMS_HEALTH_CHECK_DATABASE=fund_raising_service_db
+      
+      - PGPOOL_PARAMS_ALLOW_CLEAR_TEXT_FRONTEND_AUTH=on
+
+      # SR (Streaming Replication) check
+      - PGPOOL_PARAMS_SR_CHECK_USER=fund_raising_service_user
+      - PGPOOL_PARAMS_SR_CHECK_PASSWORD=cyngos-wikpuT-bukmo8
+      - PGPOOL_PARAMS_SR_CHECK_PERIOD=10
+      - PGPOOL_PARAMS_SR_CHECK_DATABASE=fund_raising_service_db
+      
+      # Streaming replication mode
+      - PGPOOL_PARAMS_BACKEND_CLUSTERING_MODE=streaming_replication
+      - PGPOOL_PARAMS_MASTER_SLAVE_MODE=on
+      - PGPOOL_PARAMS_MASTER_SLAVE_SUB_MODE=stream
+      
+      # Load balancing - KEEP OFF for write safety
+      - PGPOOL_PARAMS_LOAD_BALANCE_MODE=off
+      - PGPOOL_PARAMS_STATEMENT_LEVEL_LOAD_BALANCE=off
+      
+      # Write query detection - route these to primary
+      - PGPOOL_PARAMS_WRITE_FUNCTION_LIST=nextval,setval,currval
+      - PGPOOL_PARAMS_PRIMARY_ROUTING_QUERY_PATTERN_LIST=^INSERT.*;^UPDATE.*;^DELETE.*;^CREATE.*;^ALTER.*;^DROP.*;^TRUNCATE.*;^SELECT.*FOR UPDATE;^SELECT.*FOR SHARE
+      
+      # Connection pooling
+      - PGPOOL_PARAMS_NUM_INIT_CHILDREN=32
+      - PGPOOL_PARAMS_MAX_POOL=4
+      - PGPOOL_PARAMS_CHILD_LIFE_TIME=300
+      - PGPOOL_PARAMS_CONNECTION_LIFE_TIME=0
+      - PGPOOL_PARAMS_CLIENT_IDLE_LIMIT=0
+      
+      # Failover disabled (for stability)
+      - PGPOOL_PARAMS_FAILOVER_ON_BACKEND_ERROR=off
+      
+      # Enable pool_hba for authentication
+      - PGPOOL_ENABLE_POOL_HBA=on
+      - PGPOOL_PARAMS_ENABLE_POOL_HBA=on
+      
+    networks:
+      - test-stack_default
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=cyngos-wikpuT-bukmo8 psql -h localhost -U fund_raising_service_user -d fund_raising_service_db -c 'SELECT 1' || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
 
   um_postgres:
     image: postgres:15-alpine
@@ -84,72 +1456,6 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  cb_postgres:
-    container_name: cab_booking_db
-    image: 'postgres:16-alpine'
-    env_file:
-      - ./.env.cb_postgres
-    networks:
-      - test-stack_default
-    ports:
-      - "5434:5432"
-    volumes:
-      - cb_postgres_data:/var/lib/postgresql
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-  ci_postgres:
-    container_name: checkin_db
-    image: 'postgres:16-alpine'
-    env_file:
-      - ./.env.ci_postgres
-    networks:
-      - test-stack_default
-    ports:
-      - "5435:5432"
-    volumes:
-      - ci_postgres_data:/var/lib/postgresql
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-  tm_postgres:
-    image: postgres
-    env_file:
-      - ./.env.tm_postgres
-    networks:
-      - test-stack_default
-    volumes:
-      - tm_pgdata:/var/lib/postgresql
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U tea_management_service_user -d tea_management_service_db" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
-
-  c_postgres:
-    image: postgres
-    env_file:
-      - ./.env.c_postgres
-    networks:
-      - test-stack_default
-    volumes:
-      - c_pgdata:/var/lib/postgresql
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U communication_service_user -d communication_service_db" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
-
   c_mongo:
     image: mongo
     environment:
@@ -170,48 +1476,62 @@ services:
       retries: 5
       start_period: 5s
 
-  s_postgres:
-    image: postgres
-    env_file:
-      - ./.env.s_postgres
-    networks:
-      - test-stack_default
-    volumes:
-      - s_pgdata:/var/lib/postgresql
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U sharing_service_user -d sharing_service_db" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  fr_postgres:
-    image: postgres
-    env_file:
-      - ./.env.fr_postgres
-    networks:
-      - test-stack_default
-    volumes:
-      - fr_pgdata:/var/lib/postgresql
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U fund_raising_service_user -d fund_raising_service_db" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
 volumes:
-  redis_data:
-  budgeting_postgres_data:
-  lf_postgres_data:
-  cb_postgres_data:
-  ci_postgres_data:
+  postgres_budgeting_primary_data:
+    driver: local
+  postgres_budgeting_replica1_data:
+    driver: local
+  postgres_budgeting_replica2_data:
+    driver: local
+  postgres_lostFound_primary_data:
+    driver: local
+  postgres_lostFound_replica1_data:
+    driver: local
+  postgres_lostFound_replica2_data:
+    driver: local
+  postgres_cb_primary_data:
+    driver: local
+  postgres_cb_replica1_data:
+    driver: local
+  postgres_cb_replica2_data:
+    driver: local
+  postgres_ci_primary_data:
+    driver: local
+  postgres_ci_replica1_data:
+    driver: local
+  postgres_ci_replica2_data:
+    driver: local
+  postgres_tm_primary_data:
+    driver: local
+  postgres_tm_replica1_data:
+    driver: local
+  postgres_tm_replica2_data:
+    driver: local
+  postgres_c_primary_data:
+    driver: local
+  postgres_c_replica1_data:
+    driver: local
+  postgres_c_replica2_data:
+    driver: local
+  postgres_s_primary_data:
+    driver: local
+  postgres_s_replica1_data:
+    driver: local
+  postgres_s_replica2_data:
+    driver: local
+  postgres_fr_primary_data:
+    driver: local
+  postgres_fr_replica1_data:
+    driver: local
+  postgres_fr_replica2_data:
+    driver: local
+  redis1-data:
+  redis2-data:
+  redis3-data:
   um_postgres_data:
   ns_postgres_data:
-  tm_pgdata:
-  c_pgdata:
   c_mongo_data:
   c_mongo_config:
-  s_pgdata:
-  fr_pgdata:
 
 networks:
   test-stack_default:

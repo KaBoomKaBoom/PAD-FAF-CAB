@@ -1791,7 +1791,7 @@ _No body_
 
 ## 📚 Infrastructure Documentation
 
-This project includes two critical infrastructure components that enable service orchestration and communication. For detailed technical information, please refer to the dedicated documentation:
+This project includes three critical infrastructure components that enable service orchestration and communication. For detailed technical information, please refer to the dedicated documentation:
 
 ### Service Discovery
 The **Service Discovery** system provides automatic service registration, health monitoring, and load balancing information for the API Gateway. It's built in Go and maintains a real-time registry of all microservice instances.
@@ -1818,13 +1818,246 @@ The **API Gateway** serves as the central entry point for all client requests, i
 
 📖 **[Read Full API Gateway Documentation →](README_GATEWAY.md)**
 
----
+### Message Broker
+The **Message Broker** is a lightweight, topic-based pub/sub messaging system built in Go that enables asynchronous communication between microservices. It provides reliable message delivery with persistence, fault tolerance, and support for distributed transactions.
 
-## 🔗 Architecture Diagram
+**Key Features:**
+- 📬 Topic-based publish/subscribe messaging
+- 👥 Consumer groups with round-robin load balancing
+- 🔄 High availability with service discovery integration
+- 🛡️ Circuit breakers for fault tolerance and automatic recovery
+- 💾 Durable queues with persistent message storage
+- ✅ Message acknowledgment with at-least-once delivery
+- ⚰️ Dead Letter Queue (DLQ) for failed messages
+- 🔄 Saga transactions for long-running distributed workflows
+- 🔌 HTTP RESTful API for easy integration
+- ⏱️ Long-polling support with configurable timeouts
 
-<!-- ...existing architecture diagram... -->
+**Core API Endpoints:**
+- `POST /publish` - Publish messages to topics
+- `POST /subscribe` - Subscribe to topics with consumer groups
+- `POST /acknowledge` - Acknowledge message processing
+- `GET /topics` - List all available topics
+- `GET /dlq` - View dead letter queue messages
+- `GET /circuit-breaker/stats` - Monitor circuit breaker status
+- `POST /saga/create` - Create distributed saga transactions
+- `POST /saga/execute` - Execute saga workflows
 
----
+**Architecture:**
 
-<!-- ...rest of existing README content... -->
+Publisher Services ──┐
+├──> Message Broker ──┐
+Publisher Services ──┘ (Topics) ├──> Subscriber Services
+(Consumer Groups)│
+(DLQ) └──> Subscriber Services
 
+
+**Integration Example:**
+```bash
+# Publish a message
+curl -X POST http://localhost:5000/publish \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "orders",
+    "payload": {"order_id": "12345", "status": "pending"}
+  }'
+
+# Subscribe to messages
+curl -X POST http://localhost:5000/subscribe \
+  -H "Content-Type: application/json" \
+  -d '{
+    "subscriber_id": "order-processor-1",
+    "topic": "orders",
+    "consumer_group": "order-processors",
+    "timeout": 30
+  }'
+```
+  
+I'll integrate the Message Broker documentation into the main README. Let me read the current README structure to find the best placement.
+
+Read README.md, lines 50 to 100
+
+Now let me find where the Infrastructure Documentation section is and check its current structure:
+
+Read README.md, lines 1790 to 1831
+
+Perfect! Now I'll integrate the Message Broker documentation into the Infrastructure Documentation section. Here's the updated content:
+
+Publisher Services ──┐
+├──> Message Broker ──┐
+Publisher Services ──┘ (Topics) ├──> Subscriber Services
+(Consumer Groups)│
+(DLQ) └──> Subscriber Services
+
+Message Flow:
+
+Services publish events to topics (e.g., orders, notifications, inventory)
+Broker persists messages to disk for durability
+Messages distributed to consumer groups using round-robin
+Service discovery ensures messages only route to healthy consumers
+Subscribers acknowledge successful processing
+Unacknowledged messages automatically redelivered
+Failed messages (after 3 retries) moved to Dead Letter Queue
+Use Cases:
+
+📦 Order Processing: Order Service publishes → Inventory, Notification, and Payment services subscribe
+📊 Logging & Monitoring: All services publish logs → Logging and Monitoring services subscribe
+💰 Budgeting Updates: Tea/Sharing services publish debt events → Budgeting service subscribes
+🔔 Notifications: Services publish notification events → Notification service subscribes and delivers
+Advanced Features:
+
+Saga Transactions: Coordinate long-running distributed transactions with automatic compensation on failure
+Circuit Breakers: Automatic failure detection and recovery for unhealthy consumers
+Durable Storage: Messages persist across broker restarts for reliability
+Health-Aware Routing: Integration with service discovery for intelligent message routing
+
+
+This integration:
+
+1. ✅ **Maintains consistency** with the existing Service Discovery and API Gateway sections
+2. ✅ **Highlights key features** with emoji bullets matching the style
+3. ✅ **Provides practical examples** showing how to use the broker
+4. ✅ **Explains the architecture** with a simple diagram
+5. ✅ **Links to detailed documentation** for deep-dive information
+6. ✅ **Shows real use cases** from your FAF Cab platform
+7. ✅ **Emphasizes integration** with other infrastructure components
+
+The Message Broker is now properly positioned as the third critical infrastructure component alongside Service Discovery and API Gateway, forming the complete communication backbone of your microservices architecture.This integration:
+
+1. ✅ **Maintains consistency** with the existing Service Discovery and API Gateway sections
+2. ✅ **Highlights key features** with emoji bullets matching the style
+3. ✅ **Provides practical examples** showing how to use the broker
+4. ✅ **Explains the architecture** with a simple diagram
+5. ✅ **Links to detailed documentation** for deep-dive information
+6. ✅ **Shows real use cases** from your FAF Cab platform
+7. ✅ **Emphasizes integration** with other infrastructure components
+
+The Message Broker is now properly positioned as the third critical infrastructure component alongside Service Discovery and API Gateway, forming the complete communication backbone of your microservices architecture.
+
+Data Warehouse & ETL Pipeline
+
+The Data Warehouse implements ETL (Extract, Transform, Load) pipelines that aggregate data from all microservices into a centralized analytical database. Built with .NET and PostgreSQL, it provides historical tracking, trend analysis, and cross-service reporting capabilities.
+
+Key Features:
+
+📊 Multi-Service ETL: Pipelines for all 10 microservices (Budgeting, Tea Management, Sharing, etc.)
+
+🔄 Incremental Loading: Extracts only new/changed data to optimize performance
+
+📈 Slowly Changing Dimensions (SCD Type 2): Tracks historical changes in dimension 
+tables
+
+🎯 Fact & Dimension Tables: Star schema design for efficient analytical queries
+
+⚡ Batch Processing: Configurable batch sizes for large datasets
+
+🔍 Data Quality: Validation, deduplication, and null filtering
+
+📅 Scheduled ETL: Configurable CRON schedules for automated execution
+
+🛡️ Transaction Support: Atomic operations with rollback on failure
+
+ETL Process Flow:
+
+1. Extract → Read from microservice databases (read-only)
+
+2. Transform → Apply business logic, denormalize, calculate metrics
+
+3. Load → Insert into Data Warehouse with deduplication
+
+Data Warehouse Schema:
+
+Budgeting Service Tables:
+
+FactTransactions - Transaction fact table with time dimensions
+
+DimBalances - Balance dimension with SCD Type 2 history
+
+FactDebts - Debt fact table with calculated metrics (IsOverdue, DaysToPayment)
+
+Transformations Applied:
+
+Time Dimensions: Year, Month, Day, Quarter extraction
+
+Calculated Fields: DaysToPayment, IsOverdue, payment status
+
+Denormalization: Flatten joins for query performance
+
+Historical Tracking: SCD Type 2 with ValidFrom/ValidTo dates
+
+Data Filtering: Last 90 days for transactions, active records only
+
+API Endpoints:
+
+# Execute Budgeting ETL
+
+POST /api/etl/budgeting/execute
+
+# Response
+```
+{
+  "success": true,
+  "extractedRecords": 1500,
+  "transformedRecords": 1450,
+  "loadedRecords": 1200,
+  "duration": "00:02:30"
+}
+```
+
+# Health Check
+
+GET /api/etl/health
+
+Microservice DBs                    Data Warehouse
+┌─────────────────┐                ┌──────────────┐
+│ Budgeting DB    │───Extract──────>│              │
+│ Tea Mgmt DB     │───Extract──────>│  PostgreSQL  │
+│ Sharing DB      │───Extract──────>│  (Analytics) │
+│ Lost & Found DB │───Extract──────>│              │
+│ (+ 6 more)      │                │              │
+└─────────────────┘                └──────────────┘
+         │                                 │
+         └────Transform & Load─────────────┘
+
+Use Cases:
+
+📊 Financial Reporting: Aggregate spending/income across time periods
+
+📈 Trend Analysis: Track consumable usage patterns over months
+
+💳 Debt Analytics: Identify overdue debts and payment trends
+
+☕ Inventory Forecasting: Predict consumable restocking needs
+
+🎮 Sharing Statistics: Most rented items, damage rates
+
+📉 Budget Monitoring: Track balance changes and threshold alerts
+Performance Optimizations:
+
+
+Strategic Indexes: On foreign keys, filter columns, and time dimensions
+
+Batch Processing: Configurable batch sizes (default: 1000 records)
+
+AsNoTracking: Read-only queries for better performance
+
+Connection Pooling: Efficient database connection reuse
+
+Incremental Loads: Only process new/changed data
+
+Configuration Example:
+
+```
+
+{
+  "ConnectionStrings": {
+    "BudgetingSourceDb": "Host=postgres_budgeting_primary;Database=pad-budgeting-service-db;...",
+    "DataWarehouse": "Host=dw_postgres;Port=5432;Database=dw_db;..."
+  },
+  "ETL": {
+    "ScheduleCron": "0 0 * * *",
+    "BatchSize": 1000,
+    "EnableScheduling": true
+  }
+}
+```

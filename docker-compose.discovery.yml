@@ -14,7 +14,7 @@ services:
       - SMTP_PORT=587
       - SENDER_EMAIL=andrei2003berco@gmail.com
       - SENDER_PASSWORD=iqlb hady xkua gonc  # Your App Password
-      - RECIPIENT_EMAIL=andrei.berco@isa.utm.md
+      - RECIPIENT_EMAIL=andrei.berco@isa
     networks:
       - test-stack_default
     # healthcheck:

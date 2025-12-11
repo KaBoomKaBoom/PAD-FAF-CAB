@@ -9,12 +9,19 @@ services:
       - ./.env
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Host=budgeting_postgres;Port=5432;Database=${BUDGETING_POSTGRES_DB};Username=${BUDGETING_POSTGRES_USER};Password=${BUDGETING_POSTGRES_PASSWORD}
+      - BUDGETING_POSTGRES_HOST=pgpool1
+      - BUDGETING_POSTGRES_PORT=5432
+      - BUDGETING_POSTGRES_DB=pad-budgeting-service-db
+      - BUDGETING_POSTGRES_USER=pad-budgeting-service-user
+      - BUDGETING_POSTGRES_PASSWORD=pad-budgeting-service-password
       - NOTIFICATION_SERVICE_URL=${NOTIFICATION_SERVICE_URL}
       - SERVICE_NAME_FULL={{.Task.Name}}
       - SERVICE_ID={{.Task.ID}}
       - SERVICE_SLOT={{.Task.Slot}}
       - SERVICE_NAME={{.Service.Name}}
+    depends_on:
+      - pgpool1
+
     deploy:
       replicas: 2
       restart_policy:
@@ -23,7 +30,7 @@ services:
         max_attempts: 3
         window: 120s
 
-  lost-found-service:
+  lostFound-service:
     image: andreiberco/pad-l-f-service:latest
     ports:
       - "8086:8086"
@@ -33,12 +40,218 @@ services:
       - ./.env
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Host=lf_postgres;Port=5432;Database=${LF_POSTGRES_DB};Username=${LF_POSTGRES_USER};Password=${LF_POSTGRES_PASSWORD}
+      - LF_POSTGRES_HOST=pgpool2
+      - LF_POSTGRES_PORT=5432
+      - LF_POSTGRES_DB=pad-l-f-service-db
+      - LF_POSTGRES_USER=pad-l-f-service-user
+      - LF_POSTGRES_PASSWORD=pad-l-f-service-password
       - NOTIFICATION_SERVICE_URL=${NOTIFICATION_SERVICE_URL}
       - SERVICE_NAME_FULL={{.Task.Name}}
       - SERVICE_ID={{.Task.ID}}
       - SERVICE_SLOT={{.Task.Slot}}
       - SERVICE_NAME={{.Service.Name}}
+    depends_on:
+      - pgpool2
+
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  cab-booking-service:
+    image: victorrevenco/pad_cab_booking_service:latest
+    networks:
+      - test-stack_default
+    env_file:
+      - ./.env
+    environment:
+      - SERVICE_ID={{.Task.ID}}
+      - SERVICE_SLOT={{.Task.Slot}}
+      - POSTGRES_DB=cab_booking_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_password
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgpool3:5432/cab_booking_db
+      - NOTIFICATION_SERVICE_URL=${NOTIFICATION_SERVICE_URL}
+    entrypoint: /bin/sh -c "export SERVICE_NAME_FULL=$$(hostname -i | awk '{print $$1}') && exec java -jar /app/pad_cab_booking_service.jar"
+    volumes:
+      - ./src/main/resources/padcabbookingservice-9d6cdadc9671.json:/app/padcabbookingservice-9d6cdadc9671.json:ro
+    ports:
+      - "8084:8084"
+    depends_on:
+      - pgpool3
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    hostname: "cab-booking-service-{{.Task.Slot}}"
+
+
+  checkin-service:
+    image: victorrevenco/pad_check-in_service:latest
+    networks:
+      - test-stack_default
+    env_file:
+      - ./.env
+    environment:
+      - SERVICE_ID={{.Task.ID}}
+      - SERVICE_SLOT={{.Task.Slot}}
+      - POSTGRES_DB=checkindb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_password
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgpool4:5432/checkindb
+      - NOTIFICATION_SERVICE_URL=${NOTIFICATION_SERVICE_URL}
+    entrypoint: /bin/sh -c "export SERVICE_NAME_FULL=$$(hostname -i | awk '{print $$1}') && exec java -jar /app/pad_check-in_service.jar"
+    ports:
+      - "8085:8085"
+    depends_on:
+      - pgpool4
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    hostname: "check-in-service-{{.Task.Slot}}"
+
+
+  tm-service:
+    image: theboogheyman/pad-tea-management-service:latest
+    ports:
+      - "8082:8082"
+    networks:
+      - test-stack_default
+    env_file:
+      - ./.env
+    environment:
+      - HTTP_PORTS=8082
+      - TM_ASPNETCORE_ENVIRONMENT=DEVELOPMENT
+      - SERVICE_NAME_FULL={{.Task.Name}}
+      - TM_DB_HOST=pgpool5
+      - TM_DB_PORT=5432
+      - TM_DB_USER=tea_management_service_user
+      - TM_DB_PASSWORD=cyngos-wikpuT-bukmo8
+      - TM_DB_NAME=tea_management_service_db
+      - TM_BROKER_SERVICE_URL=http://message-broker:5000
+      - TM_BROKER_TOPIC=external/teaManagement
+      - TM_BROKER_CONSUMER_GROUP=tm-service
+      - TM_BROKER_SUBSCRIBE_TIMEOUT=30
+      - TM_USE_GRPC=true
+      - TM_GRPC_NOTIFICATION_SERVICE_URL=http://notification-service:50051
+    depends_on:
+      - pgpool5
+
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+  c-service:
+    image: theboogheyman/pad-communication-service:latest
+    ports:
+      - "8083:8083"
+    networks:
+      - test-stack_default
+    env_file:
+      - ./.env
+    environment:
+      - HTTP_PORTS=8083
+      - C_ASPNETCORE_ENVIRONMENT=DEVELOPMENT
+      - SERVICE_NAME_FULL={{.Task.Name}}
+      - C_DB_HOST=pgpool6
+      - C_DB_PORT=5432
+      - C_DB_USER=communication_service_db
+      - C_DB_PASSWORD=cyngos-wikpuT-bukmo8
+      - C_DB_NAME=communication_service_db
+      - C_BROKER_SERVICE_URL=http://message-broker:5000
+      - C_BROKER_TOPIC=external/communication
+      - C_BROKER_CONSUMER_GROUP=c-service
+      - C_BROKER_SUBSCRIBE_TIMEOUT=30
+      - C_USE_GRPC=true
+      - C_GRPC_NOTIFICATION_SERVICE_URL=http://notification-service:50051
+    depends_on:
+      - pgpool6
+
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  s-service:
+    image: iulianach/pad-sharing-service:latest
+    ports:
+      - "8089:8089"
+    networks:
+      - test-stack_default
+    env_file:
+      - ./.env
+    environment:
+      - HTTP_PORTS=8089
+      - S_ASPNETCORE_ENVIRONMENT=DEVELOPMENT
+      - SERVICE_NAME_FULL={{.Task.Name}}
+      - S_DB_HOST=pgpool7
+      - S_DB_PORT=5432
+      - S_DB_USER=sharing_service_user
+      - S_DB_PASSWORD=cyngos-wikpuT-bukmo8
+      - S_DB_NAME=sharing_service_db
+      - S_BROKER_SERVICE_URL=http://message-broker:5000
+      - S_BROKER_TOPIC=external/sharing
+      - S_BROKER_CONSUMER_GROUP=s-service
+      - S_BROKER_SUBSCRIBE_TIMEOUT=30
+      - S_USE_GRPC=true
+      - S_GRPC_NOTIFICATION_SERVICE_URL=http://notification-service:50051
+    depends_on:
+      - pgpool7
+
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  fr-service:
+    image: iulianach/pad-fund-raising-service:latest
+    ports:
+      - "8088:8088"
+    networks:
+      - test-stack_default
+    env_file:
+      - ./.env
+    environment:
+      - HTTP_PORTS=8088
+      - FR_ASPNETCORE_ENVIRONMENT=DEVELOPMENT
+      - SERVICE_NAME_FULL={{.Task.Name}}
+      - FR_DB_HOST=pgpool8
+      - FR_DB_PORT=5432
+      - FR_DB_USER=fund_raising_service_user
+      - FR_DB_PASSWORD=cyngos-wikpuT-bukmo8
+      - FR_DB_NAME=fund_raising_service_db
+      - FR_BROKER_SERVICE_URL=http://message-broker:5000
+      - FR_BROKER_TOPIC=external/fundRaising
+      - FR_BROKER_CONSUMER_GROUP=fr-service
+      - FR_BROKER_SUBSCRIBE_TIMEOUT=30
+      - FR_USE_GRPC=true
+      - FR_GRPC_NOTIFICATION_SERVICE_URL=http://notification-service:50051
+    depends_on:
+      - pgpool8
+
     deploy:
       replicas: 2
       restart_policy:
@@ -84,93 +297,6 @@ services:
         max_attempts: 3
         window: 120s
 
-  cab-booking-service:
-    image: victorrevenco/pad_cab_booking_service:latest
-    networks:
-      - test-stack_default
-    env_file:
-      - ./.env
-    environment:
-      - SERVICE_NAME=booking
-      - SERVICE_ID={{.Task.ID}}
-      - SERVICE_SLOT={{.Task.Slot}}
-    entrypoint: /bin/sh -c "export SERVICE_NAME_FULL=$$(hostname -i | awk '{print $$1}') && exec java -jar /app/pad_cab_booking_service.jar"
-    volumes:
-      - ./src/main/resources/padcabbookingservice-9d6cdadc9671.json:/app/padcabbookingservice-9d6cdadc9671.json:ro
-    ports:
-      - "8084:8084"
-    deploy:
-      replicas: 2
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-    hostname: "cab-booking-service-{{.Task.Slot}}"
-
-  checkin-service:
-    image: victorrevenco/pad_check-in_service:latest
-    networks:
-      - test-stack_default
-    env_file:
-      - ./.env
-    environment:
-      - SERVICE_NAME=checkin
-      - SERVICE_ID={{.Task.ID}}
-      - SERVICE_SLOT={{.Task.Slot}}
-    entrypoint: /bin/sh -c "export SERVICE_NAME_FULL=$$(hostname -i | awk '{print $$1}') && exec java -jar /app/pad_check-in_service.jar"
-    ports:
-      - "8085:8085"
-    deploy:
-      replicas: 2
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-    hostname: "checkin-service-{{.Task.Slot}}"
-
-  tm-service:
-    image: theboogheyman/pad-tea-management-service:latest
-    env_file:
-      - ./.env
-    networks:
-      - test-stack_default
-    environment:
-      - HTTP_PORTS=8082
-      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
-      - SERVICE_NAME_FULL={{.Task.Name}}
-      
-    ports:
-      - "8082:8082"
-    deploy:
-      replicas: 2
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-
-  c-service:
-    image: theboogheyman/pad-communication-service:latest
-    env_file:
-      - ./.env
-    networks:
-      - test-stack_default
-    environment:
-      - HTTP_PORTS=8083
-      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
-      # - SERVICE_DISCOVERY_URL=http://service-discovery:8002/register
-      - SERVICE_NAME_FULL={{.Task.Name}}
-    ports:
-      - "8083:8083"
-    deploy:
-      replicas: 2
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
 
   adminer:
     image: adminer
@@ -207,45 +333,6 @@ services:
         max_attempts: 3
         window: 120s
 
-  s-service:
-    image: iulianach/pad-sharing-service:latest
-    env_file:
-      - ./.env
-    networks:
-      - test-stack_default
-    environment:
-      - HTTP_PORTS=8089
-      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
-      - SERVICE_NAME_FULL={{.Task.Name}}
-    ports:
-      - "8089:8089"
-    deploy:
-      replicas: 2
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-
-  fr-service:
-    image: iulianach/pad-fund-raising-service:latest
-    env_file:
-      - ./.env
-    environment:
-      - HTTP_PORTS=8088
-      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
-      - SERVICE_NAME_FULL={{.Task.Name}}
-    ports:
-      - "8088:8088"
-    networks:
-      - test-stack_default
-    deploy:
-      replicas: 2
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
 
 networks:
   test-stack_default:

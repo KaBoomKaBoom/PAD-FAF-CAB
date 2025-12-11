@@ -107,6 +107,16 @@ if ($LASTEXITCODE -eq 0) {
     exit 1
 }
 
+Write-Host ""
+Write-Host "STAGE 6: Deploying Data Warehouse" -ForegroundColor Cyan
+docker stack deploy -c docker-compose.dw.yml padstack
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "Data Warehouse deployment initiated" -ForegroundColor Green
+} else {
+    Write-Host "Data Warehouse deployment failed" -ForegroundColor Red
+    exit 1
+}
+
 Write-Host "Waiting 10 seconds..." -ForegroundColor Yellow
 Start-Sleep -Seconds 10
 

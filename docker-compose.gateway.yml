@@ -12,6 +12,8 @@ services:
       - EXTERNAL_PORT=8000
       - INTERNAL_PORT=8001
       - SERVICE_DISCOVERY_URL=http://service-discovery:8002
+      - USE_REDIS_SHARDING=true
+      - REDIS_NODES=redis-1:redis-1:6379,redis-2:redis-2:6379,redis-3:redis-3:6379
       
     networks:
       - test-stack_default
