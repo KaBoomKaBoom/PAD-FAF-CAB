@@ -12,7 +12,7 @@ services:
       - PORT=8002
       - SMTP_HOST=smtp.gmail.com
       - SMTP_PORT=587
-      - SENDER_EMAIL=andrei2003berco@gmail.com
+      - SENDER_EMAIL=andre2003berco@gmail.com
       - SENDER_PASSWORD=iqlb hady xkua gonc  # Your App Password
       - RECIPIENT_EMAIL=andrei.berco@isa
     networks:

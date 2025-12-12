@@ -37,3 +37,6 @@
 [submodule "PAD_Message_Broker"]
 	path = PAD_Message_Broker
 	url = https://github.com/KaBoomKaBoom/PAD-Message-Broker.git
+[submodule "PAD_Data_Warehouse"]
+	path = PAD_Data_Warehouse
+	url = https://github.com/KaBoomKaBoom/PAD-Data-Warehouse.git
