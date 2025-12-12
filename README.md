@@ -6,6 +6,7 @@ Each service has a **clear boundary** and encapsulates specific functionality to
 ---
 
 ## 📑 Table of Contents
+
 - [Overview](#-overview)
 - [Service Boundaries](#-service-boundaries)
   - [1. User Management Service](#1-user-management-service)
@@ -20,13 +21,23 @@ Each service has a **clear boundary** and encapsulates specific functionality to
   - [10. Sharing Service](#10-sharing-service)
 - [Architecture Diagram](#-architecture-diagram)
 - [Technologies and Communication Patterns](#️-technologies-and-communication-patterns)
+- [Communication Patterns](#-communication-patterns)
 - [Communication Contract and Data Management](#-communication-contract-and-data-management)
 - [API Endpoints](#-api-endpoints)
-- [Docker Images](#-docker-images)
-- [Running the Project](#-running-the-project)
+  - [Lost & Found Service](#-lost--found-service-1)
+  - [Budgeting Service](#-budgeting-service-1)
+  - [Cab Booking Service](#-cab-booking-service-1)
+  - [Tea Management Service](#️-tea-management-service-1)
+  - [Communication Service](#-communication-service-1)
+  - [Sharing Service](#-sharing-service-1)
+  - [Fund Raising Service](#-fund-raising-service-1)
 - [Infrastructure Documentation](#-infrastructure-documentation)
   - [Service Discovery](#service-discovery)
   - [API Gateway](#api-gateway)
+  - [Message Broker](#message-broker)
+  - [Data Warehouse & ETL Pipeline](#data-warehouse--etl-pipeline)
+- [Docker Images](#-docker-images)
+- [Running the Project](#-running-the-project)
 - [Troubleshooting](#-troubleshooting)
 - [Health Checks](#-health-checks)
 - [Monitoring](#-monitoring)
@@ -303,16 +314,27 @@ Each microservice is implemented with a different technology stack to ensure div
 ---
 
 ## 📡 Communication Patterns
-- **Synchronous**:  
-  - REST APIs (FastAPI, ASP.NET Core, Spring Boot) used for direct queries (user lookup, booking availability, lost & found posts).  
-- **Asynchronous**:  
-  - Message Broker (RabbitMQ) used for events:  
-    - Notifications (infractions, booking reminders, consumables low).  
-    - Budget updates (fundraising completion, consumables overuse).  
-    - Resource state changes (object broken, sharing updates).  
-- **Real-time**:  
-  - WebSockets (SignalR) for chat and live user communication.  
- 
+
+The platform uses three primary communication patterns:
+
+**1. Synchronous Communication (REST APIs):**
+- FastAPI, ASP.NET Core, Spring Boot
+- Used for direct queries: user lookup, booking availability, lost & found posts
+- Request-response model with immediate feedback
+
+**2. Asynchronous Communication (Message Broker):**
+- Topic-based pub/sub messaging
+- Used for events:
+  - Notifications (infractions, booking reminders, consumables low)
+  - Budget updates (fundraising completion, consumables overuse)
+  - Resource state changes (object broken, sharing updates)
+- Decoupled, event-driven architecture
+
+**3. Real-Time Communication (WebSockets):**
+- SignalR for chat and live user communication
+- Bidirectional, persistent connections
+- Real-time message delivery
+
 ---
 
 ## 📑 Communication Contract and Data Management
@@ -371,9 +393,9 @@ To ensure **loose coupling** and **scalability**, services will communicate usin
   3. **Notification Service** consumes the event → notifies the admin.  
   4. **Budgeting Service** consumes the event → adds an entry to the debt book in SQL Server.  
 
-  ---
+---
 
-  # 📚 API Endpoints
+## 📚 API Endpoints
 
 This section defines the **Communication Contract** (endpoints, request/response formats, and data types).
 All services expose REST APIs and exchange data in **JSON format** (`Content-Type: application/json`).
@@ -382,13 +404,8 @@ All services expose REST APIs and exchange data in **JSON format** (`Content-Typ
 
 ## 🔎 Lost & Found Service
 
-**Base URL:** `/api`  
-**Database:** PostgreSQL  
-**Technology Stack:** .NET
-
----
-
-## Endpoints
+**Base URL:** `/api/post`  
+**Technology Stack:** .NET 9, PostgreSQL
 
 ### Health Check
 
@@ -570,12 +587,7 @@ All services expose REST APIs and exchange data in **JSON format** (`Content-Typ
 ## 💰 Budgeting Service
 
 **Base URL:** `/api`  
-**Database:** PostgreSQL  
-**Technology Stack:** .NET 9, Entity Framework Core
-
----
-
-## Endpoints
+**Technology Stack:** .NET 9, Entity Framework Core, PostgreSQL
 
 ### Balances
 
@@ -921,9 +933,9 @@ All services expose REST APIs and exchange data in **JSON format** (`Content-Typ
 
 ---
 
-## Background Services
+### Background Services
 
-### Balance Monitor
+**Balance Monitor:**
 Automatically monitors system balances and sends notifications to admins when balances fall below configured thresholds.
 
 - **Check Interval:** Configurable via `BALANCE_CHECK_INTERVAL_MINUTES` (default: 5 minutes)
@@ -1925,11 +1937,11 @@ The Message Broker is now properly positioned as the third critical infrastructu
 
 The Message Broker is now properly positioned as the third critical infrastructure component alongside Service Discovery and API Gateway, forming the complete communication backbone of your microservices architecture.
 
-# Data Warehouse & ETL Pipeline
+### Data Warehouse & ETL Pipeline
 
-The Data Warehouse implements ETL (Extract, Transform, Load) pipelines that aggregate data from all microservices into a centralized analytical database. Built with .NET and PostgreSQL, it provides historical tracking, trend analysis, and cross-service reporting capabilities.
+The **Data Warehouse** implements ETL (Extract, Transform, Load) pipelines that aggregate data from all microservices into a centralized analytical database. Built with .NET and PostgreSQL, it provides historical tracking, trend analysis, and cross-service reporting capabilities.
 
-Key Features:
+**Key Features:**
 
 📊 Multi-Service ETL: Pipelines for all 10 microservices (Budgeting, Tea Management, Sharing, etc.)
 
@@ -1944,41 +1956,400 @@ tables
 
 🔍 Data Quality: Validation, deduplication, and null filtering
 
-📅 Scheduled ETL: Configurable CRON schedules for automated execution
+- 📅 **Scheduled ETL**: Configurable CRON schedules for automated execution
+- 🛡️ **Transaction Support**: Atomic operations with rollback on failure
 
-🛡️ Transaction Support: Atomic operations with rollback on failure
-
-## ETL Process Flow:
-
-1. Extract → Read from microservice databases (read-only)
-
+**ETL Process Flow:**
+```
+1. Extract  → Read from microservice databases (read-only)
 2. Transform → Apply business logic, denormalize, calculate metrics
+3. Load      → Insert into Data Warehouse with deduplication
+```
 
-3. Load → Insert into Data Warehouse with deduplication
+## Data Warehouse Schema:
 
-Data Warehouse Schema:
+### Budgeting Service Tables
 
-Budgeting Service Tables:
+**FactTransactions** - Transaction fact table with time dimensions
+```csharp
+// Primary Key: FactTransactionId
+// Business Key: TransactionId
+// Indexes: UserId, Year+Month
+public class FactTransaction
+{
+    public Guid FactTransactionId { get; set; }
+    public Guid TransactionId { get; set; }
+    public Guid UserId { get; set; }
+    public string TransactionType { get; set; } // expense/income
+    public decimal Amount { get; set; }
+    public string Currency { get; set; }
+    public string? Source { get; set; }
+    public DateTime TransactionDate { get; set; }
+    public int Year { get; set; }
+    public int Month { get; set; }
+    public int Day { get; set; }
+    public Guid BalanceId { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
 
-FactTransactions - Transaction fact table with time dimensions
+**DimBalances** - Balance dimension with SCD Type 2 history
+```csharp
+// Primary Key: DimBalanceId
+// Business Key: BalanceId
+// Indexes: BalanceId, IsCurrent
+// SCD Type 2: Tracks historical balance changes
+public class DimBalance
+{
+    public Guid DimBalanceId { get; set; }
+    public Guid BalanceId { get; set; }
+    public string Currency { get; set; }
+    public decimal Amount { get; set; }
+    public DateTime SnapshotDate { get; set; }
+    // SCD Type 2 fields
+    public DateTime ValidFrom { get; set; }
+    public DateTime? ValidTo { get; set; }
+    public bool IsCurrent { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
 
-DimBalances - Balance dimension with SCD Type 2 history
+**FactDebts** - Debt fact table with calculated metrics (IsOverdue, DaysToPayment)
+```csharp
+// Primary Key: FactDebtId
+// Business Key: DebtId
+// Indexes: UserId, Status
+public class FactDebt
+{
+    public Guid FactDebtId { get; set; }
+    public Guid DebtId { get; set; }
+    public Guid UserId { get; set; }
+    public string? Description { get; set; }
+    public decimal Amount { get; set; }
+    public string Currency { get; set; }
+    public string Status { get; set; } // pending/paid/overdue
+    public string? PaymentMethod { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime DueDate { get; set; }
+    public DateTime? PaidDate { get; set; }
+    // Calculated fields
+    public int DaysToPayment { get; set; }
+    public bool IsOverdue { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
 
-FactDebts - Debt fact table with calculated metrics (IsOverdue, DaysToPayment)
+### Cab Booking Service Tables
 
-Transformations Applied:
+**DimRoom** - Room dimension with usage metrics
+```csharp
+public class DimRoom
+{
+    public Guid DimRoomId { get; set; }
+    public Guid RoomId { get; set; }
+    public string Name { get; set; }
+    public int TotalBookings { get; set; }
+    public int ActiveBookings { get; set; }
+    public decimal TotalBookedHours { get; set; }
+    public decimal AverageBookingDuration { get; set; }
+    public DateTime? FirstBookingDate { get; set; }
+    public DateTime? LastBookingDate { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
 
-Time Dimensions: Year, Month, Day, Quarter extraction
+**FactBooking** - Booking fact with timing and duration metrics
+```csharp
+public class FactBooking
+{
+    public Guid FactBookingId { get; set; }
+    public Guid BookingId { get; set; }
+    public Guid UserId { get; set; }
+    public Guid RoomId { get; set; }
+    public string Title { get; set; }
+    public string RoomName { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    // Time dimensions
+    public int StartYear { get; set; }
+    public int StartMonth { get; set; }
+    public int StartDay { get; set; }
+    public int StartHour { get; set; }
+    // Duration metrics
+    public decimal DurationHours { get; set; }
+    public int LeadTimeHours { get; set; }
+    public bool IsLongBooking { get; set; } // > 2 hours
+    public bool IsLastMinuteBooking { get; set; } // < 1 hour lead
+    public bool IsBusinessHours { get; set; }
+    public bool IsWeekend { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
 
-Calculated Fields: DaysToPayment, IsOverdue, payment status
+### Fund Raising Service Tables
 
-Denormalization: Flatten joins for query performance
+**FactFundRaiser** - Fund raiser campaigns with metrics
+```csharp
+public class FactFundRaiser
+{
+    public Guid FactFundRaiserId { get; set; }
+    public Guid FundRaiserUuid { get; set; }
+    public Guid CreatedBy { get; set; }
+    public string Title { get; set; }
+    public string GoodName { get; set; }
+    public string GoodType { get; set; }
+    // Financial metrics
+    public decimal Amount { get; set; }
+    public decimal Target { get; set; }
+    public decimal PercentageReached { get; set; }
+    public bool IsTargetReached { get; set; }
+    // Campaign duration metrics
+    public int DaysActive { get; set; }
+    public int DaysRemaining { get; set; }
+    // Donation metrics
+    public int TotalDonations { get; set; }
+    public decimal AverageDonation { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
 
-Historical Tracking: SCD Type 2 with ValidFrom/ValidTo dates
+**FactDonation** - Individual donations with context
+```csharp
+public class FactDonation
+{
+    public Guid FactDonationId { get; set; }
+    public Guid DonationUuid { get; set; }
+    public Guid UserUuid { get; set; }
+    public Guid FundRaiserUuid { get; set; }
+    public decimal Amount { get; set; }
+    public DateTime DonationDate { get; set; }
+    // Time dimensions
+    public int Year { get; set; }
+    public int Month { get; set; }
+    public int Day { get; set; }
+    // Context metrics
+    public decimal PercentageOfTarget { get; set; }
+    public int DaysUntilExpiry { get; set; }
+    public bool IsLargeDonation { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
 
-Data Filtering: Last 90 days for transactions, active records only
+### Lost & Found Service Tables
 
-API Endpoints:
+**FactPost** - Posts with engagement metrics
+```csharp
+public class FactPost
+{
+    public Guid FactPostId { get; set; }
+    public Guid PostId { get; set; }
+    public Guid UserId { get; set; }
+    public string Title { get; set; }
+    public string Type { get; set; } // lost/found
+    public string Status { get; set; } // open/closed
+    public DateTime CreatedDate { get; set; }
+    // Engagement metrics
+    public int CommentCount { get; set; }
+    public DateTime? LastCommentDate { get; set; }
+    public bool HasComments { get; set; }
+    public bool IsClosed { get; set; }
+    public int DaysOpen { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
+
+**FactComment** - Comment activity data
+```csharp
+public class FactComment
+{
+    public Guid FactCommentId { get; set; }
+    public Guid CommentId { get; set; }
+    public Guid PostId { get; set; }
+    public Guid UserId { get; set; }
+    public string Content { get; set; }
+    public int ContentLength { get; set; }
+    public DateTime CreatedDate { get; set; }
+    // Time dimensions
+    public int Year { get; set; }
+    public int Month { get; set; }
+    public int Hour { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
+
+### Sharing Service Tables
+
+**FactItem** - Item inventory and availability
+```csharp
+public class FactItem
+{
+    public Guid FactItemId { get; set; }
+    public Guid ItemUuid { get; set; }
+    public Guid OwnerUuid { get; set; }
+    public string Name { get; set; }
+    public string CategoryName { get; set; }
+    public bool IsAvailable { get; set; }
+    public string State { get; set; }
+    // Usage metrics
+    public int TotalBorrows { get; set; }
+    public int ActiveBorrows { get; set; }
+    public DateTime? LastBorrowedDate { get; set; }
+    public int DaysActive { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
+
+**FactBorrowLog** - Borrowing transaction history
+```csharp
+public class FactBorrowLog
+{
+    public Guid FactBorrowLogId { get; set; }
+    public Guid LogUuid { get; set; }
+    public Guid UserUuid { get; set; }
+    public Guid ItemUuid { get; set; }
+    public DateTime BorrowedDate { get; set; }
+    public DateTime DueDate { get; set; }
+    public DateTime? ReturnedDate { get; set; }
+    // Calculated fields
+    public int PlannedBorrowDays { get; set; }
+    public int? ActualBorrowDays { get; set; }
+    public bool IsOverdue { get; set; }
+    public bool IsLate { get; set; }
+    public int? DaysOverdue { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
+
+**DimCategory** - Category reference data
+```csharp
+public class DimCategory
+{
+    public Guid DimCategoryId { get; set; }
+    public Guid CategoryUuid { get; set; }
+    public string NormalizedName { get; set; }
+    public int ItemCount { get; set; }
+    public int ActiveItemCount { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
+
+### Tea Management Service Tables
+
+**FactConsumable** - Consumable inventory with metrics
+```csharp
+public class FactConsumable
+{
+    public Guid FactConsumableId { get; set; }
+    public Guid ConsumableUuid { get; set; }
+    public Guid AddedBy { get; set; }
+    public string Name { get; set; }
+    public string AmountTypeName { get; set; }
+    // Inventory levels
+    public decimal Amount { get; set; }
+    public decimal Threshold { get; set; }
+    public decimal OveruseThreshold { get; set; }
+    // Status
+    public bool IsBelowThreshold { get; set; }
+    public bool IsAboveOveruseThreshold { get; set; }
+    public decimal PercentageOfThreshold { get; set; }
+    // Change metrics
+    public int TotalChanges { get; set; }
+    public decimal AverageChangeAmount { get; set; }
+    public int DaysSinceLastChange { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
+
+**FactChange** - Consumable inventory adjustments
+```csharp
+public class FactChange
+{
+    public Guid FactChangeId { get; set; }
+    public Guid ChangeUuid { get; set; }
+    public Guid UserUuid { get; set; }
+    public Guid ConsumableUuid { get; set; }
+    public decimal Amount { get; set; }
+    public bool IsPositive { get; set; }
+    public DateTime ChangeDate { get; set; }
+    // Time dimensions
+    public int Year { get; set; }
+    public int Month { get; set; }
+    public int Hour { get; set; }
+    // Context metrics
+    public bool CausedThresholdAlert { get; set; }
+    public bool CausedOveruseAlert { get; set; }
+    public decimal PercentageChange { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
+
+**DimAmountType** - Units of measurement dimension
+```csharp
+public class DimAmountType
+{
+    public Guid DimAmountTypeId { get; set; }
+    public Guid AmountTypeUuid { get; set; }
+    public string NormalizedName { get; set; }
+    public int ConsumableCount { get; set; }
+    public decimal TotalAmount { get; set; }
+    public decimal AverageAmount { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
+
+### User Management Service Tables
+
+**DimUser** - User dimension with SCD Type 2
+```csharp
+public class DimUser
+{
+    public Guid DimUserId { get; set; }
+    public int UserId { get; set; }
+    public Guid UserUuid { get; set; }
+    public string NameSurname { get; set; }
+    public string Username { get; set; }
+    public string Email { get; set; }
+    public string Role { get; set; }
+    public string? DiscordId { get; set; }
+    public bool HasDiscord { get; set; }
+    public DateTime CreatedDate { get; set; }
+    // User metrics
+    public int DaysSinceCreation { get; set; }
+    public bool IsRecentlyCreated { get; set; } // < 30 days
+    // SCD Type 2 fields
+    public DateTime ValidFrom { get; set; }
+    public DateTime? ValidTo { get; set; }
+    public bool IsCurrent { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
+
+**FactUserSummary** - User role distribution and trends
+```csharp
+public class FactUserSummary
+{
+    public Guid FactUserSummaryId { get; set; }
+    public string Role { get; set; }
+    public int TotalUsers { get; set; }
+    public int UsersWithDiscord { get; set; }
+    public decimal DiscordIntegrationRate { get; set; }
+    // Registration trends
+    public int NewUsersLast7Days { get; set; }
+    public int NewUsersLast30Days { get; set; }
+    public int ActiveUsersLast7Days { get; set; }
+    public DateTime SnapshotDate { get; set; }
+    public DateTime LoadedAt { get; set; }
+}
+```
+
+**Transformations Applied:**
+- **Time Dimensions**: Year, Month, Day, Quarter extraction
+- **Calculated Fields**: DaysToPayment, IsOverdue, payment status
+- **Denormalization**: Flatten joins for query performance
+- **Historical Tracking**: SCD Type 2 with ValidFrom/ValidTo dates
+- **Data Filtering**: Last 90 days for transactions, active records only
+
+**API Endpoints:**
 
 ### Execute Budgeting ETL
 
@@ -1999,6 +2370,7 @@ POST /api/etl/budgeting/execute
 
 GET /api/etl/health
 
+```
 Microservice DBs                    Data Warehouse
 ┌─────────────────┐                ┌──────────────┐
 │ Budgeting DB    │───Extract──────>│              │
@@ -2009,7 +2381,7 @@ Microservice DBs                    Data Warehouse
 └─────────────────┘                └──────────────┘
          │                                 │
          └────Transform & Load─────────────┘
-
+```
 Use Cases:
 
 📊 Financial Reporting: Aggregate spending/income across time periods
@@ -2052,3 +2424,4 @@ Configuration Example:
   }
 }
 ```
+
