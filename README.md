@@ -33,6 +33,7 @@ Each service has a **clear boundary** and encapsulates specific functionality to
 - [Updating Services](#-updating-services)
 - [Contribution Guidelines](#-contribution-guidelines)
 
+
 ---
 
 ## 🎯 Overview
@@ -1818,7 +1819,7 @@ The **API Gateway** serves as the central entry point for all client requests, i
 
 📖 **[Read Full API Gateway Documentation →](README_GATEWAY.md)**
 
-### Message Broker
+# Message Broker
 The **Message Broker** is a lightweight, topic-based pub/sub messaging system built in Go that enables asynchronous communication between microservices. It provides reliable message delivery with persistence, fault tolerance, and support for distributed transactions.
 
 **Key Features:**
@@ -1873,16 +1874,6 @@ curl -X POST http://localhost:5000/subscribe \
   }'
 ```
   
-I'll integrate the Message Broker documentation into the main README. Let me read the current README structure to find the best placement.
-
-Read README.md, lines 50 to 100
-
-Now let me find where the Infrastructure Documentation section is and check its current structure:
-
-Read README.md, lines 1790 to 1831
-
-Perfect! Now I'll integrate the Message Broker documentation into the Infrastructure Documentation section. Here's the updated content:
-
 Publisher Services ──┐
 ├──> Message Broker ──┐
 Publisher Services ──┘ (Topics) ├──> Subscriber Services
@@ -1934,7 +1925,7 @@ The Message Broker is now properly positioned as the third critical infrastructu
 
 The Message Broker is now properly positioned as the third critical infrastructure component alongside Service Discovery and API Gateway, forming the complete communication backbone of your microservices architecture.
 
-Data Warehouse & ETL Pipeline
+# Data Warehouse & ETL Pipeline
 
 The Data Warehouse implements ETL (Extract, Transform, Load) pipelines that aggregate data from all microservices into a centralized analytical database. Built with .NET and PostgreSQL, it provides historical tracking, trend analysis, and cross-service reporting capabilities.
 
@@ -1957,7 +1948,7 @@ tables
 
 🛡️ Transaction Support: Atomic operations with rollback on failure
 
-ETL Process Flow:
+## ETL Process Flow:
 
 1. Extract → Read from microservice databases (read-only)
 
@@ -1989,11 +1980,11 @@ Data Filtering: Last 90 days for transactions, active records only
 
 API Endpoints:
 
-# Execute Budgeting ETL
+### Execute Budgeting ETL
 
 POST /api/etl/budgeting/execute
 
-# Response
+### Response
 ```
 {
   "success": true,
@@ -2004,7 +1995,7 @@ POST /api/etl/budgeting/execute
 }
 ```
 
-# Health Check
+### Health Check
 
 GET /api/etl/health
 
